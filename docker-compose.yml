@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  db:
+    # image: postgres:latest
+    image: lukaszfabia:social_media_db
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    restart: always
+
+  pgadmin:
+    container_name: social_media_pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "5050:80"
