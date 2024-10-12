@@ -1,0 +1,3 @@
+package models
+
+// create here your enums...

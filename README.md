@@ -1,25 +1,39 @@
-# Social media Database
+# Setup bazy danych w PostgreSQL
 
-## About files
+## Skrypt `setup.sh`
 
-### docker-compose.yml
+_jeśli ktoś umie w `batcha` to można sobie przepisać :blush:_
 
-Contains all you need to set your db locally in the container. You can run it in two different ways. Run it manually or use dedicated script.
+### Co robi skrypt
 
-Change privilages for `setup.sh` file.
+- sprawdza czy macie zainstalowane kolejno `docker`, `docker-compose`
 
-```bash
-sudo chmod +x setup.sh
+- jak nie macie to instaluje
+- sprawdza czy macie plik `.env` (zmienne środowiskowe) jak nie to tworzy template
+
+Jak wypełnić sobie plik
+
+### Co do czego jest w pliku `.env`
+
+```plaintext
+// passy do zalogowania na głównej stronie 
+PGADMIN_DEFAULT_EMAIL=
+PGADMIN_DEFAULT_PASSWORD=
+
+// set up to bazy
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DB=
 ```
 
-If port is taken, you can
+### Co dalej
 
-```bash
-sudo lsof -i [port]
-```
+No re-run skryptu i lecimy na **<http://localhost:5050>**, powinno przekierować do strony z logowaniem, po zalogowaniu, add new server.
 
-And just
+1. General/Name -> POSTGRES_DB
 
-```bash
-sudo kill [pid]
-```
+2. `docker inspect social_media_postgres`, szukamy ipv4 (172.0*)
+3. Connection/Host name -> to jest ipv4 tego kontenera
+4. Connection/Username -> POSTGRES_USER
+5. Connection/Password -> POSTGRES_PASSWORD
+6. Port w Connection zostwiamy w spokoju niech będzie _5432_

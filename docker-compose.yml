@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
   db:
-    # image: postgres:latest
-    image: lukaszfabia:social_media_db
+    container_name: social_media_postgres
+    image: postgres:latest
     volumes:
-      - ~/apps/postgres:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -23,3 +23,5 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
     ports:
       - "5050:80"
+volumes:
+  postgres_data:
