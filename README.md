@@ -37,3 +37,36 @@ No re-run skryptu i lecimy na **<http://localhost:5050>**, powinno przekierować
 4. Connection/Username -> POSTGRES_USER
 5. Connection/Password -> POSTGRES_PASSWORD
 6. Port w Connection zostwiamy w spokoju niech będzie _5432_
+
+## Ważne komendy
+
+Sprawdzanie zajmowanego portu, gdyby był jakiś error, to znaczy, że prawdopodobnie jest zajęty port. Kiedy **port** jest zajęty można dokonać zbrodni i zabić proces, który wykorzystuje ten port.
+
+```bash
+sudo lsof -i :[port]
+```
+
+```bash
+
+sudo kill [pid]
+```
+
+### Kontenery
+
+Podnoszenie.
+
+```bash
+docker-compose up
+```
+
+Wyłączanie, teoretycznie można mieć odpalone z jednym oknie `terminala` a potem, żeby wyłączyć można wyjść `Ctrl + c`.
+
+```bash
+docker-compose down
+```
+
+Listowanie, sprawdzenie portów oraz statusu.
+
+```bash
+docker-compose ps
+```
