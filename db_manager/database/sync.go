@@ -7,16 +7,26 @@ import (
 // register your models
 func Sync() error {
 	return Db.AutoMigrate(
+		&models.Advertisement{},
 		&models.Author{},
 		&models.AuthorType{},
-		&models.User{},
+		&models.Comment{},
+		// &models.Conversation{},
+		&models.Event{},
 		&models.ExternalUserLinks{},
-		&models.Page{},
-		&models.Tag{},
 		&models.FriendRequest{},
 		&models.FriendRequestStatus{},
+		&models.Hashtag{},
 		&models.Location{},
-		&models.Comment{},
+		// &models.Message{},
+		// &models.Multimedia{},
+		// &models.MultimediaFor{},
+		&models.Page{},
 		&models.Post{},
+		&models.Reaction{},
+		&models.Reel{},
+		&models.Tag{},
+		&models.User{},
+		&models.UserPrivilege{},
 	)
 }

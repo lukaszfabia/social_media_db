@@ -1,49 +1,59 @@
 package models
 
-import "gorm.io/gorm"
+import "time"
 
 // create your tables here...
 
+// add deleting conditions
 type Author struct {
-	gorm.Model
+	Model
 	AuthorTypeID uint       `gorm:"not null"`
 	AuthorType   AuthorType `gorm:"foreignKey:ID"`
 	Comments     []Comment  `gorm:"foreignKey:AuthorID"`
 	Posts        []Post     `gorm:"foreignKey:AuthorID"`
+	Reactions    []Reaction `gorm:"foreignKey:AuthorID"`
+	// Messages      []Message      `gorm:"foreignKey:AuthorID"`
+	// Conversations []Conversation `gorm:"foreignKey:AuthorID"`
+	Reels  []Reel  `gorm:"foreignKey:AuthorID"`
+	Events []Event `gorm:"foreignKey:AuthorID"`
 }
 
-type AuthorType struct {
-	gorm.Model
-	Type string `gorm:"not null;unique"`
-}
+// type Multimedia struct {
+// 	Model
+// 	MultimediaForID uint          `gorm:"not null"`
+// 	MultimediaFor   MultimediaFor `gorm:"foreignKey:MultimediaForID;refernces:ID"`
+// 	Link            string        `gorm:"not null"`
+// }
 
 type User struct {
-	gorm.Model
+	Model
 	Username          string              `gorm:"unique;not null;size:50"`
 	Email             string              `gorm:"unique;not null;size:100"`
 	Password          string              `gorm:"not null"`
 	PictureUrl        *string             `gorm:"size:255"`
 	BackgroundUrl     *string             `gorm:"size:255"`
+	Birthday          *time.Time          `gorm:"type=text"`
 	IsVerified        bool                `gorm:"default:false"`
 	IsMod             bool                `gorm:"default:false"`
 	Bio               string              `gorm:"default:'Edit bio';size:160"`
 	ExternalUserLinks []ExternalUserLinks `gorm:"foreignKey:UserID"`
 	Friends           []*User             `gorm:"many2many:users_friends"`
-	FriendRequests    []FriendRequest     `gorm:"foreignKey:ReceiverID"`
+	FriendRequests    []*FriendRequest    `gorm:"foreignKey:ReceiverID"`
+	UserPrivilege     UserPrivilege       `gorm:"foreignKey:UserID"`
 
 	AuthorID uint
 	Author   Author `gorm:"foreignKey:AuthorID"`
 }
 
 type ExternalUserLinks struct {
-	gorm.Model
+	Model
 	UserID   uint
 	Platform string `gorm:"not null;size:60"`
 	Link     string `gorm:"not null;size:60"`
 }
 
 type Page struct {
-	gorm.Model
+	Model
 	AuthorID uint
 	Author   Author `gorm:"foreignKey:AuthorID"`
 
@@ -54,14 +64,14 @@ type Page struct {
 }
 
 type Tag struct {
-	gorm.Model
+	Model
 	PageID  uint
 	TagName string  `gorm:"not null;unique;size:100"`
 	Pages   []*Page `gorm:"many2many:page_tags"`
 }
 
 type FriendRequest struct {
-	gorm.Model
+	Model
 	SenderID   uint `gorm:"not null"`
 	ReceiverID uint `gorm:"not null"`
 	StatusID   uint `gorm:"not null"`
@@ -71,33 +81,29 @@ type FriendRequest struct {
 	Status   FriendRequestStatus `gorm:"foreignKey:StatusID"`
 }
 
-type FriendRequestStatus struct {
-	gorm.Model
-	Status string `gorm:"not null;unique;size:30"`
-}
-
 type Comment struct {
-	gorm.Model
-	AuthorID uint   `gorm:"foreignKey:AuthorID"`
-	Content  string `gorm:"not null"`
-	// Multimedia []*string
+	Model
+	AuthorID uint
+	Author   Author `gorm:"foreignKey:AuthorID"`
+
+	Content string `gorm:"not null"`
+	// Media   []*Multimedia
 }
 
 type Post struct {
-	gorm.Model
-	AuthorID uint
+	Model
+	AuthorID uint `gorm:"not null"`
 	Title    string
 	Content  string `gorm:"not null"`
-	// Multimedia []*string
-	IsPublic bool `gorm:"default:true"`
-}
+	IsPublic bool   `gorm:"default:true"`
+	// Media    []*Multimedia
+	Location *Location `gorm:"foreignKey:LocationID;references:ID"`
 
-type Multimedia struct {
-	//
+	LocationID uint
 }
 
 type Location struct {
-	gorm.Model
+	Model
 	City       string  `gorm:"size:100"`
 	Country    string  `gorm:"size:100"`
 	Latitude   float64 `gorm:"not null"`
@@ -106,29 +112,45 @@ type Location struct {
 	PostalCode string  `gorm:"size:20"`
 }
 
-// type Hashtag struct {
-// }
+type Hashtag struct {
+	Model
+	TagName string `gorm:"not null;unique;size:200"`
+}
 
-// type Event struct {
-// }
+type Event struct {
+	Model
+	AuthorID    uint       `gorm:"not null"`
+	Name        string     `gorm:"not null"`
+	Description string     `gorm:"size:1024"`
+	StartDate   *time.Time `gorm:"not null"`
+	EndDate     *time.Time `gorm:"not null"`
 
-// type Reaction struct {
-// }
+	Location   *Location `gorm:"foreignKey:LocationID;references:ID"`
+	LocationID uint
+}
 
-// type Story struct {
-// }
-
-// type Reel struct {
-// }
+// zastanowic sie czy jest sens
+type Reel struct {
+	Model
+	AuthorID uint   `gorm:"not null"`
+	Content  string `gorm:"not null"`
+}
 
 // type Message struct {
+// 	Model
+// 	AuthorID uint `gorm:"not null"`
+// 	Message  *string
+// 	// Multimedia []*Multimedia
 // }
 
 // type Conversation struct {
+// 	Model
+// 	Receivers []*Author `gorm:"many2many:conversation_users"`
 // }
 
-// type Group struct {
-// }
-
-// type Advertisement struct {
-// }
+type Advertisement struct {
+	Model
+	Content string `gorm:"not null"`
+	AdLink  string `gorm:"not null"`
+	// Media   []*Multimedia
+}
