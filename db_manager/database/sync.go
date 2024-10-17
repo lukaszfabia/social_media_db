@@ -4,7 +4,19 @@ import (
 	"social_media/models"
 )
 
+// register your models
 func Sync() error {
-	// register your models
-	return Db.AutoMigrate(&models.User{})
+	return Db.AutoMigrate(
+		&models.Author{},
+		&models.AuthorType{},
+		&models.User{},
+		&models.ExternalUserLinks{},
+		&models.Page{},
+		&models.Tag{},
+		&models.FriendRequest{},
+		&models.FriendRequestStatus{},
+		&models.Location{},
+		&models.Comment{},
+		&models.Post{},
+	)
 }

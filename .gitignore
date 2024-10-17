@@ -1,1 +1,9 @@
 .env 
+
+*.aux
+*.fdb*
+*.fls*
+*.log
+*.gz
+*.toc
+*.out
