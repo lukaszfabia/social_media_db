@@ -1,7 +1,0 @@
-Etap 2: Faza logiczna
-Definicja schematów relacji na podstawie diagramu obiektowo-związkowego. 
-Każdy schemat relacji powinien zawierać: atrybuty, zbiór funkcyjnych i 
-wielowartościowych zależności między atrybutami. 
-Schematy powinny odzwierciedlać elementy diagramu obiektowo-związkowego.
-Normalizacja schematów do III postaci normalnej.
-Wykonanie diagramu relacji za pomocą dowolnego pakietu wspomagającego projektowanie baz danych.

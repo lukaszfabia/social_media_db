@@ -1,7 +1,0 @@
-Etap 1: Faza konceptualna
-Przedstawienie następujących informacji wynikających z analizy świata rzeczywistego:
-Streszczenie - zarys wymagań projektu. Jakie są potrzeby informacyjne? Jakie czynności, wyszukiwania (pytania) można wykonać za pomocą projektowanej bazy
-Cele projektu - cele projektu powinny być zapisane w formacie SMART, co oznacza, że muszą być konkretne, wymierne, osiągalne, realistyczne i określone w czasie
-Zakres projektu - co należy uwzględnić, a czego nie.
-Wymagania funkcjonalne: Przedstawione wymagania mają uwzględnić mechanizm logowania użytkowników oraz pozwalać na przypisywanie im różnych poziomów dostępu (min. 3) np. admin, user, editor, guest etc.
-Przygotowanie diagramu obiektowo-związkowego. Na diagramie ma się znaleźć min. 15 różnych encji. Na tym etapie nie mogą występować encje asocjacyjne. Opracowany diagram ma uwzględniać przynajmniej jedną relację 1-N oraz przynajmniej jedną relację N-N.
