@@ -6,6 +6,7 @@ import (
 
 // register your models
 func Sync() error {
+
 	return Db.AutoMigrate(
 		&models.Advertisement{},
 		&models.Author{},

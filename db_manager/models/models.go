@@ -26,23 +26,24 @@ type Author struct {
 // }
 
 type User struct {
-	Model
-	Username          string              `gorm:"unique;not null;size:50"`
+	AuthorID          uint                `grom:"primaryKey"`
+	FirstName         string              `gorm:"unique;not null;size:50"`
+	SecondName        string              `gorm:"unique;not null;size:50"`
 	Email             string              `gorm:"unique;not null;size:100"`
 	Password          string              `gorm:"not null"`
 	PictureUrl        *string             `gorm:"size:255"`
 	BackgroundUrl     *string             `gorm:"size:255"`
 	Birthday          *time.Time          `gorm:"type=text"`
 	IsVerified        bool                `gorm:"default:false"`
-	IsMod             bool                `gorm:"default:false"`
 	Bio               string              `gorm:"default:'Edit bio';size:160"`
 	ExternalUserLinks []ExternalUserLinks `gorm:"foreignKey:UserID"`
 	Friends           []*User             `gorm:"many2many:users_friends"`
 	FriendRequests    []*FriendRequest    `gorm:"foreignKey:ReceiverID"`
 	UserPrivilege     UserPrivilege       `gorm:"foreignKey:UserID"`
 
-	AuthorID uint
-	Author   Author `gorm:"foreignKey:AuthorID"`
+	UserPrivilegeID uint
+
+	Author Author `gorm:"foreignKey:AuthorID"`
 }
 
 type ExternalUserLinks struct {
@@ -112,15 +113,10 @@ type Location struct {
 	PostalCode string  `gorm:"size:20"`
 }
 
-type Hashtag struct {
-	Model
-	TagName string `gorm:"not null;unique;size:200"`
-}
-
 type Event struct {
 	Model
 	AuthorID    uint       `gorm:"not null"`
-	Name        string     `gorm:"not null"`
+	Name        string     `gorm:"not null;size:300"`
 	Description string     `gorm:"size:1024"`
 	StartDate   *time.Time `gorm:"not null"`
 	EndDate     *time.Time `gorm:"not null"`

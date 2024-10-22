@@ -27,3 +27,8 @@ type Reaction struct {
 	PostID   uint   `gorm:"primaryKey"`
 	Reaction string `gorm:"size:20;not null"`
 }
+
+type Hashtag struct {
+	Model
+	TagName string `gorm:"not null;unique;size:200"`
+}
