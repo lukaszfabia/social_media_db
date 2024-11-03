@@ -7,23 +7,18 @@ import "time"
 // add deleting conditions
 type Author struct {
 	Model
-	AuthorTypeID uint       `gorm:"not null"`
-	AuthorType   AuthorType `gorm:"foreignKey:ID"`
+	AuthorType AuthorType 'gorm:"text; not null"'
+	
 	Comments     []Comment  `gorm:"foreignKey:AuthorID"`
 	Posts        []Post     `gorm:"foreignKey:AuthorID"`
 	Reactions    []Reaction `gorm:"foreignKey:AuthorID"`
-	// Messages      []Message      `gorm:"foreignKey:AuthorID"`
-	// Conversations []Conversation `gorm:"foreignKey:AuthorID"`
+	Messages      []Message      `gorm:"foreignKey:AuthorID"`
+	Conversations []Conversation `gorm:"foreignKey:AuthorID"`
 	Reels  []Reel  `gorm:"foreignKey:AuthorID"`
 	Events []Event `gorm:"foreignKey:AuthorID"`
+	Groups []Group  `gorm:"foreignKey:AuthorID"`
 }
 
-// type Multimedia struct {
-// 	Model
-// 	MultimediaForID uint          `gorm:"not null"`
-// 	MultimediaFor   MultimediaFor `gorm:"foreignKey:MultimediaForID;refernces:ID"`
-// 	Link            string        `gorm:"not null"`
-// }
 
 type User struct {
 	AuthorID          uint                `grom:"primaryKey"`
@@ -88,7 +83,8 @@ type Comment struct {
 	Author   Author `gorm:"foreignKey:AuthorID"`
 
 	Content string `gorm:"not null"`
-	// Media   []*Multimedia
+
+	Hashtags []*Hashtags `gorm:"many2many:comment_hashtags"`
 }
 
 type Post struct {
@@ -97,20 +93,40 @@ type Post struct {
 	Title    string
 	Content  string `gorm:"not null"`
 	IsPublic bool   `gorm:"default:true"`
-	// Media    []*Multimedia
+	
 	Location *Location `gorm:"foreignKey:LocationID;references:ID"`
-
 	LocationID uint
+
+	Hashtags []*Hashtags `gorm:"many2many:post_hashtags"`
 }
 
 type Location struct {
 	Model
 	City       string  `gorm:"size:100"`
 	Country    string  `gorm:"size:100"`
+	PostalCode string  `gorm:"size:20"`
+
+	Geolocation *Geolocation `gorm:"foreignKey:GeolocationID;references:ID"`
+	GeolocationID uint
+
+	Address *Address `gorm:"foreignKey:AddressID;references:ID"`
+	AddressID uint
+	
+}
+
+type Geolocation struct{
+	Model 
 	Latitude   float64 `gorm:"not null"`
 	Longitude  float64 `gorm:"not null"`
-	Address    string  `gorm:"size:255"`
-	PostalCode string  `gorm:"size:20"`
+}
+
+type Address struct{
+	Model
+	StreetName string  `gorm:"not null;size:255"`
+	Building   string  `gorm:"size:20"`
+	Gate	   string  `gorm:"size:20"`
+	Floor      string  `gorm:"size:20"`
+	Apartment  string  `gorm:"size:20"`
 }
 
 type Event struct {
@@ -120,6 +136,8 @@ type Event struct {
 	Description string     `gorm:"size:1024"`
 	StartDate   *time.Time `gorm:"not null"`
 	EndDate     *time.Time `gorm:"not null"`
+
+	Members   []*Author `gorm:"many2many:event_members"`
 
 	Location   *Location `gorm:"foreignKey:LocationID;references:ID"`
 	LocationID uint
@@ -143,7 +161,10 @@ type Reel struct {
 type Conversation struct {
  	Model
 	Title string uint `gorm:"not null"`
-	ProfileUrl string `gorm:"not null"` //what's that tho?
+	IconUrl string  
+	AuthorID uint `gorm:"not null"`
+	Members   []*Author `gorm:"many2many:conversation_members"`
+	
 }
 
 type Advertisement struct {
@@ -157,4 +178,5 @@ type Advertisement struct {
 type Group struct{
 	Name string `gorm:"not null"`
 	AuthorID uint `gorm:"not null"`
+	Members   []*Author `gorm:"many2many:group_members"`	
 }
