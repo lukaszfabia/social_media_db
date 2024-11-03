@@ -6,10 +6,7 @@ type MultimediaFor struct {
 	For string `gorm:"not null;unique"`
 }
 
-type AuthorType struct {
-	Model
-	Type string `gorm:"not null;unique"`
-}
+type AuthorType string const ( PageType AuthorType = "page", UserType AuthorType  = "user")
 
 type FriendRequestStatus struct {
 	Model
