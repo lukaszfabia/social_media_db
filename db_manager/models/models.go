@@ -132,21 +132,29 @@ type Reel struct {
 	Content  string `gorm:"not null"`
 }
 
-// type Message struct {
-// 	Model
-// 	AuthorID uint `gorm:"not null"`
-// 	Message  *string
+ type Message struct {
+ 	Model
+ 	Content  string `gorm:"not null"`
+	AuthorID uint `gorm:"not null"`
+	ConversationID uint `gorm:"not null"`
 // 	// Multimedia []*Multimedia
-// }
+}
 
-// type Conversation struct {
-// 	Model
-// 	Receivers []*Author `gorm:"many2many:conversation_users"`
-// }
+type Conversation struct {
+ 	Model
+	Title string uint `gorm:"not null"`
+	ProfileUrl string `gorm:"not null"` //what's that tho?
+}
 
 type Advertisement struct {
 	Model
 	Content string `gorm:"not null"`
 	AdLink  string `gorm:"not null"`
+	PageID uint  `gorm:"not null"`
 	// Media   []*Multimedia
+}
+
+type Group struct{
+	Name string `gorm:"not null"`
+	AuthorID uint `gorm:"not null"`
 }
