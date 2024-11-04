@@ -7,7 +7,10 @@ type MultimediaFor struct {
 }
 
 type AuthorType string 
-const( PageType AuthorType = "page" UserType AuthorType  = "user")
+const( 
+	PageType AuthorType = "page" 
+	UserType AuthorType  = "user"
+)
 
 type FriendRequestStatus struct {
 	Model
