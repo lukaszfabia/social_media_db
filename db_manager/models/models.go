@@ -10,7 +10,7 @@ import (
 
 type Author struct {
 	gorm.Model
-	AuthorType AuthorType `gorm:"type:author_type_enum;not null"`
+	AuthorType AuthorType `gorm:"type:author_type_enum;not null;constraint:OnDelete:CASCADE"`
 
 	Comments      []Comment      `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 	Posts         []Post         `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
@@ -39,9 +39,9 @@ type User struct {
 	Birthday          *time.Time          `gorm:"type:date"`
 	IsVerified        bool                `gorm:"default:false"`
 	Bio               string              `gorm:"default:'Edit bio';size:160;check:bio <> ''"` // Added CHECK constraint
-	ExternalUserLinks []ExternalUserLinks `gorm:"foreignKey:AuthorID"`
-	Friends           []User              `gorm:"many2many:user_friends;"`
-	FriendRequests    []FriendRequest     `gorm:"foreignKey:ReceiverID"`
+	ExternalUserLinks []ExternalUserLinks `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Friends           []User              `gorm:"many2many:user_friends;constraint:OnDelete:CASCADE"`
+	FriendRequests    []FriendRequest     `gorm:"foreignKey:ReceiverID;constraint:OnDelete:CASCADE"`
 	UserPrivilegeID   uint                `gorm:"not null"`
 
 	Author Author `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
@@ -49,7 +49,7 @@ type User struct {
 
 type UserPrivilege struct {
 	gorm.Model
-	Users         []User `gorm:"foreignKey:UserPrivilegeID"`
+	Users         []User `gorm:"foreignKey:UserPrivilegeID;constraint:OnDelete:CASCADE"`
 	PrivilegeName string `gorm:"not null;unique;size:40"`
 }
 
@@ -64,7 +64,7 @@ type Tag struct {
 	gorm.Model
 	PageID  uint
 	TagName string  `gorm:"not null;unique;size:100"`
-	Pages   []*Page `gorm:"many2many:page_tags"`
+	Pages   []*Page `gorm:"many2many:page_tags;constraint:OnDelete:CASCADE"`
 }
 
 type FriendRequest struct {
@@ -73,18 +73,18 @@ type FriendRequest struct {
 	ReceiverID uint   `gorm:"not null"`
 	Status     string `gorm:"type:friend_request_status;default:'pending';check:status IN ('pending', 'accepted', 'rejected')"` // Added CHECK constraint
 
-	Sender   User `gorm:"foreignKey:SenderID;references:AuthorID;constraint:OnDelete:CASCADE"`
-	Receiver User `gorm:"foreignKey:ReceiverID;references:AuthorID;constraint:OnDelete:CASCADE"`
+	Sender   User `gorm:"foreignKey:SenderID;references:AuthorID;constraint:OnDelete:CASCADE;"`
+	Receiver User `gorm:"foreignKey:ReceiverID;references:AuthorID;constraint:OnDelete:CASCADE;"`
 }
 
 type Comment struct {
 	gorm.Model
 	AuthorID uint
-	Author   Author `gorm:"foreignKey:AuthorID"`
+	Author   Author `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 
 	Content string `gorm:"not null"`
 
-	Hashtags []*Hashtag `gorm:"many2many:comment_hashtags"`
+	Hashtags []*Hashtag `gorm:"many2many:comment_hashtags;constraint:OnDelete:CASCADE"`
 }
 
 type Post struct {
@@ -94,10 +94,10 @@ type Post struct {
 	Content  string `gorm:"not null"`
 	IsPublic bool   `gorm:"default:true"`
 
-	Location   *Location `gorm:"foreignKey:LocationID;references:ID"`
+	Location   *Location `gorm:"foreignKey:LocationID;references:ID;constraint:OnDelete:CASCADE"`
 	LocationID uint
 
-	Hashtags []*Hashtag `gorm:"many2many:post_hashtags"`
+	Hashtags []*Hashtag `gorm:"many2many:post_hashtags;constraint:OnDelete:CASCADE"`
 }
 
 type Location struct {
@@ -106,10 +106,10 @@ type Location struct {
 	Country    string `gorm:"size:100"`
 	PostalCode string `gorm:"size:20"`
 
-	Geolocation   *Geolocation `gorm:"foreignKey:GeolocationID;references:ID"`
+	Geolocation   *Geolocation `gorm:"foreignKey:GeolocationID;references:ID;constraint:OnDelete:CASCADE"`
 	GeolocationID uint
 
-	Address   *Address `gorm:"foreignKey:AddressID;references:ID"`
+	Address   *Address `gorm:"foreignKey:AddressID;references:ID;constraint:OnDelete:CASCADE"`
 	AddressID uint
 }
 
@@ -136,9 +136,9 @@ type Event struct {
 	StartDate   *time.Time `gorm:"not null;type:date"`
 	EndDate     *time.Time `gorm:"not null;type:date"`
 
-	Members []*Author `gorm:"many2many:event_members"`
+	Members []*Author `gorm:"many2many:event_members;constraint:OnDelete:CASCADE"`
 
-	Location   *Location `gorm:"foreignKey:LocationID;references:ID"`
+	Location   *Location `gorm:"foreignKey:LocationID;references:ID;constraint:OnDelete:CASCADE"`
 	LocationID uint
 }
 
@@ -160,7 +160,7 @@ type Conversation struct {
 	Title    string `gorm:"not null"`
 	IconUrl  string
 	AuthorID uint      `gorm:"not null"`
-	Members  []*Author `gorm:"many2many:conversation_members"`
+	Members  []*Author `gorm:"many2many:conversation_members;constraint:OnDelete:CASCADE"`
 }
 
 type Page struct {
@@ -186,7 +186,7 @@ type Reaction struct {
 	gorm.Model
 	AuthorID uint   `gorm:"primaryKey"`
 	PostID   uint   `gorm:"primaryKey"`
-	Reaction string `gorm:"size:20;not null;check:reaction IN ('like', 'love', 'haha', 'wow', 'sad', 'angry')"` // Added CHECK constraint
+	Reaction string `gorm:"size:20;not null;check:reaction IN ('like', 'love', 'haha', 'wow', 'sad', 'angry')"`
 }
 
 type Hashtag struct {
