@@ -2317,3 +2317,38 @@ ALTER TABLE ONLY public.friend_requests
 -- PostgreSQL database dump complete
 --
 
+ALTER TABLE public.pages
+ADD CONSTRAINT check_views_non_negative CHECK (views >= 0),
+ADD CONSTRAINT check_likes_non_negative CHECK (likes >= 0);
+
+ALTER TABLE public.posts
+ADD CONSTRAINT check_is_public_boolean CHECK (is_public IN (true, false));
+
+ALTER TABLE public.reactions
+ADD CONSTRAINT check_reaction_length CHECK (char_length(reaction) <= 20);
+
+ALTER TABLE public.tags
+ADD CONSTRAINT check_tag_name_length CHECK (char_length(tag_name) <= 100);
+
+ALTER TABLE public.hashtags
+ADD CONSTRAINT check_tag_name_length CHECK (char_length(tag_name) <= 200);
+
+ALTER TABLE public.users
+ADD CONSTRAINT check_email_length CHECK (char_length(email) <= 100),
+ADD CONSTRAINT check_first_name_length CHECK (char_length(first_name) <= 50),
+ADD CONSTRAINT check_second_name_length CHECK (char_length(second_name) <= 50),
+ADD CONSTRAINT check_bio_length CHECK (char_length(bio) <= 160);
+
+ALTER TABLE public.events
+ADD CONSTRAINT check_name_length CHECK (char_length(name) <= 300),
+ADD CONSTRAINT check_description_length CHECK (char_length(description) <= 1024);
+
+ALTER TABLE public.locations
+ADD CONSTRAINT check_city_length CHECK (char_length(city) <= 100),
+ADD CONSTRAINT check_country_length CHECK (char_length(country) <= 100),
+ADD CONSTRAINT check_postal_code_length CHECK (char_length(postal_code) <= 20);
+
+ALTER TABLE public.advertisements
+ADD CONSTRAINT check_content_length CHECK (char_length(content) <= 255),
+ADD CONSTRAINT check_ad_link_length CHECK (char_length(ad_link) <= 255);
+
