@@ -7,7 +7,7 @@ import "time"
 // add deleting conditions
 type Author struct {
 	Model
-	AuthorType AuthorType `gorm:"text; not null"`
+	AuthorType AuthorType `gorm:"type=text; not null"`
 	
 	Comments     []Comment  `gorm:"foreignKey:AuthorID"`
 	Posts        []Post     `gorm:"foreignKey:AuthorID"`
