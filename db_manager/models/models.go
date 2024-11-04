@@ -84,7 +84,7 @@ type Comment struct {
 
 	Content string `gorm:"not null"`
 
-	Hashtags []*Hashtags `gorm:"many2many:comment_hashtags"`
+	Hashtags []*Hashtag `gorm:"many2many:comment_hashtags"`
 }
 
 type Post struct {
@@ -97,7 +97,7 @@ type Post struct {
 	Location *Location `gorm:"foreignKey:LocationID;references:ID"`
 	LocationID uint
 
-	Hashtags []*Hashtags `gorm:"many2many:post_hashtags"`
+	Hashtags []*Hashtag `gorm:"many2many:post_hashtags"`
 }
 
 type Location struct {
