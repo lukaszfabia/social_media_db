@@ -121,4 +121,22 @@ Do tabel zostały dodane atrybuty, tabele \textbf{Page} oraz \textbf{User} zosta
     \label{fig:rel}
 \end{figure}
 
+\section{Etap 3: Faza fizyczna}
+
+Encje, które uległy zmianie:
+
+\begin{itemize}
+    \item Rozbicie lokalizacji na pomniejsze tabele
+    \item Zamiana na enumy: typu autora oraz statusu zaproszenia do znajomych
+\end{itemize}
+
+Do stworzenia struktury bazy wykorzystano mechanizm ORM - (\href{https://gorm.io/}{gorm}). Sama baza wymagała dopracowania jeśli chodzi o enumeracje oraz reguły usuwania już bezpośrednio w systemie PostgreSQL (pgadmin). 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/postgres_diagram.png}
+    \caption{Diagram relacji z PostgreSQL}
+    \label{fig:postgres}
+\end{figure}
+
 \end{document}
