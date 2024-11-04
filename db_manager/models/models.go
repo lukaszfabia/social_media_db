@@ -38,7 +38,7 @@ type User struct {
 	BackgroundUrl     *string             `gorm:"size:255"`
 	Birthday          *time.Time          `gorm:"type:date"`
 	IsVerified        bool                `gorm:"default:false"`
-	Bio               string              `gorm:"default:'Edit bio';size:160"`
+	Bio               string              `gorm:"default:'Edit bio';size:160;check:bio <> ''"` // Added CHECK constraint
 	ExternalUserLinks []ExternalUserLinks `gorm:"foreignKey:AuthorID"`
 	Friends           []User              `gorm:"many2many:user_friends;"`
 	FriendRequests    []FriendRequest     `gorm:"foreignKey:ReceiverID"`
@@ -71,7 +71,7 @@ type FriendRequest struct {
 	gorm.Model
 	SenderID   uint   `gorm:"not null"`
 	ReceiverID uint   `gorm:"not null"`
-	Status     string `gorm:"type:friend_request_status;default:'pending'"`
+	Status     string `gorm:"type:friend_request_status;default:'pending';check:status IN ('pending', 'accepted', 'rejected')"` // Added CHECK constraint
 
 	Sender   User `gorm:"foreignKey:SenderID;references:AuthorID;constraint:OnDelete:CASCADE"`
 	Receiver User `gorm:"foreignKey:ReceiverID;references:AuthorID;constraint:OnDelete:CASCADE"`
@@ -177,8 +177,8 @@ type Page struct {
 
 type Advertisement struct {
 	gorm.Model
-	Content string `gorm:"not null"`
-	AdLink  string `gorm:"not null"`
+	Content string `gorm:"not null;size:16000"`
+	AdLink  string `gorm:"not null;size:255"`
 	PageID  uint   `gorm:"null"`
 }
 
@@ -186,7 +186,7 @@ type Reaction struct {
 	gorm.Model
 	AuthorID uint   `gorm:"primaryKey"`
 	PostID   uint   `gorm:"primaryKey"`
-	Reaction string `gorm:"size:20;not null"`
+	Reaction string `gorm:"size:20;not null;check:reaction IN ('like', 'love', 'haha', 'wow', 'sad', 'angry')"` // Added CHECK constraint
 }
 
 type Hashtag struct {
