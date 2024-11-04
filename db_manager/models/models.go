@@ -160,7 +160,7 @@ type Reel struct {
 
 type Conversation struct {
  	Model
-	Title string uint `gorm:"not null"`
+	Title string `gorm:"not null"`
 	IconUrl string  
 	AuthorID uint `gorm:"not null"`
 	Members   []*Author `gorm:"many2many:conversation_members"`
