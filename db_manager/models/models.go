@@ -26,7 +26,15 @@ type Author struct {
 type Group struct {
 	gorm.Model
 	Name    string    `gorm:"not null;size:100"`
-	Members []*Author `gorm:"many2many:group_members;constraint:OnDelete:CASCADE"`
+	Members []*Author `gorm:"many2many:group_members;constraint:OnDelete:CASCADE;"`
+}
+
+func (g *Group) BeforeSave(tx *gorm.DB) (err error) {
+	memberCount := len(g.Members)
+	if memberCount < 1 || memberCount > 10000000 {
+		return errors.New("a group must have between 1 and 10,000,000 members")
+	}
+	return
 }
 
 type User struct {
@@ -81,7 +89,7 @@ type FriendRequest struct {
 	gorm.Model
 	SenderID   uint   `gorm:"not null"`
 	ReceiverID uint   `gorm:"not null"`
-	Status     string `gorm:"type:friend_request_status;default:'pending';check:status IN ('pending', 'accepted', 'rejected')"`
+	Status     string `gorm:"type:friend_request_status;default:'pending';not null"`
 
 	Sender   User `gorm:"foreignKey:SenderID;references:AuthorID;constraint:OnDelete:CASCADE;"`
 	Receiver User `gorm:"foreignKey:ReceiverID;references:AuthorID;constraint:OnDelete:CASCADE;"`
@@ -150,10 +158,10 @@ type Event struct {
 	AuthorID    uint       `gorm:"not null"`
 	Name        string     `gorm:"not null;size:300"`
 	Description string     `gorm:"size:1024"`
-	StartDate   *time.Time `gorm:"not null;type:date"`
+	StartDate   *time.Time `gorm:"not null;type:date;check:start_date < end_date"`
 	EndDate     *time.Time `gorm:"not null;type:date"`
 
-	Members []*Author `gorm:"many2many:event_members;constraint:OnDelete:CASCADE"`
+	Members []*Author `gorm:"many2many:event_members;constraint:OnDelete:CASCADE;"`
 
 	Location   *Location `gorm:"foreignKey:LocationID;references:ID;constraint:OnDelete:CASCADE"`
 	LocationID uint
@@ -203,7 +211,7 @@ type Reaction struct {
 	gorm.Model
 	AuthorID uint   `gorm:"primaryKey"`
 	PostID   uint   `gorm:"primaryKey"`
-	Reaction string `gorm:"size:20;not null;check:reaction IN ('like', 'love', 'haha', 'wow', 'sad', 'angry')"`
+	Reaction string `gorm:"type:reaction_type;default:'like';not null"`
 }
 
 type Hashtag struct {
