@@ -17,7 +17,8 @@
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 
 \title{Baza danych medium społecznościowego}
-\author{Łukasz Fabia 272724 \\ Mikołaj Kubś ... \\ Projektowanie baz danych wt 18:55}
+\author{Łukasz Fabia 272724 \\ Mikołaj Kubś 272662 \\ Martyna Łopianiak 272682 \\ Piotr Schubert 272659 \\ Projektowanie baz danych wt 18:55}
+
 
 \begin{document}
 \maketitle
@@ -128,9 +129,21 @@ Encje, które uległy zmianie:
 \begin{itemize}
     \item Rozbicie lokalizacji na pomniejsze tabele
     \item Zamiana na enumy: typu autora oraz statusu zaproszenia do znajomych
+    \item Dodanie do encji Conversation pole Members, które przechowuje id użytkowników biorących udział w konwersacji
+\end{itemize}
+
+
+Wykorzystano instrukcję CHECK do potwierdzenia poprawności danych w paru encjach. Przykładowo:
+\begin{itemize}
+    \item 'A' nie moze być przyjacielem 'A'
+    \item 'A' nie moze wysłać zaproszenia do znajomych do 'A'
+    \item Czas rozpoczęcia wydarzenia musi być wcześniejszy niż czas zakończenia wydarzenia
+    \item Grupa musi mieć od 1 do 10000000 członków.
 \end{itemize}
 
 Do stworzenia struktury bazy wykorzystano mechanizm ORM - (\href{https://gorm.io/}{gorm}). Sama baza wymagała dopracowania jeśli chodzi o enumeracje oraz reguły usuwania już bezpośrednio w systemie PostgreSQL (pgadmin). 
+
+\textbf{Usuwanie}: Każdy model posiada pole \textit{DeletedAt} z indeksem. Podczas usuwania danego wiersza pole \textit{DeletedAt} jest ustawiane na znacznik czasu (timestamp) wskazujący moment, w którym dane zostały usunięte. Dzięki temu baza obsługuje soft deleting. Oznacza to, że gdy użytkownik usunie swoje konto, będzie można je przywrócić. Taką operację obsługują na przykład serwisy takie jak Facebook.
 
 \begin{figure}[H]
     \centering
