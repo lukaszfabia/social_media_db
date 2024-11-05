@@ -16,3 +16,14 @@ const (
 	Rejected FriendRequestStatus = "rejected"
 	Accepted FriendRequestStatus = "accepted"
 )
+
+type ReactionType string
+
+const (
+	Like  ReactionType = "like"
+	Love  ReactionType = "love"
+	Haha  ReactionType = "haha"
+	Wow   ReactionType = "wow"
+	Sad   ReactionType = "sad"
+	Angry ReactionType = "angry"
+)
