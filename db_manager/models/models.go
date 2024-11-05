@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"time"
 
 	"gorm.io/gorm"
@@ -38,13 +39,22 @@ type User struct {
 	BackgroundUrl     *string             `gorm:"size:255"`
 	Birthday          *time.Time          `gorm:"type:date"`
 	IsVerified        bool                `gorm:"default:false"`
-	Bio               string              `gorm:"default:'Edit bio';size:160;check:bio <> ''"` // Added CHECK constraint
+	Bio               string              `gorm:"default:'Edit bio';size:160;check:bio <> ''"`
 	ExternalUserLinks []ExternalUserLinks `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 	Friends           []User              `gorm:"many2many:user_friends;constraint:OnDelete:CASCADE"`
 	FriendRequests    []FriendRequest     `gorm:"foreignKey:ReceiverID;constraint:OnDelete:CASCADE"`
 	UserPrivilegeID   uint                `gorm:"not null"`
 
 	Author Author `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+}
+
+func (u *User) BeforeSave(tx *gorm.DB) (err error) {
+	for _, friend := range u.Friends {
+		if friend.AuthorID == u.AuthorID {
+			return errors.New("a user cannot add themselves as a friend")
+		}
+	}
+	return
 }
 
 type UserPrivilege struct {
@@ -71,10 +81,17 @@ type FriendRequest struct {
 	gorm.Model
 	SenderID   uint   `gorm:"not null"`
 	ReceiverID uint   `gorm:"not null"`
-	Status     string `gorm:"type:friend_request_status;default:'pending';check:status IN ('pending', 'accepted', 'rejected')"` // Added CHECK constraint
+	Status     string `gorm:"type:friend_request_status;default:'pending';check:status IN ('pending', 'accepted', 'rejected')"`
 
 	Sender   User `gorm:"foreignKey:SenderID;references:AuthorID;constraint:OnDelete:CASCADE;"`
 	Receiver User `gorm:"foreignKey:ReceiverID;references:AuthorID;constraint:OnDelete:CASCADE;"`
+}
+
+func (fr *FriendRequest) BeforeSave(tx *gorm.DB) (err error) {
+	if fr.SenderID == fr.ReceiverID {
+		return errors.New("a user cannot send a friend request to themselves")
+	}
+	return
 }
 
 type Comment struct {
