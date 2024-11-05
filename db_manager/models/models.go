@@ -186,7 +186,7 @@ type Reaction struct {
 	gorm.Model
 	AuthorID uint   `gorm:"primaryKey"`
 	PostID   uint   `gorm:"primaryKey"`
-	Reaction string `gorm:"type:reaction_type;default:'like';not null"`
+	Reaction string `gorm:"type:reaction_type;default:'like'"`
 }
 
 type Hashtag struct {
