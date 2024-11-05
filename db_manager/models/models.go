@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"time"
 
 	"gorm.io/gorm"
@@ -26,15 +25,7 @@ type Author struct {
 type Group struct {
 	gorm.Model
 	Name    string    `gorm:"not null;size:100"`
-	Members []*Author `gorm:"many2many:group_members;constraint:OnDelete:CASCADE;"`
-}
-
-func (g *Group) BeforeSave(tx *gorm.DB) (err error) {
-	memberCount := len(g.Members)
-	if memberCount < 1 || memberCount > 10000000 {
-		return errors.New("a group must have between 1 and 10,000,000 members")
-	}
-	return
+	Members []*Author `gorm:"many2many:group_members;constraint:OnDelete:CASCADE;check:member_count >= 1 AND member_count <= 10000000"`
 }
 
 type User struct {
@@ -54,15 +45,6 @@ type User struct {
 	UserPrivilegeID   uint                `gorm:"not null"`
 
 	Author Author `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-}
-
-func (u *User) BeforeSave(tx *gorm.DB) (err error) {
-	for _, friend := range u.Friends {
-		if friend.AuthorID == u.AuthorID {
-			return errors.New("a user cannot add themselves as a friend")
-		}
-	}
-	return
 }
 
 type UserPrivilege struct {
@@ -88,18 +70,11 @@ type Tag struct {
 type FriendRequest struct {
 	gorm.Model
 	SenderID   uint   `gorm:"not null"`
-	ReceiverID uint   `gorm:"not null"`
+	ReceiverID uint   `gorm:"not null;check:sender_id <> receiver_id"`
 	Status     string `gorm:"type:friend_request_status;default:'pending';not null"`
 
 	Sender   User `gorm:"foreignKey:SenderID;references:AuthorID;constraint:OnDelete:CASCADE;"`
 	Receiver User `gorm:"foreignKey:ReceiverID;references:AuthorID;constraint:OnDelete:CASCADE;"`
-}
-
-func (fr *FriendRequest) BeforeSave(tx *gorm.DB) (err error) {
-	if fr.SenderID == fr.ReceiverID {
-		return errors.New("a user cannot send a friend request to themselves")
-	}
-	return
 }
 
 type Comment struct {
