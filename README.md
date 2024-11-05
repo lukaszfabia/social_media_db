@@ -16,7 +16,7 @@ Jak wypełnić sobie plik
 ### Co do czego jest w pliku `.env`
 
 ```plaintext
-// passy do zalogowania na głównej stronie 
+// passy do zalogowania na głównej stronie
 PGADMIN_DEFAULT_EMAIL=
 PGADMIN_DEFAULT_PASSWORD=
 
@@ -28,11 +28,11 @@ POSTGRES_DB=
 
 ### Co dalej
 
-No re-run skryptu i lecimy na **<http://localhost:5050>**, powinno przekierować do strony z logowaniem, po zalogowaniu, add new server.
+No re-run skryptu i lecimy na **<http://localhost:5050>** albo na **<http://0.0.0.0:5050>**, powinno przekierować do strony z logowaniem, po zalogowaniu, add new server.
 
 1. General/Name -> POSTGRES_DB
 
-2. `docker inspect social_media_postgres`, szukamy ipv4 (172.0*)
+2. `docker inspect social_media_postgres`, szukamy ipv4 (172.0\*)
 3. Connection/Host name -> to jest ipv4 tego kontenera
 4. Connection/Username -> POSTGRES_USER
 5. Connection/Password -> POSTGRES_PASSWORD

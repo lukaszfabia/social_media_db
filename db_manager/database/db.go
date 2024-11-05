@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -24,9 +25,9 @@ func Connect() {
 
 	var c Credintials = Credintials{
 		Host:     "localhost",
-		User:     os.Getenv("POSTGRES_USER"),
-		Password: os.Getenv("POSTGRES_PASSWORD"),
-		DBName:   os.Getenv("POSTGRES_DB"),
+		User:     strings.TrimSpace(os.Getenv("POSTGRES_USER")),
+		Password: strings.TrimSpace(os.Getenv("POSTGRES_PASSWORD")),
+		DBName:   strings.TrimSpace(os.Getenv("POSTGRES_DB")),
 		Port:     "5432",
 	}
 
