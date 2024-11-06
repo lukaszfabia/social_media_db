@@ -18,6 +18,6 @@ if [ -f "$(pwd)/.env" ]; then
     docker-compose --env-file .env up
 else
     touch .env
-    echo -e "POSTGRES_USER=$(whoami)\nPOSTGRES_PASSWORD=$(whoami)\nPOSTGRES_DB=\nPGADMIN_DEFAULT_EMAIL=\nPGADMIN_DEFAULT_PASSWORD=\n" > .env
+    echo -e "POSTGRES_USER=$(whoami)\nPOSTGRES_PASSWORD=$(whoami)\nPOSTGRES_DB=social_media_db\nPGADMIN_DEFAULT_EMAIL=\nPGADMIN_DEFAULT_PASSWORD=\n" > .env
     echo ".env file created $(pwd). Please re-run when you make sure that env vars are proper!"
 fi
