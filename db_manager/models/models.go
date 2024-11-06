@@ -168,11 +168,11 @@ type Page struct {
 	AuthorID uint
 	Author   Author `gorm:"foreignKey:AuthorID"`
 
-	Title          string `gorm:"not null;size:100"`
-	Tags           []*Tag `gorm:"many2many:page_tags"`
-	Advertisements []*Advertisement
-	Views          uint `gorm:"default:0"`
-	Likes          uint `gorm:"default:0"`
+	Title          string           `gorm:"not null;size:100"`
+	Tags           []*Tag           `gorm:"many2many:page_tags"`
+	Advertisements []*Advertisement `gorm:"many2many:page_ads"`
+	Views          uint             `gorm:"default:0"`
+	Likes          uint             `gorm:"default:0"`
 }
 
 type Advertisement struct {
