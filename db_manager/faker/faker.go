@@ -36,4 +36,4 @@ func (t *Hashtag) Fake(f *gofakeit.Faker) string {
 	}
 
 	return f.RandomString(mySet)
-}
+} 
