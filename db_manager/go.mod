@@ -9,8 +9,7 @@ require (
 )
 
 require (
-	github.com/brianvoe/gofakeit v3.18.0+incompatible
-	github.com/brianvoe/gofakeit/v6 v6.28.0 // indirect
+	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.7.1 // indirect
