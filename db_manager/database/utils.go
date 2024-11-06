@@ -33,7 +33,7 @@ func CreateEnum(enumName string, values ...string) error {
 	query := fmt.Sprintf("CREATE TYPE \"%s\" AS ENUM (%s);", enumName, strValues)
 
 	if err := Db.Exec(fmt.Sprintf(query, anyValues...)).Error; err != nil {
-		return errors.New("Can't create new type, table migration has been stopped")
+		return errors.New("Can't create new type, maybe already exists")
 	}
 
 	log.Printf("Created enum %s.\n", enumName)
@@ -49,4 +49,15 @@ func DropTables() error {
 	}
 
 	return nil
+}
+
+func ClearTable(table string) {
+	q := fmt.Sprintf("TRUNCATE TABLE %s RESTART IDENTITY CASCADE", table)
+
+	if err := Db.Exec(q).Error; err != nil {
+		log.Fatalln(err)
+	} else {
+		log.Printf("%s has been cleared", table)
+	}
+
 }
