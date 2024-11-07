@@ -60,13 +60,6 @@ type ExternalUserLinks struct {
 	Link     string `gorm:"not null"`
 }
 
-type Tag struct {
-	gorm.Model
-	PageID  uint
-	TagName string  `gorm:"not null;unique;size:100"`
-	Pages   []*Page `gorm:"many2many:page_tags;constraint:OnDelete:CASCADE"`
-}
-
 type FriendRequest struct {
 	gorm.Model
 	SenderID   uint   `gorm:"not null"`
@@ -98,6 +91,13 @@ type Post struct {
 	LocationID uint
 
 	Hashtags []*Hashtag `gorm:"many2many:post_hashtags;constraint:OnDelete:CASCADE"`
+}
+
+type Tag struct {
+	gorm.Model
+	PageID  uint
+	TagName string  `gorm:"not null;unique;size:100"`
+	Pages   []*Page `gorm:"many2many:page_tags;constraint:OnDelete:CASCADE"`
 }
 
 type Location struct {
@@ -168,11 +168,11 @@ type Page struct {
 	AuthorID uint
 	Author   Author `gorm:"foreignKey:AuthorID"`
 
-	Title          string           `gorm:"not null;size:100"`
-	Tags           []*Tag           `gorm:"many2many:page_tags"`
-	Advertisements []*Advertisement `gorm:"many2many:page_ads"`
-	Views          uint             `gorm:"default:0"`
-	Likes          uint             `gorm:"default:0"`
+	Title          string `gorm:"not null;size:100"`
+	Tags           []*Tag `gorm:"many2many:page_tags"`
+	Advertisements []*Advertisement
+	Views          uint `gorm:"default:0"`
+	Likes          uint `gorm:"default:0"`
 }
 
 type Advertisement struct {

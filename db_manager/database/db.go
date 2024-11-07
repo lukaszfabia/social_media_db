@@ -25,11 +25,11 @@ func Connect() {
 	var err error
 
 	var c Credintials = Credintials{
-		Host:     "localhost",
+		Host:     strings.TrimSpace(os.Getenv("HOST")),
 		User:     strings.TrimSpace(os.Getenv("POSTGRES_USER")),
 		Password: strings.TrimSpace(os.Getenv("POSTGRES_PASSWORD")),
 		DBName:   strings.TrimSpace(os.Getenv("POSTGRES_DB")),
-		Port:     "5432",
+		Port:     strings.TrimSpace(os.Getenv("PORT")),
 	}
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", c.Host, c.User, c.Password, c.DBName, c.Port)

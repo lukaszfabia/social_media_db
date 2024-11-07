@@ -5,6 +5,7 @@ import (
 	"log"
 	"social_media/faker"
 	"social_media/models"
+	"social_media/pkg"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"gorm.io/gorm"
@@ -26,7 +27,8 @@ func New(db *gorm.DB, f *gofakeit.Faker) *Seeder {
 }
 
 // Simple wrapper for fill functions
-func (s *Seeder) factory(f func() bool, count int) {
+// If there was an error occured during creating row it will work until done achieve count
+func (s *Seeder) factory(f func() bool, count int, info *string) {
 	var done int = 0
 
 	for done < count {
@@ -35,60 +37,96 @@ func (s *Seeder) factory(f func() bool, count int) {
 		}
 	}
 
-	log.Println("Done!")
+	if info != nil {
+		log.Println(info)
+	} else {
+		log.Println("Done!")
+	}
 }
 
 // Generates some tags, fills simple fields
 func (s *Seeder) FillTags(count int) {
+	var info string = "Tags have been added"
+
 	s.factory(func() bool {
 		var tag models.Tag = models.Tag{
-			TagName: gofakeit.Noun(),
+			TagName: s.f.Noun(),
 		}
 		return s.db.Create(&tag).Error == nil
-	}, count)
+	}, count, &info)
 }
 
-// TODO: finish it
+// Generates entire page
 func (s *Seeder) FillPages(count int) {
 	var dummyTitle faker.Title
+	var info string = "Pages have been added"
 
 	s.factory(func() bool {
-		likes := float64(gofakeit.Number(0, 1000000))
-		views := likes*gofakeit.Float64Range(1.4, 5.4) + gofakeit.Float64Range(23, 212)
+		likes := float64(s.f.Number(0, 1000000))
+		views := likes*s.f.Float64Range(1.4, 5.4) + s.f.Float64Range(23, 212)
 
-		var page models.Page = models.Page{
-			Title: dummyTitle.Fake(s.f),
-			Likes: uint(likes),
-			Views: uint(views),
+		var tags []*models.Tag = nil
+
+		if err := s.db.Find(&tags).Error; err != nil {
+			log.Println(err)
 		}
 
+		var ads []*models.Advertisement = nil
+		adsAmount := s.f.Number(1, 100)
+
+		s.factory(func() bool {
+			var ad *models.Advertisement = &models.Advertisement{
+				Content: s.f.Sentence(s.f.Number(10, 100)),
+				AdLink:  s.f.URL(),
+			}
+			if s.db.Create(&ad).Error == nil {
+				ads = append(ads, ad)
+
+				return true
+			}
+			return false
+		}, adsAmount, nil) // generates random ads amount
+
+		var a models.Author
+		var page models.Page
+
+		if randomAuthor := a.GetRandomAuthor(s.db, s.f); randomAuthor != nil {
+			page.AuthorID = randomAuthor.ID
+			page.Author = *randomAuthor
+		}
+
+		page.Title = dummyTitle.Fake(s.f)
+		page.Tags = tags
+		page.Advertisements = ads
+		page.Likes = uint(likes)
+		page.Views = uint(views)
+
 		return s.db.Create(&page).Error == nil
-	}, count)
+	}, count, &info)
 }
 
-// Generates fake locations (location, coords, address)
+// Generates fake entire locations
 func (s *Seeder) FillLocations(count int) {
 	s.factory(func() bool {
-		dummyAddress := gofakeit.Address()
+		dummyAddress := s.f.Address()
 		var geolocation *models.Geolocation = &models.Geolocation{
 			Latitude:  dummyAddress.Latitude,
 			Longitude: dummyAddress.Longitude,
 		}
 		s.db.Create(&geolocation)
 
-		// TODO: what do you mean about building, gate, floor, apartment
 		var address *models.Address = &models.Address{
-			StreetName: gofakeit.StreetName(),
-			Building:   fmt.Sprintf("%d", gofakeit.Number(1, 100)),
-			Gate:       fmt.Sprintf("%d", gofakeit.Number(1, 10)),
-			Floor:      fmt.Sprintf("%d", gofakeit.Number(0, 20)),
-			Apartment:  fmt.Sprintf("%d", gofakeit.Number(1, 100)),
+			StreetName: s.f.StreetName(),
+			Building:   fmt.Sprintf("%d", s.f.Number(1, 100)),
+			Gate:       fmt.Sprintf("%d", s.f.Number(1, 10)),
+			Floor:      fmt.Sprintf("%d", s.f.Number(0, 20)),
+			Apartment:  fmt.Sprintf("%d", s.f.Number(1, 100)),
 		}
 		s.db.Create(&address)
 
 		var loc models.Location = models.Location{
-			City:       gofakeit.City(),
-			Country:    gofakeit.Country(),
+			City:       s.f.City(),
+			Country:    s.f.Country(),
 			PostalCode: dummyAddress.Zip,
 
 			Geolocation:   geolocation,
@@ -99,7 +137,7 @@ func (s *Seeder) FillLocations(count int) {
 		}
 
 		return s.db.Create(&loc).Error == nil
-	}, count)
+	}, count, nil)
 }
 
 // Generates random hashtags
@@ -110,7 +148,7 @@ func (s *Seeder) FillHashtags(count int) {
 		return s.db.Create(&models.Hashtag{
 			TagName: dummyHashtag.Fake(s.f),
 		}).Error == nil
-	}, count)
+	}, count, nil)
 }
 
 // Simple generator
@@ -139,5 +177,49 @@ func (s *Seeder) FillPrivileges() {
 		return s.db.Create(&models.UserPrivilege{
 			PrivilegeName: *priv,
 		}).Error == nil
-	}, len(privileges))
+	}, len(privileges), nil)
+}
+
+// TODO finish it
+func (s *Seeder) FillUsers(count int) {
+	var info string = "Users have been created!"
+
+	s.factory(func() bool {
+		var user models.User
+		var a models.Author
+		var randomAuthor *models.Author = a.GetRandomAuthor(s.db, s.f)
+		var birthday faker.Birthday
+		var up models.UserPrivilege
+
+		if randomAuthor != nil {
+			user.Author = *randomAuthor
+			user.Author.ID = randomAuthor.ID
+		}
+
+		user.FirstName = s.f.FirstName()
+		user.SecondName = s.f.LastName()
+		user.Email = s.f.Email()
+
+		if hashed, err := pkg.HashPassword(s.f.Password(true, true, true, true, false, 50)); err != nil {
+			log.Println(err)
+			return false
+		} else {
+			user.Password = hashed
+		}
+
+		user.Bio = s.f.HipsterSentence(20)
+
+		user.Birthday = birthday.Fake(s.f)
+
+		user.PictureUrl = &s.f.Person().Image
+
+		background := s.f.ImageURL(1920, 1080)
+		user.BackgroundUrl = &background
+
+		user.IsVerified = s.f.Bool()
+
+		user.UserPrivilegeID = up.GetRandomPrivilege(s.db, s.f).ID
+
+		return s.db.Create(&user).Error == nil
+	}, count, &info)
 }

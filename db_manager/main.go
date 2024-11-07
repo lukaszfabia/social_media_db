@@ -1,9 +1,8 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"social_media/database"
-	"social_media/seeder"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/joho/godotenv"
@@ -24,9 +23,9 @@ func init() {
 	// 	log.Println("Successfully dropped all the tables")
 	// }
 
-	if err := database.Sync(); err != nil {
-		log.Println("Failed to migrate tables!")
-	}
+	// if err := database.Sync(); err != nil {
+	// 	log.Println("Failed to migrate tables!")
+	// }
 
 	// adding constraints
 
@@ -40,12 +39,16 @@ func init() {
 }
 
 func main() {
-	var f *gofakeit.Faker = gofakeit.New(gofakeit.Date().UnixMilli())
-	seeder := seeder.New(database.Db, f)
+	// var f *gofakeit.Faker = gofakeit.New(gofakeit.Date().UnixMilli())
+	// seeder := seeder.New(database.Db, f)
 
-	database.ClearTable("user_privileges")
-	seeder.FillPrivileges()
+	// database.ClearTable("user_privileges")
+	// seeder.FillPrivileges()
 
 	// var title faker.Title
+
+	for i := 0; i < 10; i++ {
+		fmt.Println(gofakeit.Password(true, true, true, true, false, 50))
+	}
 
 }

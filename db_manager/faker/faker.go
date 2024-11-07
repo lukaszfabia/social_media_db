@@ -2,6 +2,7 @@ package faker
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 )
@@ -36,4 +37,11 @@ func (t *Hashtag) Fake(f *gofakeit.Faker) string {
 	}
 
 	return f.RandomString(mySet)
-} 
+}
+
+type Birthday time.Time
+
+func (t *Birthday) Fake(f *gofakeit.Faker) *time.Time {
+	d := f.DateRange(time.Now().AddDate(-50, 0, 0), time.Now().AddDate(-18, 0, 0))
+	return &d
+}
