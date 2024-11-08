@@ -5,7 +5,6 @@ import (
 	"social_media/models"
 )
 
-// raz dziala raz nie idk
 var AllModels = []any{
 	&models.Author{},
 	&models.User{},

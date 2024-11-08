@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"strings"
+
+	"gorm.io/gorm"
 )
 
 /*
@@ -51,13 +53,12 @@ func DropTables() error {
 	return nil
 }
 
-func ClearTable(table string) {
-	q := fmt.Sprintf("TRUNCATE TABLE %s RESTART IDENTITY CASCADE", table)
+// Clear all data from db
+func ClearAllTables() {
+	for _, model := range AllModels {
+		if err := Db.Unscoped().Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(model).Error; err != nil {
+			log.Println(err)
+		}
 
-	if err := Db.Exec(q).Error; err != nil {
-		log.Fatalln(err)
-	} else {
-		log.Printf("%s has been cleared", table)
 	}
-
 }
