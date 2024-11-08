@@ -33,6 +33,28 @@ func (a *Author) GetRandomAuthor(tx *gorm.DB, f *gofakeit.Faker) *Author {
 	return nil
 }
 
-func (up *UserPrivilege) GetRandomPrivilege(tx *gorm.DB, f *gofakeit.Faker) *UserPrivilege {
-	return nil
+func (up *UserPrivilege) GetRandomPrivilege(tx *gorm.DB, f *gofakeit.Faker) (*UserPrivilege, error) {
+
+	// takePrivilege := func(name string) (*UserPrivilege, error) {
+	// 	var res *UserPrivilege
+
+	// 	if err := tx.First(&res, "privilege_name = ?", name).Error; err != nil {
+	// 		return nil, err
+	// 	}
+	// 	return res, nil
+	// }
+
+	// max := 100000
+	// var adminChance float32 = 0.01 * max
+	// modChange := 0.1
+	// chance := float64(gofakeit.Number(1, 100000))
+
+	// if calcChange := max * adminChance; calcChange < max {
+	// 	return takePrivilege("admin")
+	// } else if chance >= 99997 && chance <= 99999 {
+	// 	return takePrivilege("mod")
+	// } else {
+	// 	return takePrivilege("user")
+	// }
+	return nil, nil
 }

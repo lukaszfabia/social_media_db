@@ -152,4 +152,31 @@ Do stworzenia struktury bazy wykorzystano mechanizm ORM - (\href{https://gorm.io
     \label{fig:postgres}
 \end{figure}
 
+
+\section{Faza Fizyczna cd.}
+
+\quad Mając napisany ORM poprzenio, w tym etapie pozostało napisać funkcje generujące dane do bazy. Rozwiązanie można podzielić na 3 cześci (od szczegółu do ogółu):
+
+\begin{enumerate}
+    \item Dekorator, który będzie wykonywać okreśolny blok \texttt{count} razy.
+    \item Funkcja, generująca dany typ danych np. generator użytkowników.
+    \item Odpowienie ułożenie wywołań.
+\end{enumerate}
+
+
+\textbf{Język}: \href{https://go.dev/}{Go} 
+
+\textbf{Generowanie sztucznych danych}: \href{https://github.com/brianvoe/gofakeit}{gofakeit} 
+
+\textbf{Object relational mapping (ORM)}: \href{https://github.com/go-gorm/gorm}{gorm} \\
+
+Reszta rzeczy, które zostały wykonane:
+
+\begin{itemize}
+    \item Funkcja usuwająca dane z tabel
+    \item Własne implementacje niektórych danych np. \texttt{Title}, \texttt{Birthday} 
+    \item Konfiguracja loggera 
+    \item Funkcja haszująca hasło 
+\end{itemize}
+
 \end{document}

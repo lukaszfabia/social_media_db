@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"social_media/database"
+	"social_media/models"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/joho/godotenv"
@@ -39,7 +40,7 @@ func init() {
 }
 
 func main() {
-	// var f *gofakeit.Faker = gofakeit.New(gofakeit.Date().UnixMilli())
+	var f *gofakeit.Faker = gofakeit.New(gofakeit.Date().UnixMilli())
 	// seeder := seeder.New(database.Db, f)
 
 	// database.ClearTable("user_privileges")
@@ -47,8 +48,15 @@ func main() {
 
 	// var title faker.Title
 
-	for i := 0; i < 10; i++ {
-		fmt.Println(gofakeit.Password(true, true, true, true, false, 50))
+	var p models.UserPrivilege
+
+	for i := 0; i < 100000; i++ {
+		if up, err := p.GetRandomPrivilege(database.Db, f); err == nil {
+			if up.PrivilegeName != "user" {
+
+				fmt.Println(up.PrivilegeName)
+			}
+		}
 	}
 
 }

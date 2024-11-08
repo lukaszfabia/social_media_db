@@ -218,7 +218,11 @@ func (s *Seeder) FillUsers(count int) {
 
 		user.IsVerified = s.f.Bool()
 
-		user.UserPrivilegeID = up.GetRandomPrivilege(s.db, s.f).ID
+		if up, err := up.GetRandomPrivilege(s.db, s.f); err != nil {
+			return false
+		} else {
+			user.UserPrivilegeID = up.ID
+		}
 
 		return s.db.Create(&user).Error == nil
 	}, count, &info)
