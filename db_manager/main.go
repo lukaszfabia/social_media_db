@@ -1,9 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"social_media/database"
-	"social_media/faker"
+	"social_media/seeder"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/joho/godotenv"
@@ -41,13 +40,12 @@ func init() {
 
 func main() {
 	var f *gofakeit.Faker = gofakeit.New(gofakeit.Date().UnixMilli())
-	// seeder := seeder.New(database.Db, f)
+	seeder := seeder.New(database.Db, f)
 
 	// database.ClearTable("user_privileges")
 	// seeder.FillPrivileges()
 
-	var t faker.PlatformWithLink
+	seeder.FillHashtags(10)
 
-	fmt.Println(t.Fake(f))
-
+	database.ClearAllTables()
 }
