@@ -180,7 +180,7 @@ func (s *Seeder) FillPrivileges() {
 	}, len(privileges), nil)
 }
 
-// TODO finish it
+// Generates "count" users without friends and friends request
 func (s *Seeder) FillUsers(count int) {
 	var info string = "Users have been created!"
 
@@ -223,6 +223,27 @@ func (s *Seeder) FillUsers(count int) {
 		} else {
 			user.UserPrivilegeID = up.ID
 		}
+
+		var links []models.ExternalUserLinks
+
+		s.factory(func() bool {
+			var p faker.PlatformWithLink
+			link := models.ExternalUserLinks{
+				AuthorID: randomAuthor.ID,
+				Platform: p.Platform,
+				Link:     p.Link,
+			}
+
+			if err := s.db.Create(&link).Error; err != nil {
+				return false
+			}
+
+			links = append(links, link)
+
+			return true
+		}, s.f.Number(1, 4), nil)
+
+		user.ExternalUserLinks = links
 
 		return s.db.Create(&user).Error == nil
 	}, count, &info)

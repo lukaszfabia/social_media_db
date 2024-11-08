@@ -2,6 +2,7 @@ package faker
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -45,4 +46,24 @@ type Birthday time.Time
 func (t *Birthday) Fake(f *gofakeit.Faker) *time.Time {
 	d := f.DateRange(time.Now().AddDate(-100, 0, 0), time.Now().AddDate(-18, 0, 0))
 	return &d
+}
+
+type PlatformWithLink struct {
+	Platform string
+	Link     string
+}
+
+// Popular social media generator
+func (p *PlatformWithLink) Fake(f *gofakeit.Faker) PlatformWithLink {
+	socialMediaPlatforms := []string{"Twitter", "Instagram", "Facebook", "LinkedIn", "TikTok", "Snapchat", "YouTube", "Pinterest", "Reddit"}
+
+	var pl PlatformWithLink
+
+	pl.Platform = f.RandomString(socialMediaPlatforms)
+
+	uuid := f.UUID()
+
+	pl.Link = fmt.Sprintf("https://%s.com/%s", strings.ToLower(pl.Platform), uuid)
+
+	return pl
 }

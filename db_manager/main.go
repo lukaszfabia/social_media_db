@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"social_media/database"
-	"social_media/models"
+	"social_media/faker"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/joho/godotenv"
@@ -46,17 +46,8 @@ func main() {
 	// database.ClearTable("user_privileges")
 	// seeder.FillPrivileges()
 
-	// var title faker.Title
+	var t faker.PlatformWithLink
 
-	var p models.UserPrivilege
-
-	for i := 0; i < 100000; i++ {
-		if up, err := p.GetRandomPrivilege(database.Db, f); err == nil {
-			if up.PrivilegeName != "user" {
-
-				fmt.Println(up.PrivilegeName)
-			}
-		}
-	}
+	fmt.Println(t.Fake(f))
 
 }

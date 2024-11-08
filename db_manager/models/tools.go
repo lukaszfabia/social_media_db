@@ -35,26 +35,27 @@ func (a *Author) GetRandomAuthor(tx *gorm.DB, f *gofakeit.Faker) *Author {
 
 func (up *UserPrivilege) GetRandomPrivilege(tx *gorm.DB, f *gofakeit.Faker) (*UserPrivilege, error) {
 
-	// takePrivilege := func(name string) (*UserPrivilege, error) {
-	// 	var res *UserPrivilege
+	takePrivilege := func(name string) (*UserPrivilege, error) {
+		var res *UserPrivilege
 
-	// 	if err := tx.First(&res, "privilege_name = ?", name).Error; err != nil {
-	// 		return nil, err
-	// 	}
-	// 	return res, nil
-	// }
+		if err := tx.First(&res, "privilege_name = ?", name).Error; err != nil {
+			return nil, err
+		}
+		return res, nil
+	}
 
-	// max := 100000
-	// var adminChance float32 = 0.01 * max
-	// modChange := 0.1
-	// chance := float64(gofakeit.Number(1, 100000))
+	var max float64 = 1000.0
+	var adminChance float64 = 0.003 * max
+	var modChance float64 = 0.01 * max
 
-	// if calcChange := max * adminChance; calcChange < max {
-	// 	return takePrivilege("admin")
-	// } else if chance >= 99997 && chance <= 99999 {
-	// 	return takePrivilege("mod")
-	// } else {
-	// 	return takePrivilege("user")
-	// }
-	return nil, nil
+	chance := gofakeit.Number(1, int(max))
+
+	if adminThreshold := int(adminChance); chance < adminThreshold {
+		return takePrivilege("admin")
+	} else if modThreshold := int(modChance); chance < modThreshold {
+		return takePrivilege("mod")
+	} else {
+		return takePrivilege("user")
+	}
+
 }
