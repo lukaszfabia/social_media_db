@@ -1,4 +1,4 @@
-package seeder
+package database
 
 import (
 	"fmt"
@@ -11,24 +11,46 @@ import (
 	"gorm.io/gorm"
 )
 
-type Seeder struct {
+type SeederService interface {
+	FillTags(count int)
+	FillPages(count int)
+	FillLocations(count int)
+	FillHashtags(count int)
+	FillPrivileges()
+	FillUsers(count int)
+
+	// TODO: implement
+	FillAuthors(count int)
+	FillComments(count int)
+	FillReels(count int)
+	FillFriendsAndFriendRequests(count int)
+	FillEvent(count int)
+	FillPostAndReactions(count int)
+	FillGroups(count int)
+	FillMessagesAndConversations(count int)
+}
+
+type seederServiceImpl struct {
 	db *gorm.DB
 	f  *gofakeit.Faker
 }
 
-/*
-Constructor, init seed
+// New instance of seeder service
+func NewSeederService(db *gorm.DB, f *gofakeit.Faker) SeederService {
+	return &seederServiceImpl{
+		db: db,
+		f:  f,
+	}
+}
 
-returns:
-  - new seeder
-*/
-func New(db *gorm.DB, f *gofakeit.Faker) *Seeder {
-	return &Seeder{db: db, f: f}
+// Getter which returns instance which has been created during connecting with database
+func (s *service) SeederService() SeederService {
+	return s.seederService
 }
 
 // Simple wrapper for fill functions
 // If there was an error occured during creating row it will work until done achieve count
-func (s *Seeder) factory(f func() bool, count int, info *string) {
+func (s *seederServiceImpl) factory(f func() bool, count int, info *string) {
 	var done int = 0
 
 	for done < count {
@@ -38,14 +60,14 @@ func (s *Seeder) factory(f func() bool, count int, info *string) {
 	}
 
 	if info != nil {
-		log.Println(info)
+		log.Println(*info)
 	} else {
 		log.Println("Done!")
 	}
 }
 
 // Generates some tags, fills simple fields
-func (s *Seeder) FillTags(count int) {
+func (s *seederServiceImpl) FillTags(count int) {
 	var info string = "Tags have been added"
 
 	s.factory(func() bool {
@@ -57,7 +79,7 @@ func (s *Seeder) FillTags(count int) {
 }
 
 // Generates entire page
-func (s *Seeder) FillPages(count int) {
+func (s *seederServiceImpl) FillPages(count int) {
 	var dummyTitle faker.Title
 	var info string = "Pages have been added"
 
@@ -106,7 +128,7 @@ func (s *Seeder) FillPages(count int) {
 }
 
 // Generates fake entire locations
-func (s *Seeder) FillLocations(count int) {
+func (s *seederServiceImpl) FillLocations(count int) {
 	s.factory(func() bool {
 		dummyAddress := s.f.Address()
 		var geolocation *models.Geolocation = &models.Geolocation{
@@ -141,7 +163,7 @@ func (s *Seeder) FillLocations(count int) {
 }
 
 // Generates random hashtags
-func (s *Seeder) FillHashtags(count int) {
+func (s *seederServiceImpl) FillHashtags(count int) {
 	s.factory(func() bool {
 		var dummyHashtag faker.Hashtag
 
@@ -165,7 +187,7 @@ func nextPrivilege(arr []string) func() *string {
 	}
 }
 
-func (s *Seeder) FillPrivileges() {
+func (s *seederServiceImpl) FillPrivileges() {
 	privileges := []string{"mod", "admin", "user"}
 	nextPriv := nextPrivilege(privileges)
 
@@ -181,7 +203,7 @@ func (s *Seeder) FillPrivileges() {
 }
 
 // Generates "count" users without friends and friends request
-func (s *Seeder) FillUsers(count int) {
+func (s *seederServiceImpl) FillUsers(count int) {
 	var info string = "Users have been created!"
 
 	s.factory(func() bool {
@@ -248,3 +270,13 @@ func (s *Seeder) FillUsers(count int) {
 		return s.db.Create(&user).Error == nil
 	}, count, &info)
 }
+
+// TODO: implement, (association tables you fill by adding list as a property where is demanded)
+func (s *seederServiceImpl) FillAuthors(count int)                  {}
+func (s *seederServiceImpl) FillComments(count int)                 {}
+func (s *seederServiceImpl) FillReels(count int)                    {}
+func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {}
+func (s *seederServiceImpl) FillEvent(count int)                    {}
+func (s *seederServiceImpl) FillPostAndReactions(count int)         {}
+func (s *seederServiceImpl) FillGroups(count int)                   {}
+func (s *seederServiceImpl) FillMessagesAndConversations(count int) {}

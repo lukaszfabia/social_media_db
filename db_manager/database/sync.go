@@ -29,9 +29,9 @@ var AllModels = []any{
 }
 
 // register your models
-func Sync() error {
+func (s *service) Sync() error {
 	for _, model := range AllModels {
-		if err := Db.AutoMigrate(model); err != nil {
+		if err := s.db.AutoMigrate(model); err != nil {
 			log.Fatalf("Cant migrate model %T", model)
 			return err
 		}

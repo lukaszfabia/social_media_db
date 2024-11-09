@@ -38,7 +38,7 @@ type User struct {
 	BackgroundUrl     *string             `gorm:"size:255"`
 	Birthday          *time.Time          `gorm:"type:date"`
 	IsVerified        bool                `gorm:"default:false"`
-	Bio               string              `gorm:"default:'Edit bio';size:160;check:bio <> ''"`
+	Bio               string              `gorm:"default:'Edit bio';size:512;check:bio <> ''"`
 	ExternalUserLinks []ExternalUserLinks `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 	Friends           []User              `gorm:"many2many:user_friends;constraint:OnDelete:CASCADE"`
 	FriendRequests    []FriendRequest     `gorm:"foreignKey:ReceiverID;constraint:OnDelete:CASCADE"`
