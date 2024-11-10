@@ -21,7 +21,8 @@ func (a *Author) GetRandomAuthor(tx *gorm.DB, f *gofakeit.Faker) *Author {
 	// searching range of authors
 	if err := tx.Model(&Author{}).Count(&count).Error; err == nil && count > 0 {
 		// take random one
-		if err := tx.First(&randomAuthor, "id = ?", f.Number(1, int(count))).Error; err != nil {
+		var id int = f.Number(1, int(count))
+		if err := tx.First(&randomAuthor, "id = ?", id).Error; err != nil {
 			log.Println(err)
 			return nil
 		}
@@ -31,6 +32,21 @@ func (a *Author) GetRandomAuthor(tx *gorm.DB, f *gofakeit.Faker) *Author {
 
 	log.Println("No authors, please call it after FillAuthors")
 	return nil
+}
+
+func (at *AuthorType) GetRandomAuthorType(tx *gorm.DB, f *gofakeit.Faker) (*AuthorType, error) {
+	var max float64 = 1000.0
+	var userChance float64 = 0.9 * max
+
+	chance := gofakeit.Number(1, int(max))
+
+	if userThreshold := int(userChance); chance < userThreshold {
+		userType := AuthorType("user")
+		return &userType, nil
+	} else {
+		userType := AuthorType("page")
+		return &userType, nil
+	}
 }
 
 func (up *UserPrivilege) GetRandomPrivilege(tx *gorm.DB, f *gofakeit.Faker) (*UserPrivilege, error) {
