@@ -11,3 +11,7 @@ start_db:
 tidy:
 	@echo "Tidy up libs..."
 	@go mod tidy 
+
+clear:
+	@echo "Clearing up database..."
+	@docker-compose down --volumes
