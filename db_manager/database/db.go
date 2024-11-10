@@ -42,7 +42,6 @@ type service struct {
 
 // New connection with database, create service
 func Connect() Service {
-
 	var c Credintials = Credintials{
 		Host:     strings.TrimSpace(os.Getenv("HOST")),
 		User:     strings.TrimSpace(os.Getenv("POSTGRES_USER")),
@@ -56,7 +55,7 @@ func Connect() Service {
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
-		panic("Can't connect to db!")
+		panic("Can't connect to db!\n" + err.Error())
 	} else {
 		log.Println("Successfully connected to db!")
 		var f *gofakeit.Faker = gofakeit.New(gofakeit.Date().UnixMilli())
