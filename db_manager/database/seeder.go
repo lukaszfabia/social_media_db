@@ -28,6 +28,7 @@ type SeederService interface {
 	FillPostAndReactions(count int)
 	FillGroups(count int)
 	FillMessagesAndConversations(count int)
+	FillAuthorLists(count int)
 }
 
 type seederServiceImpl struct {
@@ -61,8 +62,6 @@ func (s *seederServiceImpl) factory(f func() bool, count int, info *string) {
 
 	if info != nil {
 		log.Println(*info)
-	} else {
-		log.Println("Done!")
 	}
 }
 
@@ -87,46 +86,54 @@ func (s *seederServiceImpl) FillPages(count int) {
 		likes := float64(s.f.Number(0, 1000000))
 		views := likes*s.f.Float64Range(1.4, 5.4) + s.f.Float64Range(23, 212)
 
-		var tags []*models.Tag = nil
-
-		if err := s.db.Find(&tags).Error; err != nil {
-			log.Println(err)
-		}
-
-		var ads []*models.Advertisement = nil
-		adsAmount := s.f.Number(1, 5) * s.f.Number(1, 5)
-
+		var tags []*models.Tag
 		s.factory(func() bool {
-			var ad *models.Advertisement = &models.Advertisement{
-				Content: s.f.Sentence(s.f.Number(10, 100)),
-				AdLink:  s.f.URL(),
-			}
-			if s.db.Create(&ad).Error == nil {
-				ads = append(ads, ad)
-
+			randtag := models.GetRandomModel(s.db, s.f, &models.Tag{})
+			if tag, ok := randtag.(*models.Tag); ok {
+				tags = append(tags, tag)
 				return true
 			}
+			log.Println("Failed to retrieve a random tag or type assertion failed")
 			return false
-		}, adsAmount, nil) // generates random ads amount
+		}, s.f.Number(1, 10), nil)
 
 		var a models.Author
 		var page models.Page
+		pageType := models.PageType
 
-		if randomAuthor := a.GetRandomAuthor(s.db, s.f); randomAuthor != nil {
+		if randomAuthor := a.GetRandomAuthor(s.db, s.f, &pageType); randomAuthor != nil {
 			page.AuthorID = randomAuthor.ID
 			page.Author = *randomAuthor
 		}
 
 		page.Title = dummyTitle.Fake(s.f)
 		page.Tags = tags
-		page.Advertisements = ads
 		page.Likes = uint(likes)
 		page.Views = uint(views)
 
-		var error = s.db.Create(&page).Error
-		println(error)
+		if err := s.db.Create(&page).Error; err != nil {
+			log.Println("Failed to create page:", err)
+			return false
+		}
 
-		return error == nil
+		var ads []*models.Advertisement
+		adsAmount := s.f.Number(1, 5) * s.f.Number(1, 5)
+		s.factory(func() bool {
+			ad := &models.Advertisement{
+				Content: s.f.Sentence(s.f.Number(10, 100)),
+				AdLink:  s.f.URL(),
+				PageID:  page.ID,
+			}
+			if err := s.db.Create(&ad).Error; err == nil {
+				ads = append(ads, ad)
+				return true
+			}
+			log.Println("Failed to create advertisement")
+			return false
+		}, adsAmount, nil)
+
+		page.Advertisements = ads
+		return s.db.Save(&page).Error == nil
 	}, count, &info)
 }
 
@@ -194,25 +201,19 @@ func nextPrivilege(arr []string) func() *string {
 	}
 }
 
-// this should crash if fails even once
 func (s *seederServiceImpl) FillPrivileges() {
 	privileges := []string{"mod", "admin", "user"}
 	nextPriv := nextPrivilege(privileges)
 
-	for i := 0; i < len(privileges); i++ {
+	s.factory(func() bool {
 		priv := nextPriv()
 		if priv == nil {
-			panic("Privilege is nil")
+			return false
 		}
-		if err := s.db.Create(&models.UserPrivilege{
+		return s.db.Save(&models.UserPrivilege{
 			PrivilegeName: *priv,
-			Users:         nil,
-		}).Error; err != nil {
-			panic(fmt.Sprintf("Failed to create privilege: %s", err))
-		}
-	}
-
-	log.Println("All privileges have been added")
+		}).Error == nil
+	}, len(privileges), nil)
 }
 
 // Generates "count" users without friends and friends request
@@ -222,13 +223,16 @@ func (s *seederServiceImpl) FillUsers(count int) {
 	s.factory(func() bool {
 		var user models.User
 		var a models.Author
-		var randomAuthor *models.Author = a.GetRandomAuthor(s.db, s.f)
+		userType := models.UserType
+		var randomAuthor *models.Author = a.GetRandomAuthor(s.db, s.f, &userType)
 		var birthday faker.Birthday
 		var up models.UserPrivilege
 
 		if randomAuthor != nil {
 			user.Author = *randomAuthor
 			user.Author.ID = randomAuthor.ID
+		} else {
+			return false
 		}
 
 		user.FirstName = s.f.FirstName()
@@ -254,31 +258,11 @@ func (s *seederServiceImpl) FillUsers(count int) {
 		user.IsVerified = s.f.Bool()
 
 		if up, err := up.GetRandomPrivilege(s.db, s.f); err != nil {
+			log.Println("Cant get random priv")
 			return false
 		} else {
 			user.UserPrivilegeID = up.ID
 		}
-
-		var links []models.ExternalUserLinks
-
-		s.factory(func() bool {
-			var p faker.PlatformWithLink
-			link := models.ExternalUserLinks{
-				AuthorID: randomAuthor.ID,
-				Platform: p.Platform,
-				Link:     p.Link,
-			}
-
-			if err := s.db.Create(&link).Error; err != nil {
-				return false
-			}
-
-			links = append(links, link)
-
-			return true
-		}, s.f.Number(1, 4), nil)
-
-		user.ExternalUserLinks = links
 
 		return s.db.Create(&user).Error == nil
 	}, count, &info)
@@ -298,16 +282,6 @@ func (s *seederServiceImpl) FillAuthors(count int) {
 		} else {
 			author.AuthorType = *up
 		}
-
-		author.Comments = nil
-		author.Posts = nil
-		author.Reactions = nil
-		author.Messages = nil
-		author.Conversations = nil
-		author.Reels = nil
-		author.Events = nil
-		author.Groups = nil
-
 		return s.db.Create(&author).Error == nil
 	}, count, &info)
 }
@@ -319,7 +293,7 @@ func (s *seederServiceImpl) FillComments(count int) {
 		var comment models.Comment
 		var a models.Author
 
-		if randomAuthor := a.GetRandomAuthor(s.db, s.f); randomAuthor != nil {
+		if randomAuthor := a.GetRandomAuthor(s.db, s.f, nil); randomAuthor != nil {
 			comment.AuthorID = randomAuthor.ID
 			comment.Author = *randomAuthor
 		}
@@ -337,7 +311,7 @@ func (s *seederServiceImpl) FillReels(count int) {
 		var reel models.Reel
 		var a models.Author
 
-		if randomAuthor := a.GetRandomAuthor(s.db, s.f); randomAuthor != nil {
+		if randomAuthor := a.GetRandomAuthor(s.db, s.f, nil); randomAuthor != nil {
 			reel.AuthorID = randomAuthor.ID
 		}
 
@@ -345,8 +319,11 @@ func (s *seederServiceImpl) FillReels(count int) {
 	}, count, &info)
 }
 
-func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {}
+func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
+
+}
 func (s *seederServiceImpl) FillEvent(count int)                    {}
 func (s *seederServiceImpl) FillPostAndReactions(count int)         {}
 func (s *seederServiceImpl) FillGroups(count int)                   {}
 func (s *seederServiceImpl) FillMessagesAndConversations(count int) {}
+func (s *seederServiceImpl) FillAuthorLists(count int)              {}

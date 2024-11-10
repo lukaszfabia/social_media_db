@@ -12,14 +12,15 @@ type Author struct {
 	gorm.Model
 	AuthorType AuthorType `gorm:"type:author_type_enum;not null;constraint:OnDelete:CASCADE"`
 
-	Comments      []Comment      `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Posts         []Post         `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Reactions     []Reaction     `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Messages      []Message      `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Conversations []Conversation `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Reels         []Reel         `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Events        []Event        `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Groups        []Group        `gorm:"many2many:group_members;constraint:OnDelete:CASCADE"`
+	Comments            []Comment             `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Posts               []Post                `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Reactions           []Reaction            `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Messages            []Message             `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Conversations       []Conversation        `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Reels               []Reel                `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Events              []Event               `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Groups              []Group               `gorm:"many2many:group_members;constraint:OnDelete:CASCADE"`
+	ExternalAuthorLinks []ExternalAuthorLinks `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 }
 
 type Group struct {
@@ -29,20 +30,19 @@ type Group struct {
 }
 
 type User struct {
-	AuthorID          uint                `gorm:"primaryKey"`
-	FirstName         string              `gorm:"not null;size:50"`
-	SecondName        string              `gorm:"not null;size:50"`
-	Email             string              `gorm:"not null;size:100;unique"`
-	Password          string              `gorm:"not null"`
-	PictureUrl        *string             `gorm:"size:255"`
-	BackgroundUrl     *string             `gorm:"size:255"`
-	Birthday          *time.Time          `gorm:"type:date"`
-	IsVerified        bool                `gorm:"default:false"`
-	Bio               string              `gorm:"default:'Edit bio';size:512;check:bio <> ''"`
-	ExternalUserLinks []ExternalUserLinks `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Friends           []User              `gorm:"many2many:user_friends;constraint:OnDelete:CASCADE"`
-	FriendRequests    []FriendRequest     `gorm:"foreignKey:ReceiverID;constraint:OnDelete:CASCADE"`
-	UserPrivilegeID   uint                `gorm:"not null"`
+	AuthorID        uint            `gorm:"primaryKey"`
+	FirstName       string          `gorm:"not null;size:50"`
+	SecondName      string          `gorm:"not null;size:50"`
+	Email           string          `gorm:"not null;size:100;unique"`
+	Password        string          `gorm:"not null"`
+	PictureUrl      *string         `gorm:"size:255"`
+	BackgroundUrl   *string         `gorm:"size:255"`
+	Birthday        *time.Time      `gorm:"type:date"`
+	IsVerified      bool            `gorm:"default:false"`
+	Bio             string          `gorm:"default:'Edit bio';size:512;check:bio <> ''"`
+	Friends         []User          `gorm:"many2many:user_friends;constraint:OnDelete:CASCADE"`
+	FriendRequests  []FriendRequest `gorm:"foreignKey:ReceiverID;constraint:OnDelete:CASCADE"`
+	UserPrivilegeID uint            `gorm:"not null"`
 
 	Author Author `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 }
@@ -53,7 +53,7 @@ type UserPrivilege struct {
 	PrivilegeName string `gorm:"not null;unique;size:40"`
 }
 
-type ExternalUserLinks struct {
+type ExternalAuthorLinks struct {
 	gorm.Model
 	AuthorID uint   `gorm:"not null"`
 	Platform string `gorm:"not null"`
@@ -95,7 +95,6 @@ type Post struct {
 
 type Tag struct {
 	gorm.Model
-	PageID  uint
 	TagName string  `gorm:"not null;unique;size:100"`
 	Pages   []*Page `gorm:"many2many:page_tags;constraint:OnDelete:CASCADE"`
 }
@@ -166,7 +165,7 @@ type Conversation struct {
 type Page struct {
 	gorm.Model
 	AuthorID uint
-	Author   Author `gorm:"foreignKey:AuthorID"`
+	Author   Author `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 
 	Title          string `gorm:"not null;size:100"`
 	Tags           []*Tag `gorm:"many2many:page_tags"`

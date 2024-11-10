@@ -25,8 +25,9 @@ func main() {
 	// create new service
 	s := database.Connect()
 
-	s.ClearAllTables()
-	s.DropTables()
+	// s.ClearAllTables()
+	// s.InitEnums()
+	// s.DropTables()
 
 	if err := s.Sync(); err != nil {
 		log.Println("Failed to migrate tables!")

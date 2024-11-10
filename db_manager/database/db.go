@@ -103,8 +103,20 @@ func (s *service) CreateEnum(enumName string, values ...string) error {
 
 func (s *service) DropTables() error {
 	for _, model := range AllModels {
-		if err := s.db.Migrator().DropTable(model); err != nil {
-			log.Fatalf("Failed to migarte %T", model)
+		if err := s.db.Unscoped().Migrator().DropTable(model); err != nil {
+			log.Fatalf("Failed to drop %T", model)
+			return err
+		}
+	}
+
+	nnTables := []string{
+		"comment_hashtags", "conversation_members", "event_members", "group_members", "page_tags", "post_hashtags", "user_friends",
+	}
+
+	for _, table := range nnTables {
+		query := fmt.Sprintf("DROP TABLE IF EXISTS %s", table)
+		if err := s.db.Exec(query).Error; err != nil {
+			log.Println("Error dropping table:", table, err)
 			return err
 		}
 	}
@@ -148,7 +160,6 @@ func (s *service) Cook() {
 	s.seederService.FillAuthors(100)
 	s.seederService.FillComments(50)
 	s.seederService.FillReels(50)
-	//s.seederService.FillPages(10)
-	//s.seederService.FillUsers(10)
-
+	s.seederService.FillPages(10)
+	s.seederService.FillUsers(10)
 }
