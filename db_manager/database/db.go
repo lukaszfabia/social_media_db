@@ -139,6 +139,16 @@ func (s *service) InitEnums() {
 // Here you can stack fill funcs
 func (s *service) Cook() {
 
-	// TODO: implement
+	// TODO: implement all
+
 	s.seederService.FillTags(10)
+	s.seederService.FillLocations(10)
+	s.seederService.FillHashtags(10)
+	s.seederService.FillPrivileges()
+	s.seederService.FillAuthors(100)
+	s.seederService.FillComments(50)
+	s.seederService.FillReels(50)
+	//s.seederService.FillPages(10)
+	//s.seederService.FillUsers(10)
+
 }

@@ -68,7 +68,7 @@ func (s *seederServiceImpl) factory(f func() bool, count int, info *string) {
 
 // Generates some tags, fills simple fields
 func (s *seederServiceImpl) FillTags(count int) {
-	var info string = "Tags have been added"
+	var info string = fmt.Sprintf("%d Tags have been added", count)
 
 	s.factory(func() bool {
 		var tag models.Tag = models.Tag{
@@ -81,7 +81,7 @@ func (s *seederServiceImpl) FillTags(count int) {
 // Generates entire page
 func (s *seederServiceImpl) FillPages(count int) {
 	var dummyTitle faker.Title
-	var info string = "Pages have been added"
+	var info string = fmt.Sprintf("%d Pages have been added", count)
 
 	s.factory(func() bool {
 		likes := float64(s.f.Number(0, 1000000))
@@ -94,20 +94,6 @@ func (s *seederServiceImpl) FillPages(count int) {
 		}
 
 		var ads []*models.Advertisement = nil
-		adsAmount := s.f.Number(1, 100)
-
-		s.factory(func() bool {
-			var ad *models.Advertisement = &models.Advertisement{
-				Content: s.f.Sentence(s.f.Number(10, 100)),
-				AdLink:  s.f.URL(),
-			}
-			if s.db.Create(&ad).Error == nil {
-				ads = append(ads, ad)
-
-				return true
-			}
-			return false
-		}, adsAmount, nil) // generates random ads amount
 
 		var a models.Author
 		var page models.Page
@@ -123,12 +109,17 @@ func (s *seederServiceImpl) FillPages(count int) {
 		page.Likes = uint(likes)
 		page.Views = uint(views)
 
-		return s.db.Create(&page).Error == nil
+		var error = s.db.Create(&page).Error
+		println(error)
+
+		return error == nil
 	}, count, &info)
 }
 
 // Generates fake entire locations
 func (s *seederServiceImpl) FillLocations(count int) {
+	var info string = fmt.Sprintf("%d Locations have been added", count)
+
 	s.factory(func() bool {
 		dummyAddress := s.f.Address()
 		var geolocation *models.Geolocation = &models.Geolocation{
@@ -159,18 +150,20 @@ func (s *seederServiceImpl) FillLocations(count int) {
 		}
 
 		return s.db.Create(&loc).Error == nil
-	}, count, nil)
+	}, count, &info)
 }
 
 // Generates random hashtags
 func (s *seederServiceImpl) FillHashtags(count int) {
+	var info string = fmt.Sprintf("%d Hashtags have been added", count)
+
 	s.factory(func() bool {
 		var dummyHashtag faker.Hashtag
 
 		return s.db.Create(&models.Hashtag{
 			TagName: dummyHashtag.Fake(s.f),
 		}).Error == nil
-	}, count, nil)
+	}, count, &info)
 }
 
 // Simple generator
@@ -187,24 +180,30 @@ func nextPrivilege(arr []string) func() *string {
 	}
 }
 
+// this should crash if fails even once
 func (s *seederServiceImpl) FillPrivileges() {
 	privileges := []string{"mod", "admin", "user"}
 	nextPriv := nextPrivilege(privileges)
 
-	s.factory(func() bool {
+	for i := 0; i < len(privileges); i++ {
 		priv := nextPriv()
 		if priv == nil {
-			return false
+			panic("Privilege is nil")
 		}
-		return s.db.Create(&models.UserPrivilege{
+		if err := s.db.Create(&models.UserPrivilege{
 			PrivilegeName: *priv,
-		}).Error == nil
-	}, len(privileges), nil)
+			Users:         nil,
+		}).Error; err != nil {
+			panic(fmt.Sprintf("Failed to create privilege: %s", err))
+		}
+	}
+
+	log.Println("All privileges have been added")
 }
 
 // Generates "count" users without friends and friends request
 func (s *seederServiceImpl) FillUsers(count int) {
-	var info string = "Users have been created!"
+	var info string = fmt.Sprintf("%d Users have been added", count)
 
 	s.factory(func() bool {
 		var user models.User
@@ -272,9 +271,66 @@ func (s *seederServiceImpl) FillUsers(count int) {
 }
 
 // TODO: implement, (association tables you fill by adding list as a property where is demanded)
-func (s *seederServiceImpl) FillAuthors(count int)                  {}
-func (s *seederServiceImpl) FillComments(count int)                 {}
-func (s *seederServiceImpl) FillReels(count int)                    {}
+func (s *seederServiceImpl) FillAuthors(count int) {
+	var info string = fmt.Sprintf("%d Authors have been added", count)
+
+	s.factory(func() bool {
+		var author models.Author
+
+		var at models.AuthorType
+
+		if up, err := at.GetRandomAuthorType(s.db, s.f); err != nil {
+			return false
+		} else {
+			author.AuthorType = *up
+		}
+
+		author.Comments = nil
+		author.Posts = nil
+		author.Reactions = nil
+		author.Messages = nil
+		author.Conversations = nil
+		author.Reels = nil
+		author.Events = nil
+		author.Groups = nil
+
+		return s.db.Create(&author).Error == nil
+	}, count, &info)
+}
+
+func (s *seederServiceImpl) FillComments(count int) {
+	var info string = fmt.Sprintf("%d Comments have been added", count)
+
+	s.factory(func() bool {
+		var comment models.Comment
+		var a models.Author
+
+		if randomAuthor := a.GetRandomAuthor(s.db, s.f); randomAuthor != nil {
+			comment.AuthorID = randomAuthor.ID
+			comment.Author = *randomAuthor
+		}
+
+		comment.Content = s.f.Sentence(10)
+
+		return s.db.Create(&comment).Error == nil
+	}, count, &info)
+}
+
+func (s *seederServiceImpl) FillReels(count int) {
+	var info string = fmt.Sprintf("%d Reels have been added", count)
+
+	s.factory(func() bool {
+		var reel models.Reel
+		var a models.Author
+
+		if randomAuthor := a.GetRandomAuthor(s.db, s.f); randomAuthor != nil {
+			reel.AuthorID = randomAuthor.ID
+		}
+
+		return s.db.Create(&reel).Error == nil
+	}, count, &info)
+}
+
 func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {}
 func (s *seederServiceImpl) FillEvent(count int)                    {}
 func (s *seederServiceImpl) FillPostAndReactions(count int)         {}
