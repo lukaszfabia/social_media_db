@@ -94,6 +94,20 @@ func (s *seederServiceImpl) FillPages(count int) {
 		}
 
 		var ads []*models.Advertisement = nil
+		adsAmount := s.f.Number(1, 5) * s.f.Number(1, 5)
+
+		s.factory(func() bool {
+			var ad *models.Advertisement = &models.Advertisement{
+				Content: s.f.Sentence(s.f.Number(10, 100)),
+				AdLink:  s.f.URL(),
+			}
+			if s.db.Create(&ad).Error == nil {
+				ads = append(ads, ad)
+
+				return true
+			}
+			return false
+		}, adsAmount, nil) // generates random ads amount
 
 		var a models.Author
 		var page models.Page
