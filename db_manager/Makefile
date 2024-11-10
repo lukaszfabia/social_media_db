@@ -10,5 +10,4 @@ start_db:
 
 tidy:
 	@echo "Tidy up libs..."
-	@cd db_manager
 	@go mod tidy 
