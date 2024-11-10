@@ -28,6 +28,7 @@ type SeederService interface {
 	FillPostAndReactions(count int)
 	FillGroups(count int)
 	FillMessagesAndConversations(count int)
+	FillGeolocations(count int)
 }
 
 type seederServiceImpl struct {
@@ -346,7 +347,40 @@ func (s *seederServiceImpl) FillReels(count int) {
 }
 
 func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {}
-func (s *seederServiceImpl) FillEvent(count int)                    {}
+func (s *seederServiceImpl) FillEvent(count int) {
+	var info string = fmt.Sprintf("%d Events have been added", count)
+
+	s.factory(func() bool {
+		var a models.Author
+		randomAuthor := a.GetRandomAuthor(s.db, s.f)
+
+		startDate := s.f.Date()
+
+		var chance int = s.f.Number(0, 1000)
+
+		var deltaDays int = 0
+		if chance < 500 {
+			deltaDays = s.f.Number(1, 14)
+		}
+		endDate := startDate.AddDate(0, 0, deltaDays)
+
+		event := models.Event{
+			AuthorID:    randomAuthor.ID,
+			Name:        s.f.Sentence(3),
+			Description: s.f.Paragraph(1, 3, 5, " "),
+			StartDate:   &startDate,
+			EndDate:     &endDate,
+		}
+
+		if err := s.db.Create(&event).Error; err != nil {
+			log.Println(err)
+			return false
+		}
+
+		return true
+	}, count, &info)
+}
 func (s *seederServiceImpl) FillPostAndReactions(count int)         {}
 func (s *seederServiceImpl) FillGroups(count int)                   {}
 func (s *seederServiceImpl) FillMessagesAndConversations(count int) {}
+func (s *seederServiceImpl) FillGeolocations(count int)             {}

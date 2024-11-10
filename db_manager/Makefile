@@ -4,9 +4,14 @@ run:
 
 
 start_db:
-	@echo "Starting database..."
+	@echo "Stopping postgres..."
 	@bash ../stop_postgres.sh
+	@echo "Starting postgres..."
 	@docker-compose --env-file ../.env up 
+
+start_without_stop:
+	@echo "Starting postgres..."
+	@docker-compose --env-file ../.env up
 
 tidy:
 	@echo "Tidy up libs..."

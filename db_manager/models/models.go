@@ -133,7 +133,7 @@ type Event struct {
 	AuthorID    uint       `gorm:"not null"`
 	Name        string     `gorm:"not null;size:300"`
 	Description string     `gorm:"size:1024"`
-	StartDate   *time.Time `gorm:"not null;type:date;check:start_date < end_date"`
+	StartDate   *time.Time `gorm:"not null;type:date;check:start_date <= end_date"`
 	EndDate     *time.Time `gorm:"not null;type:date"`
 
 	Members []*Author `gorm:"many2many:event_members;constraint:OnDelete:CASCADE;"`

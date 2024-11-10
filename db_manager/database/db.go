@@ -145,10 +145,10 @@ func (s *service) Cook() {
 	s.seederService.FillLocations(10)
 	s.seederService.FillHashtags(10)
 	s.seederService.FillPrivileges()
-	s.seederService.FillAuthors(100)
+	s.seederService.FillAuthors(1000)
 	s.seederService.FillComments(50)
 	s.seederService.FillReels(50)
+	s.seederService.FillEvent(50)
 	//s.seederService.FillPages(10)
 	//s.seederService.FillUsers(10)
-
 }
