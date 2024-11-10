@@ -67,3 +67,32 @@ func (p *PlatformWithLink) Fake(f *gofakeit.Faker) PlatformWithLink {
 
 	return pl
 }
+
+type EventName string
+
+func (e *EventName) Faker(f *gofakeit.Faker) string {
+	eventTypes := []string{
+		"Conference", "Party", "Festival", "Summit", "Workshop", "Seminar", "Webinar",
+	}
+
+	eventType := f.RandomString(eventTypes)
+
+	eventName := fmt.Sprintf("%s %s", eventType, gofakeit.Company())
+
+	return eventName
+}
+
+type DateRange struct {
+	StartDate time.Time
+	EndDate   time.Time
+}
+
+func (d *DateRange) Faker(f *gofakeit.Faker) DateRange {
+	sd := f.FutureDate()
+	ed := sd.AddDate(0, 0, f.Number(0, 10))
+
+	return DateRange{
+		StartDate: sd,
+		EndDate:   ed,
+	}
+}

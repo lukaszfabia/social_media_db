@@ -24,11 +24,9 @@ type SeederService interface {
 	FillComments(count int)
 	FillReels(count int)
 	FillFriendsAndFriendRequests(count int)
-	FillEvent(count int)
 	FillPostAndReactions(count int)
-	FillGroups(count int)
 	FillMessagesAndConversations(count int)
-	FillAuthorLists(count int)
+	FillAuthorLists()
 }
 
 type seederServiceImpl struct {
@@ -322,8 +320,62 @@ func (s *seederServiceImpl) FillReels(count int) {
 func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
 
 }
-func (s *seederServiceImpl) FillEvent(count int)                    {}
-func (s *seederServiceImpl) FillPostAndReactions(count int)         {}
+
+func (s *seederServiceImpl) FillPostAndReactions(count int) {
+
+}
+
 func (s *seederServiceImpl) FillGroups(count int)                   {}
 func (s *seederServiceImpl) FillMessagesAndConversations(count int) {}
-func (s *seederServiceImpl) FillAuthorLists(count int)              {}
+func (s *seederServiceImpl) FillAuthorLists() {
+	info := fmt.Sprintf("Authors has been filled")
+
+	// get all author from db
+	var authors []*models.Author
+	var ptr int = 0
+	if err := s.db.Find(&authors).Error; err != nil {
+		log.Println("No authors, please call it after you create some of them!")
+	}
+
+	s.factory(func() bool {
+		// get nth author
+		curr := authors[ptr]
+		ptr++ // offset
+
+		var events []models.Event
+
+		s.factory(func() bool {
+			var e faker.EventName
+			var rd faker.DateRange
+			dates := rd.Faker(s.f)
+
+			randLocation := models.GetRandomModel(s.db, s.f, &models.Location{})
+			event := models.Event{
+				AuthorID:    curr.ID,
+				Name:        e.Faker(s.f),
+				Description: s.f.Sentence(40),
+				StartDate:   &(dates.StartDate),
+				EndDate:     &dates.EndDate,
+			}
+
+			if location, ok := randLocation.(*models.Location); ok {
+				event.Location = location
+				event.LocationID = event.LocationID
+			}
+
+			if err := s.db.Save(&event).Error; err != nil {
+				log.Println(err)
+				return false
+			}
+
+			events = append(events, event)
+			return true
+		}, s.f.Number(0, 40), nil)
+
+		curr.Events = events
+
+		// var msgs models.Conversation
+
+		return s.db.Save(&curr).Error == nil
+	}, len(authors), &info)
+}
