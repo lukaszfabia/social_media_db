@@ -104,11 +104,16 @@ func (s *seederServiceImpl) FillPages(count int) {
 			return false
 		}, s.f.Number(1, 10), nil)
 
-		var a models.Author
 		var page models.Page
 		pageType := models.PageType
 
-		if randomAuthor := a.GetRandomAuthor(s.db, s.f, &pageType); randomAuthor != nil {
+		randomAuthor, err := CreateRandomAuthor(s, &pageType)
+		if err != nil {
+			log.Println("Failed to create random author:", err)
+			return false
+		}
+
+		if randomAuthor != nil {
 			page.AuthorID = randomAuthor.ID
 			page.Author = *randomAuthor
 		}
@@ -229,7 +234,15 @@ func (s *seederServiceImpl) FillUsers(count int) {
 
 	s.factory(func() bool {
 		var user models.User
-		randomAuthor, _ := CreateRandomAuthor(s)
+
+		userType := models.UserType
+
+		randomAuthor, err := CreateRandomAuthor(s, &userType)
+		if err != nil {
+			log.Println("Failed to create random author:", err)
+			return false
+		}
+
 		var birthday faker.Birthday
 		var up models.UserPrivilege
 
@@ -284,7 +297,7 @@ func (s *seederServiceImpl) FillAuthors(count int) {
 	var info string = fmt.Sprintf("%d Authors have been added", count)
 
 	s.factory(func() bool {
-		_, err := CreateRandomAuthor(s)
+		_, err := CreateRandomAuthor(s, nil)
 		if err != nil {
 			log.Println("Failed to create random author:", err)
 			return false
@@ -293,16 +306,19 @@ func (s *seederServiceImpl) FillAuthors(count int) {
 	}, count, &info)
 }
 
-func CreateRandomAuthor(s *seederServiceImpl) (*models.Author, error) {
+func CreateRandomAuthor(s *seederServiceImpl, authorType *models.AuthorType) (*models.Author, error) {
 	var author models.Author
 	var at models.AuthorType
 
-	userPrivilege, err := at.GetRandomAuthorType(s.db, s.f)
-	if err != nil {
-		return nil, err
+	if authorType == nil {
+		var err error
+		authorType, err = at.GetRandomAuthorType(s.db, s.f)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	author.AuthorType = *userPrivilege
+	author.AuthorType = *authorType
 	if err := s.db.Create(&author).Error; err != nil {
 		return nil, err
 	}
@@ -422,8 +438,7 @@ func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
 		// check if a friend request exists
 		var existingRequest models.FriendRequest
 		if err := tx.Where("sender_id = ? AND receiver_id = ?", user1.AuthorID, user2.AuthorID).Or("sender_id = ? AND receiver_id = ?", user2.AuthorID, user1.AuthorID).First(&existingRequest).Error; err == nil {
-			log.Printf("Already exists this (%d, %d) of relation in friends requests\n", user1.AuthorID, user2.AuthorID)
-
+			//log.Printf("Already exists this (%d, %d) of relation in friends requests\n", user1.AuthorID, user2.AuthorID)
 			return false
 		}
 
