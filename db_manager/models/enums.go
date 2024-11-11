@@ -27,3 +27,12 @@ const (
 	Sad   ReactionType = "sad"
 	Angry ReactionType = "angry"
 )
+
+var ReactionTypeLst = []string{
+	string(Like),
+	string(Love),
+	string(Haha),
+	string(Wow),
+	string(Sad),
+	string(Angry),
+}

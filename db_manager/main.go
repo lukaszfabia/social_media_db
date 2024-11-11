@@ -27,7 +27,7 @@ func main() {
 
 	// s.ClearAllTables()
 	// s.InitEnums()
-	// s.DropTables()
+	s.DropTables()
 
 	if err := s.Sync(); err != nil {
 		log.Println("Failed to migrate tables!")

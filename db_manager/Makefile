@@ -3,10 +3,15 @@ run:
 	@go run main.go
 
 
-start_db:
+docker-run:
 	@echo "Starting database..."
 	@bash ../stop_postgres.sh
 	@docker-compose --env-file ../.env up 
+
+docker-down:
+	@echo "Starting database..."
+	@bash ../stop_postgres.sh
+	@docker-compose down 
 
 tidy:
 	@echo "Tidy up libs..."

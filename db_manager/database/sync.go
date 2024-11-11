@@ -9,7 +9,7 @@ var AllModels = []any{
 	&models.Author{},
 	&models.User{},
 	&models.UserPrivilege{},
-	&models.ExternalAuthorLinks{},
+	&models.ExternalAuthorLink{},
 	&models.FriendRequest{},
 	&models.Comment{},
 	&models.Post{},

@@ -12,15 +12,15 @@ type Author struct {
 	gorm.Model
 	AuthorType AuthorType `gorm:"type:author_type_enum;not null;constraint:OnDelete:CASCADE"`
 
-	Comments            []Comment             `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Posts               []Post                `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Reactions           []Reaction            `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Messages            []Message             `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Conversations       []Conversation        `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Reels               []Reel                `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Events              []Event               `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
-	Groups              []Group               `gorm:"many2many:group_members;constraint:OnDelete:CASCADE"`
-	ExternalAuthorLinks []ExternalAuthorLinks `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Comments            []Comment            `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Posts               []Post               `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Reactions           []Reaction           `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Messages            []Message            `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Conversations       []Conversation       `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Reels               []Reel               `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Events              []Event              `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Groups              []Group              `gorm:"many2many:group_members;constraint:OnDelete:CASCADE"`
+	ExternalAuthorLinks []ExternalAuthorLink `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 }
 
 type Group struct {
@@ -53,7 +53,7 @@ type UserPrivilege struct {
 	PrivilegeName string `gorm:"not null;unique;size:40"`
 }
 
-type ExternalAuthorLinks struct {
+type ExternalAuthorLink struct {
 	gorm.Model
 	AuthorID uint   `gorm:"not null"`
 	Platform string `gorm:"not null"`
