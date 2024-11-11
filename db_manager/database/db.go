@@ -161,7 +161,7 @@ func (s *service) Cook() {
 	s.seederService.FillComments(50)
 	s.seederService.FillReels(50)
 	s.seederService.FillPostAndReactions(40)
-	//s.seederService.FillMessagesAndConversations(40)
-	//s.seederService.FillGroups(50)
-	//s.seederService.FillAuthorLists()
+	s.seederService.FillMessagesAndConversations(40)
+	s.seederService.FillGroups(50)
+	s.seederService.FillAuthorLists()
 }
