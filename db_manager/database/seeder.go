@@ -51,15 +51,26 @@ func (s *service) SeederService() SeederService {
 // If there was an error occured during creating row it will work until done achieve count
 func (s *seederServiceImpl) factory(f func() bool, count int, info *string) {
 	var done int = 0
+	var tooManyFailed int = 0
+	maxFailed := count / 2 // if 50% of row will be failed just stop it
 
-	for done < count {
+	for done < count && maxFailed > tooManyFailed {
 		if f() {
 			done++
+		} else {
+			tooManyFailed++
 		}
+	}
+
+	if maxFailed == tooManyFailed {
+		log.Println("Can't make more sorry :(")
+		return
 	}
 
 	if info != nil {
 		log.Println(*info)
+	} else {
+		log.Println("Done!")
 	}
 }
 
@@ -266,7 +277,6 @@ func (s *seederServiceImpl) FillUsers(count int) {
 	}, count, &info)
 }
 
-// TODO: implement, (association tables you fill by adding list as a property where is demanded)
 func (s *seederServiceImpl) FillAuthors(count int) {
 	var info string = fmt.Sprintf("%d Authors have been added", count)
 
@@ -343,7 +353,100 @@ func (s *seederServiceImpl) FillReels(count int) {
 }
 
 func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
+	var users []models.User
+	if err := s.db.Find(&users).Error; err != nil {
+		log.Println("Failed to fetch users from db:", err)
+		return
+	}
 
+	usersAmount := len(users)
+
+	if usersAmount < 2 {
+		log.Println("Not enough users to create friends")
+		return
+	}
+
+	// new transaction
+	tx := s.db.Begin()
+	if tx.Error != nil {
+		log.Println("Failed to start transaction:", tx.Error)
+		return
+	}
+
+	s.factory(func() bool {
+		sender := users[s.f.Number(0, usersAmount-1)]
+		receiver := users[s.f.Number(0, usersAmount-1)]
+
+		friendRequest := models.FriendRequest{
+			SenderID:   sender.AuthorID,
+			ReceiverID: receiver.AuthorID,
+			Sender:     sender,
+			Receiver:   receiver,
+		}
+
+		if err := tx.Create(&friendRequest).Error; err != nil {
+			log.Println("Failed to save friend request:", err)
+			tx.Rollback()
+			return false
+		}
+
+		return true
+	}, count, nil)
+
+	s.factory(func() bool {
+		user1 := users[s.f.Number(0, usersAmount-1)]
+		user2 := users[s.f.Number(0, usersAmount-1)]
+
+		if user1.AuthorID == user2.AuthorID {
+			log.Println("Cant be in friendship with himself")
+			return false
+		}
+
+		// check if a friend request exists
+		var existingRequest models.FriendRequest
+		if err := tx.Where("sender_id = ? AND receiver_id = ?", user1.AuthorID, user2.AuthorID).Or("sender_id = ? AND receiver_id = ?", user2.AuthorID, user1.AuthorID).First(&existingRequest).Error; err == nil {
+			log.Printf("Already exists this (%d, %d) of relation in friends requests\n", user1.AuthorID, user2.AuthorID)
+
+			return false
+		}
+
+		// def friendship (user1, user2) <=> (user2, user1)
+		if err := tx.Model(&user1).Association("Friends").Append(&user2); err != nil {
+			log.Println("Failed to add friend:", err)
+			tx.Rollback()
+			return false
+		}
+
+		if err := tx.Model(&user2).Association("Friends").Append(&user1); err != nil {
+			log.Println("Failed to add friend:", err)
+			tx.Rollback()
+			return false
+		}
+
+		if err := tx.Save(&user1).Error; err != nil {
+			log.Println("Failed to save user1:", err)
+			tx.Rollback()
+			return false
+		}
+
+		if err := tx.Save(&user2).Error; err != nil {
+			log.Println("Failed to save user2:", err)
+			tx.Rollback()
+			return false
+		}
+
+		return true
+	}, int(count/2), nil)
+
+	if tx.Error == nil {
+		if err := tx.Commit().Error; err != nil {
+			log.Println("Failed to commit transaction:", err)
+			tx.Rollback()
+			return
+		}
+	} else {
+		tx.Rollback()
+	}
 }
 
 func (s *seederServiceImpl) FillPostAndReactions(count int) {
@@ -473,7 +576,7 @@ func (s *seederServiceImpl) FillAuthorLists() {
 		ptr++
 
 		// create events and external links for the author
-		curr.Events = s.createEventsForAuthor(curr.ID)
+		curr.Events = s.createEventsForAuthor(curr.ID) // sets events where author is events admin
 		curr.Comments = s.findAuthorsComments(curr.ID)
 		curr.ExternalAuthorLinks = s.createExternalLinksForAuthor(curr.ID)
 		curr.Reels = s.findAuthorsReels(curr.ID)
@@ -530,6 +633,19 @@ func (s *seederServiceImpl) createEventsForAuthor(authorID uint) []models.Event 
 			log.Println(err)
 			return false
 		}
+
+		// take n ppl
+		s.factory(func() bool {
+			var chosen models.Author
+
+			if err := s.db.Where("id <> ?", authorID).Order("RANDOM()").First(&chosen).Error; err != nil {
+				log.Println("Failed to find random author")
+				return false
+			}
+
+			event.Members = append(event.Members, &chosen)
+			return true
+		}, s.f.Number(1, 10), nil)
 
 		events = append(events, event)
 		return true
