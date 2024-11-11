@@ -24,7 +24,7 @@ make run
 
 można użyć takiego launch.json:
 
-```
+```json
 {
     "version": "0.2.0",
     "configurations": [
