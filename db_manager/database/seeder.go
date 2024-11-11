@@ -617,11 +617,19 @@ func (s *seederServiceImpl) FillMessagesAndConversations(count int) {
 
 		msgLen := s.f.Number(1, 10)
 
+		// get random author
+		rAuhtor := &models.Author{}
+
+		if err := s.db.Order("RANDOM()").First(&rAuhtor).Error; err != nil {
+			log.Println("Failed to get random author")
+			return false
+		}
+
 		for i := 0; i < msgLen; i++ {
 			messageContent := s.f.SentenceSimple()
 			message := &models.Message{
 				Content:        messageContent,
-				AuthorID:       authors[s.f.Number(1, len(authors)-1)].ID, // random author from the members
+				AuthorID:       rAuhtor.ID, // random author from the members
 				ConversationID: conversation.ID,
 			}
 
