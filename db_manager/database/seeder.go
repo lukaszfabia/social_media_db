@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"log"
+	"math"
 	"social_media/faker"
 	"social_media/models"
 	"social_media/pkg"
@@ -52,7 +53,7 @@ func (s *service) SeederService() SeederService {
 func (s *seederServiceImpl) factory(f func() bool, count int, info *string) {
 	var done int = 0
 	var failCount int = 0
-	maxFailCount := count / 2 // if 50% of row will be failed just stop it
+	maxFailCount := int(math.Ceil(float64(count) / 2.0)) // if 50% of rows fail, just stop it // if 50% of row will be failed just stop it
 
 	for done < count && maxFailCount > failCount {
 		if f() {
