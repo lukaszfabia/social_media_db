@@ -151,7 +151,7 @@ func (s *service) InitEnums() {
 func (s *service) Cook() {
 
 	s.seederService.FillPrivileges()
-	s.seederService.FillAuthors(300)
+	//s.seederService.FillAuthors(300)
 	s.seederService.FillUsers(150)
 	s.seederService.FillFriendsAndFriendRequests(50)
 	s.seederService.FillTags(50)

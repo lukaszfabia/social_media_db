@@ -69,8 +69,6 @@ func (s *seederServiceImpl) factory(f func() bool, count int, info *string) {
 
 	if info != nil {
 		log.Println(*info)
-	} else {
-		log.Println("Done!")
 	}
 }
 
@@ -231,9 +229,7 @@ func (s *seederServiceImpl) FillUsers(count int) {
 
 	s.factory(func() bool {
 		var user models.User
-		var a models.Author
-		userType := models.UserType
-		var randomAuthor *models.Author = a.GetRandomAuthor(s.db, s.f, &userType)
+		randomAuthor, _ := CreateRandomAuthor(s)
 		var birthday faker.Birthday
 		var up models.UserPrivilege
 
@@ -275,7 +271,12 @@ func (s *seederServiceImpl) FillUsers(count int) {
 			user.UserPrivilegeID = up.ID
 		}
 
-		return s.db.Create(&user).Error == nil
+		var error = s.db.Create(&user).Error
+		if error != nil {
+			log.Println("Failed to create user:", error)
+			return false
+		}
+		return true
 	}, count, &info)
 }
 
@@ -283,17 +284,29 @@ func (s *seederServiceImpl) FillAuthors(count int) {
 	var info string = fmt.Sprintf("%d Authors have been added", count)
 
 	s.factory(func() bool {
-		var author models.Author
-
-		var at models.AuthorType
-
-		if up, err := at.GetRandomAuthorType(s.db, s.f); err != nil {
+		_, err := CreateRandomAuthor(s)
+		if err != nil {
+			log.Println("Failed to create random author:", err)
 			return false
-		} else {
-			author.AuthorType = *up
 		}
-		return s.db.Create(&author).Error == nil
+		return err == nil
 	}, count, &info)
+}
+
+func CreateRandomAuthor(s *seederServiceImpl) (*models.Author, error) {
+	var author models.Author
+	var at models.AuthorType
+
+	userPrivilege, err := at.GetRandomAuthorType(s.db, s.f)
+	if err != nil {
+		return nil, err
+	}
+
+	author.AuthorType = *userPrivilege
+	if err := s.db.Create(&author).Error; err != nil {
+		return nil, err
+	}
+	return &author, nil
 }
 
 func (s *seederServiceImpl) FillComments(count int) {
@@ -355,6 +368,8 @@ func (s *seederServiceImpl) FillReels(count int) {
 }
 
 func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
+	var info string = fmt.Sprintf("%d friends and requests have been added", count)
+
 	var users []models.User
 	if err := s.db.Find(&users).Error; err != nil {
 		log.Println("Failed to fetch users from db:", err)
@@ -438,7 +453,7 @@ func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
 		}
 
 		return true
-	}, int(len(users)/4), nil)
+	}, int(len(users)/4), &info)
 
 	if tx.Error == nil {
 		if err := tx.Commit().Error; err != nil {
