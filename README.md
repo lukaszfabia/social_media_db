@@ -1,20 +1,29 @@
 # gORM
 
-## Opis plików i modułów
+## Wymagania
 
-`main.go` - główny plik, który kompilujemy
+- docker
+- docker-compose
+
+Do odpalenia polecam użyć **db_manager/Makefile**:
+
+```bash
+make docker-run
+make run
+```
+
+## Opis plików i modułów
 
 `models/` - moduł z tabelami z bazy danych oraz enumami używanymi w bazie
 
-`database` - moduł zawierający funkcje służące do łączenia się z bazą danych, migracją tabel oraz funkcjami zawierającymi surowy **SQL**.
+`database/` - moduł zawierający funkcje służące do łączenia się z bazą danych, migracją tabel oraz funkcjami zawierającymi surowy **SQL** oraz zawierający service generujący dane do bazy.
 
-`seeder` - moduł zawierający funkcje do generowania fake danych
-
-`faker` - moduł zawierający funckje umożliwiające tworzenie własnych sztucznych danych np. Tytuł strony
+`faker/` - moduł zawierający funckje umożliwiające tworzenie własnych sztucznych danych np. Tytuł strony
 
 ## Porady
 
 można użyć takiego launch.json:
+
 ```
 {
     "version": "0.2.0",
