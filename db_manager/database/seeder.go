@@ -25,8 +25,6 @@ type SeederService interface {
 	FillFriendsAndFriendRequests(count int) // unstable
 	FillPostAndReactions(count int)
 	FillAuthorLists()
-
-	// TODO
 	FillGroups(count int)
 	FillMessagesAndConversations(count int)
 }
@@ -53,18 +51,18 @@ func (s *service) SeederService() SeederService {
 // If there was an error occured during creating row it will work until done achieve count
 func (s *seederServiceImpl) factory(f func() bool, count int, info *string) {
 	var done int = 0
-	var tooManyFailed int = 0
-	maxFailed := count / 2 // if 50% of row will be failed just stop it
+	var failCount int = 0
+	maxFailCount := count / 2 // if 50% of row will be failed just stop it
 
-	for done < count && maxFailed > tooManyFailed {
+	for done < count && maxFailCount > failCount {
 		if f() {
 			done++
 		} else {
-			tooManyFailed++
+			failCount++
 		}
 	}
 
-	if maxFailed == tooManyFailed {
+	if maxFailCount == failCount {
 		log.Println("Can't make more sorry :(")
 		return
 	}
