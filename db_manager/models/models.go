@@ -63,7 +63,7 @@ type ExternalAuthorLink struct {
 type FriendRequest struct {
 	gorm.Model
 	SenderID   uint   `gorm:"not null"`
-	ReceiverID uint   `gorm:"not null;check:sender_id <> receiver_id"`
+	ReceiverID uint   `gorm:"not null"`
 	Status     string `gorm:"type:friend_request_status;default:'pending';not null"`
 
 	Sender   User `gorm:"foreignKey:SenderID;references:AuthorID;constraint:OnDelete:CASCADE;"`

@@ -19,14 +19,16 @@ type SeederService interface {
 	FillPrivileges()
 	FillUsers(count int)
 
-	// TODO: implement
 	FillAuthors(count int)
 	FillComments(count int)
 	FillReels(count int)
-	FillFriendsAndFriendRequests(count int)
+	FillFriendsAndFriendRequests(count int) // unstable
 	FillPostAndReactions(count int)
-	FillMessagesAndConversations(count int)
 	FillAuthorLists()
+
+	// TODO
+	FillGroups(count int)
+	FillMessagesAndConversations(count int)
 }
 
 type seederServiceImpl struct {
@@ -244,9 +246,11 @@ func (s *seederServiceImpl) FillUsers(count int) {
 			return false
 		}
 
+		var reallyUniqueEmail faker.UniqueEmail
+
 		user.FirstName = s.f.FirstName()
 		user.SecondName = s.f.LastName()
-		user.Email = s.f.Email()
+		user.Email = reallyUniqueEmail.Faker(s.f)
 
 		if hashed, err := pkg.HashPassword(s.f.Password(true, true, true, true, false, 50)); err != nil {
 			log.Println(err)
@@ -391,7 +395,7 @@ func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
 		}
 
 		return true
-	}, count, nil)
+	}, int((count / 2)), nil)
 
 	s.factory(func() bool {
 		user1 := users[s.f.Number(0, usersAmount-1)]
@@ -436,7 +440,7 @@ func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
 		}
 
 		return true
-	}, int(count/2), nil)
+	}, int(len(users)/4), nil)
 
 	if tx.Error == nil {
 		if err := tx.Commit().Error; err != nil {

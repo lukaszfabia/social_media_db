@@ -153,16 +153,16 @@ func (s *service) Cook() {
 
 	// TODO: implement all
 
-	// s.seederService.FillTags(100)
+	s.seederService.FillPrivileges()
+	s.seederService.FillAuthors(300)
+	s.seederService.FillUsers(150)
+	s.seederService.FillFriendsAndFriendRequests(50)
+	// s.seederService.FillTags(1000)
+	// s.seederService.FillPages(200)
 	// s.seederService.FillLocations(400)
 	// s.seederService.FillHashtags(100)
-	s.seederService.FillPrivileges()
-	s.seederService.FillAuthors(50)
 	// s.seederService.FillComments(50)
 	// s.seederService.FillReels(50)
-	// s.seederService.FillPages(40)
-	s.seederService.FillUsers(40)
-	s.seederService.FillFriendsAndFriendRequests(10)
 	// s.seederService.FillPostAndReactions(40)
 	// s.seederService.FillAuthorLists()
 }

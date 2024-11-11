@@ -96,3 +96,10 @@ func (d *DateRange) Faker(f *gofakeit.Faker) DateRange {
 		EndDate:   ed,
 	}
 }
+
+type UniqueEmail string
+
+func (u *UniqueEmail) Faker(f *gofakeit.Faker) string {
+	return fmt.Sprintf("%s%d@%s.com", strings.ToLower(f.Username()), f.Number(1, 1000000), f.DomainName())
+
+}
