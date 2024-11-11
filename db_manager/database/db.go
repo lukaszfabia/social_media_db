@@ -94,10 +94,9 @@ func (s *service) CreateEnum(enumName string, values ...string) error {
 	query := fmt.Sprintf("CREATE TYPE \"%s\" AS ENUM (%s);", enumName, strValues)
 
 	if err := s.db.Exec(fmt.Sprintf(query, anyValues...)).Error; err != nil {
-		return errors.New("Can't create new type, maybe already exists")
+		return nil
 	}
 
-	log.Printf("Created enum %s.\n", enumName)
 	return nil
 }
 

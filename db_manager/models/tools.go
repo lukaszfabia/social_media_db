@@ -42,6 +42,7 @@ returns:
 
   - ptr to Author
 */
+
 func (a *Author) GetRandomAuthor(tx *gorm.DB, f *gofakeit.Faker, preferdAuthorType *AuthorType) *Author {
 	var randomAuthor Author
 	var count int64

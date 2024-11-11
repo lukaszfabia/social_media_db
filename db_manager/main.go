@@ -18,7 +18,7 @@ import (
 // }
 
 func main() {
-	if err := godotenv.Load("../.env"); err != nil {
+	if err := godotenv.Load(); err != nil {
 		panic("No .env file")
 	}
 
@@ -26,7 +26,7 @@ func main() {
 	s := database.Connect()
 
 	// s.ClearAllTables()
-	// s.InitEnums()
+	s.InitEnums()
 	s.DropTables()
 
 	if err := s.Sync(); err != nil {
