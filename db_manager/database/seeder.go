@@ -559,8 +559,81 @@ func (s *seederServiceImpl) createReactionsForPost(post models.Post, count int, 
 	}, s.f.Number(1, count), nil)
 }
 
-func (s *seederServiceImpl) FillGroups(count int)                   {}
-func (s *seederServiceImpl) FillMessagesAndConversations(count int) {}
+func (s *seederServiceImpl) FillGroups(count int) {
+	s.factory(func() bool {
+		var name faker.GroupName
+
+		groupName := name.Faker(s.f)
+
+		authorCount := s.f.Number(1, 6)
+
+		var authors []*models.Author
+		if err := s.db.Limit(authorCount).Find(&authors).Error; err != nil {
+			log.Println("Error fetching authors:", err)
+			return false
+		}
+
+		if len(authors) < 1 {
+			log.Println("Not enough authors to create a group")
+			return false
+		}
+
+		group := &models.Group{
+			Name:    groupName,
+			Members: authors,
+		}
+
+		if err := s.db.Create(group).Error; err != nil {
+			log.Println("Error creating group:", err)
+			return false
+		}
+
+		fmt.Printf("Group '%s' created with %d members.\n", groupName, len(authors))
+		return true
+	}, count, nil)
+}
+
+func (s *seederServiceImpl) FillMessagesAndConversations(count int) {
+	s.factory(func() bool {
+		iconUrl := s.f.ImageURL(200, 200)
+		var title faker.Title
+		var authors []*models.Author
+		if err := s.db.Limit(s.f.Number(1, 20)).Find(&authors).Error; err != nil {
+			log.Println("Error fetching authors:", err)
+			return false
+		}
+
+		conversation := &models.Conversation{
+			Title:    title.Fake(s.f),
+			IconUrl:  iconUrl,
+			AuthorID: authors[0].ID, // first fetched is admin of group
+			Members:  authors,
+		}
+
+		if err := s.db.Create(conversation).Error; err != nil {
+			log.Println("Error creating conversation:", err)
+			return false
+		}
+
+		msgLen := s.f.Number(1, 10)
+
+		for i := 0; i < msgLen; i++ {
+			messageContent := s.f.SentenceSimple()
+			message := &models.Message{
+				Content:        messageContent,
+				AuthorID:       authors[s.f.Number(1, len(authors)-1)].ID, // random author from the members
+				ConversationID: conversation.ID,
+			}
+
+			if err := s.db.Create(message).Error; err != nil {
+				log.Println("Error creating message:", err)
+				return false
+			}
+		}
+
+		return true
+	}, count, nil)
+}
 
 func (s *seederServiceImpl) FillAuthorLists() {
 	info := fmt.Sprintf("Authors have been filled")
@@ -584,9 +657,36 @@ func (s *seederServiceImpl) FillAuthorLists() {
 		curr.Comments = s.findAuthorsComments(curr.ID)
 		curr.ExternalAuthorLinks = s.createExternalLinksForAuthor(curr.ID)
 		curr.Reels = s.findAuthorsReels(curr.ID)
+		curr.Groups = s.setGroups(curr.ID)
+		curr.Conversations = s.getConversations(curr.ID) // converstation where author is admin
+		curr.Messages = s.getMessages(curr.ID)
 
 		return s.db.Save(&curr).Error == nil
 	}, len(authors), &info)
+}
+
+func (s *seederServiceImpl) getConversations(authorID uint) []models.Conversation {
+	var conversations []models.Conversation
+
+	s.db.Find(&conversations, "author_id = ?", authorID)
+
+	return conversations
+}
+
+func (s *seederServiceImpl) getMessages(authorID uint) []models.Message {
+	var messages []models.Message
+
+	s.db.Find(&messages, "author_id = ?", authorID)
+
+	return messages
+}
+
+func (s *seederServiceImpl) setGroups(authorID uint) []models.Group {
+	var groups []models.Group
+
+	s.db.Preload("Members", "author_id = ?", authorID).Find(&groups)
+
+	return groups
 }
 
 func (s *seederServiceImpl) findAuthorsComments(authorID uint) []models.Comment {

@@ -10,13 +10,13 @@ import (
 
 type Title string
 
-// Creates dummy title for page
+// Creates dummy title for page or conversation
 func (t *Title) Fake(f *gofakeit.Faker) string {
 	mySet := []string{
 		f.HipsterWord(),
 		f.School(),
 		f.AppName(),
-		fmt.Sprintf("%s - %s page", f.Company(), f.NounAbstract()),
+		fmt.Sprintf("%s - %s association", f.Company(), f.NounAbstract()),
 	}
 
 	return f.RandomString(mySet)
@@ -102,4 +102,12 @@ type UniqueEmail string
 func (u *UniqueEmail) Faker(f *gofakeit.Faker) string {
 	return fmt.Sprintf("%s%d@%s.com", strings.ToLower(f.Username()), f.Number(1, 1000000), f.DomainName())
 
+}
+
+type GroupName string
+
+func (g *GroupName) Faker(f *gofakeit.Faker) string {
+	groupName := fmt.Sprintf("%s %s", gofakeit.Adjective(), gofakeit.Noun())
+
+	return groupName
 }
