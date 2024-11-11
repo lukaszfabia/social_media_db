@@ -38,3 +38,16 @@ można użyć takiego launch.json:
     ]
 }
 ```
+
+w pierwszej kolejności warto
+>cd db_manager
+
+uwaga na zapisanie pliku .env jako "UTF with BOM" - trzeba zwykły UTF
+
+jeśli chcecie jeszcze raz zasetupować bazę, to należy najpierw wykonać 
+>make clear
+do wyczyszczenia potrzebnych danych
+
+aby w ogóle działało, trzeba pamiętać, aby WSL 2 działał i docker desktop był włączony
+
+jeśli jest błąd migracji, to trzeba w main.go odkomentować linijkę z dodawaniem enumów
