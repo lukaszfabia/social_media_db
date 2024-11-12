@@ -349,21 +349,23 @@ func (s *seederServiceImpl) FillComments(count int) {
 		}
 
 		//get some hashtags
-		s.factory(func() bool {
-			hashtag := models.GetRandomModel(s.db, s.f, &models.Hashtag{})
-			if tag, ok := hashtag.(*models.Hashtag); ok {
-				comment.Hashtags = append(comment.Hashtags, tag)
-				return true
-			} else {
-				log.Println("Failed to add hashtag")
+		if s.f.RandomInt([]int{0, 10}) < 4 {
+			s.factory(func() bool {
+				hashtag := models.GetRandomModel(s.db, s.f, &models.Hashtag{})
+				if tag, ok := hashtag.(*models.Hashtag); ok {
+					comment.Hashtags = append(comment.Hashtags, tag)
+					return true
+				} else {
+					log.Println("Failed to add hashtag")
+					return false
+				}
+			}, s.f.Number(1, 10), nil)
+
+			// overwrite comment with hashtags
+			if err := s.db.Save(&comment).Error; err != nil {
+				log.Println("Failed to save comment")
 				return false
 			}
-		}, s.f.Number(1, 10), nil)
-
-		// overwrite comment with hashtags
-		if err := s.db.Save(&comment).Error; err != nil {
-			log.Println("Failed to save comment")
-			return false
 		}
 
 		return true
