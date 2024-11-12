@@ -349,7 +349,7 @@ func (s *seederServiceImpl) FillComments(count int) {
 		}
 
 		//get some hashtags
-		if s.f.RandomInt([]int{0, 10}) < 4 {
+		if s.f.Number(0, 10) < 4 {
 			s.factory(func() bool {
 				hashtag := models.GetRandomModel(s.db, s.f, &models.Hashtag{})
 				if tag, ok := hashtag.(*models.Hashtag); ok {
@@ -531,7 +531,9 @@ func (s *seederServiceImpl) createPostsForAuthor(author *models.Author, count in
 			post.LocationID = location.ID
 		}
 
-		s.addHashtagsToPost(&post)
+		if s.f.Number(0, 10) < 4 {
+			s.addHashtagsToPost(&post)
+		}
 
 		if err := s.db.Save(&post).Error; err != nil {
 			log.Println("Failed to save post")
