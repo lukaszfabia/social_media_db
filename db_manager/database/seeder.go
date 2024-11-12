@@ -7,6 +7,7 @@ import (
 	"social_media/faker"
 	"social_media/models"
 	"social_media/pkg"
+	"strings"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"gorm.io/gorm"
@@ -193,9 +194,11 @@ func (s *seederServiceImpl) FillHashtags(count int) {
 
 	s.factory(func() bool {
 		var dummyHashtag faker.Hashtag
+		hashtag := dummyHashtag.Fake(s.f)
+		hashtag = strings.Replace(hashtag, " ", "", -1)
 
 		return s.db.Create(&models.Hashtag{
-			TagName: dummyHashtag.Fake(s.f),
+			TagName: hashtag,
 		}).Error == nil
 	}, count, &info)
 }
