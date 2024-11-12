@@ -7,6 +7,7 @@ import (
 	"os"
 	"social_media/models"
 	"strings"
+	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"gorm.io/driver/postgres"
@@ -41,7 +42,17 @@ type service struct {
 }
 
 // New connection with database, create service
-func Connect() Service {
+func Connect(logFile *os.File) Service {
+
+	customLogger := logger.New(
+		log.New(logFile, "\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: time.Second,
+			LogLevel:      logger.Info,
+			Colorful:      false,
+		},
+	)
+
 	var c Credintials = Credintials{
 		Host:     strings.TrimSpace(os.Getenv("HOST")),
 		User:     strings.TrimSpace(os.Getenv("POSTGRES_USER")),
@@ -52,7 +63,7 @@ func Connect() Service {
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", c.Host, c.User, c.Password, c.DBName, c.Port)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
+		Logger: customLogger,
 	})
 	if err != nil {
 		panic("Can't connect to db!\n" + err.Error())
@@ -150,18 +161,33 @@ func (s *service) InitEnums() {
 // Here you can stack fill funcs
 func (s *service) Cook() {
 
+	// s.seederService.FillPrivileges()
+	// s.seederService.FillUsers(2700)
+	// s.seederService.FillFriendsAndFriendRequests(100)
+	// s.seederService.FillTags(234)
+	// s.seederService.FillPages(100)
+	// s.seederService.FillLocations(12451)
+	// s.seederService.FillHashtags(345)
+	// s.seederService.FillComments(54350)
+	// s.seederService.FillReels(9000)
+	// s.seederService.FillPostAndReactions(10)         // quite slow
+	// s.seederService.FillMessagesAndConversations(10) // quite slow
+	// s.seederService.FillGroups(20)
+	// s.seederService.FillAuthorLists()
+
+	// for test purposes
+
 	s.seederService.FillPrivileges()
-	s.seederService.FillAuthors(300)
-	s.seederService.FillUsers(150)
-	s.seederService.FillFriendsAndFriendRequests(50)
-	s.seederService.FillTags(50)
-	s.seederService.FillPages(50)
-	s.seederService.FillLocations(50)
-	s.seederService.FillHashtags(30)
-	s.seederService.FillComments(50)
-	s.seederService.FillReels(50)
-	s.seederService.FillPostAndReactions(40)
-	s.seederService.FillMessagesAndConversations(40)
-	s.seederService.FillGroups(50)
+	s.seederService.FillUsers(10)
+	// s.seederService.FillFriendsAndFriendRequests(100)
+	s.seederService.FillTags(2)
+	s.seederService.FillPages(1)
+	s.seederService.FillLocations(2)
+	s.seederService.FillHashtags(3)
+	s.seederService.FillComments(2)
+	s.seederService.FillReels(3)
+	s.seederService.FillPostAndReactions(1)         // quite slow
+	s.seederService.FillMessagesAndConversations(4) // quite slow
+	s.seederService.FillGroups(2)
 	s.seederService.FillAuthorLists()
 }

@@ -36,8 +36,7 @@ func (t *Hashtag) Fake(f *gofakeit.Faker) string {
 		f.Language(),
 		f.MinecraftFood(),
 	}
-
-	return f.RandomString(mySet)
+	return strings.Replace(f.RandomString(mySet), " ", "", -1)
 }
 
 type Birthday time.Time

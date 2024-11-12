@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"social_media/database"
 
 	"github.com/joho/godotenv"
@@ -18,12 +19,17 @@ import (
 // }
 
 func main() {
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load("../.env"); err != nil {
 		panic("No .env file")
 	}
+	file, err := os.OpenFile("../logs/gorm.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
 
 	// create new service
-	s := database.Connect()
+	s := database.Connect(file)
 
 	// s.ClearAllTables()
 	s.InitEnums()

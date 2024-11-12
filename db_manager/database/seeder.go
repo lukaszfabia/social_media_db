@@ -1,13 +1,11 @@
 package database
 
 import (
+	"errors"
 	"fmt"
-	"log"
-	"math"
 	"social_media/faker"
 	"social_media/models"
 	"social_media/pkg"
-	"strings"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"gorm.io/gorm"
@@ -21,7 +19,7 @@ type SeederService interface {
 	FillPrivileges()
 	FillUsers(count int)
 
-	FillAuthors(count int)
+	// FillAuthors(count int)
 	FillComments(count int)
 	FillReels(count int)
 	FillFriendsAndFriendRequests(count int) // unstable
@@ -49,31 +47,6 @@ func (s *service) SeederService() SeederService {
 	return s.seederService
 }
 
-// Simple wrapper for fill functions
-// If there was an error occured during creating row it will work until done achieve count
-func (s *seederServiceImpl) factory(f func() bool, count int, info *string) {
-	var done int = 0
-	var failCount int = 0
-	maxFailCount := int(math.Ceil(float64(count) / 2.0)) // if 50% of rows fail, just stop it // if 50% of row will be failed just stop it
-
-	for done < count && maxFailCount > failCount {
-		if f() {
-			done++
-		} else {
-			failCount++
-		}
-	}
-
-	if maxFailCount == failCount {
-		log.Println("Can't make more sorry :(")
-		return
-	}
-
-	if info != nil {
-		log.Println(*info)
-	}
-}
-
 // Generates some tags, fills simple fields
 func (s *seederServiceImpl) FillTags(count int) {
 	var info string = fmt.Sprintf("%d Tags have been added", count)
@@ -96,22 +69,19 @@ func (s *seederServiceImpl) FillPages(count int) {
 		views := likes*s.f.Float64Range(1.4, 5.4) + s.f.Float64Range(23, 212)
 
 		var tags []*models.Tag
-		s.factory(func() bool {
-			randtag := models.GetRandomModel(s.db, s.f, &models.Tag{})
-			if tag, ok := randtag.(*models.Tag); ok {
-				tags = append(tags, tag)
-				return true
-			}
-			log.Println("Failed to retrieve a random tag or type assertion failed")
+		limit := s.f.Number(1, 10)
+		// get some tags
+		if err := s.db.Model(&models.Tag{}).Limit(limit).Order("RANDOM()").Find(&tags).Error; err != nil {
+			pkg.LogError("get", "tags", err)
 			return false
-		}, s.f.Number(1, 10), nil)
+		}
 
 		var page models.Page
 		pageType := models.PageType
 
 		randomAuthor, err := CreateRandomAuthor(s, &pageType)
 		if err != nil {
-			log.Println("Failed to create random author:", err)
+			pkg.LogError("create", "author", err)
 			return false
 		}
 
@@ -126,11 +96,10 @@ func (s *seederServiceImpl) FillPages(count int) {
 		page.Views = uint(views)
 
 		if err := s.db.Create(&page).Error; err != nil {
-			log.Println("Failed to create page:", err)
+			pkg.LogError("create", "page", err)
 			return false
 		}
 
-		var ads []*models.Advertisement
 		adsAmount := s.f.Number(1, 5) * s.f.Number(1, 5)
 		s.factory(func() bool {
 			ad := &models.Advertisement{
@@ -138,15 +107,15 @@ func (s *seederServiceImpl) FillPages(count int) {
 				AdLink:  s.f.URL(),
 				PageID:  page.ID,
 			}
-			if err := s.db.Create(&ad).Error; err == nil {
-				ads = append(ads, ad)
-				return true
+			if err := s.db.Create(&ad).Error; err != nil {
+				pkg.LogError("create", "ad", err)
+				return false
 			}
-			log.Println("Failed to create advertisement")
-			return false
+
+			page.Advertisements = append(page.Advertisements, ad)
+			return true
 		}, adsAmount, nil)
 
-		page.Advertisements = ads
 		return s.db.Save(&page).Error == nil
 	}, count, &info)
 }
@@ -161,6 +130,7 @@ func (s *seederServiceImpl) FillLocations(count int) {
 			Latitude:  dummyAddress.Latitude,
 			Longitude: dummyAddress.Longitude,
 		}
+
 		s.db.Create(&geolocation)
 
 		var address *models.Address = &models.Address{
@@ -195,26 +165,11 @@ func (s *seederServiceImpl) FillHashtags(count int) {
 	s.factory(func() bool {
 		var dummyHashtag faker.Hashtag
 		hashtag := dummyHashtag.Fake(s.f)
-		hashtag = strings.Replace(hashtag, " ", "", -1)
 
 		return s.db.Create(&models.Hashtag{
 			TagName: hashtag,
 		}).Error == nil
 	}, count, &info)
-}
-
-// Simple generator
-func nextPrivilege(arr []string) func() *string {
-	offset := 0
-
-	return func() *string {
-		if offset >= len(arr) {
-			return nil
-		}
-		priv := arr[offset]
-		offset++
-		return &priv
-	}
 }
 
 func (s *seederServiceImpl) FillPrivileges() {
@@ -224,6 +179,7 @@ func (s *seederServiceImpl) FillPrivileges() {
 	s.factory(func() bool {
 		priv := nextPriv()
 		if priv == nil {
+			pkg.LogError("get next", "privilage", nil)
 			return false
 		}
 		return s.db.Save(&models.UserPrivilege{
@@ -243,7 +199,7 @@ func (s *seederServiceImpl) FillUsers(count int) {
 
 		randomAuthor, err := CreateRandomAuthor(s, &userType)
 		if err != nil {
-			log.Println("Failed to create random author:", err)
+			pkg.LogError("create", "author", err)
 			return false
 		}
 
@@ -264,7 +220,7 @@ func (s *seederServiceImpl) FillUsers(count int) {
 		user.Email = reallyUniqueEmail.Faker(s.f)
 
 		if hashed, err := pkg.HashPassword(s.f.Password(true, true, true, true, false, 50)); err != nil {
-			log.Println(err)
+			pkg.LogError("hash", "password", err)
 			return false
 		} else {
 			user.Password = hashed
@@ -282,87 +238,59 @@ func (s *seederServiceImpl) FillUsers(count int) {
 		user.IsVerified = s.f.Bool()
 
 		if up, err := up.GetRandomPrivilege(s.db, s.f); err != nil {
-			log.Println("Cant get random priv")
+			pkg.LogError("get random", "privilage", err)
 			return false
 		} else {
 			user.UserPrivilegeID = up.ID
 		}
 
-		var error = s.db.Create(&user).Error
-		if error != nil {
-			log.Println("Failed to create user:", error)
+		if err := s.db.Create(&user).Error; err != nil {
+			pkg.LogError("create", "user", err)
 			return false
 		}
 		return true
 	}, count, &info)
 }
 
-func (s *seederServiceImpl) FillAuthors(count int) {
-	var info string = fmt.Sprintf("%d Authors have been added", count)
+// func (s *seederServiceImpl) FillAuthors(count int) {
+// 	var info string = fmt.Sprintf("%d Authors have been added", count)
 
-	s.factory(func() bool {
-		_, err := CreateRandomAuthor(s, nil)
-		if err != nil {
-			log.Println("Failed to create random author:", err)
-			return false
-		}
-		return err == nil
-	}, count, &info)
-}
-
-func CreateRandomAuthor(s *seederServiceImpl, authorType *models.AuthorType) (*models.Author, error) {
-	var author models.Author
-	var at models.AuthorType
-
-	if authorType == nil {
-		var err error
-		authorType, err = at.GetRandomAuthorType(s.db, s.f)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	author.AuthorType = *authorType
-	if err := s.db.Create(&author).Error; err != nil {
-		return nil, err
-	}
-	return &author, nil
-}
+// 	s.factory(func() bool {
+// 		_, err := CreateRandomAuthor(s, nil)
+// 		if err != nil {
+// 			log.Println("Failed to create random author:", err)
+// 			return false
+// 		}
+// 		return err == nil
+// 	}, count, &info)
+// }
 
 func (s *seederServiceImpl) FillComments(count int) {
 	var info string = fmt.Sprintf("%d Comments have been added", count)
 
 	s.factory(func() bool {
 		var comment models.Comment
-		var a models.Author
+		var randAuthor models.Author
 
-		if randomAuthor := a.GetRandomAuthor(s.db, s.f, nil); randomAuthor != nil {
-			comment.AuthorID = randomAuthor.ID
-			comment.Author = *randomAuthor
-		}
-
-		comment.Content = s.f.Sentence(10)
-
-		if err := s.db.Create(&comment).Error; err != nil {
-			log.Println("Failed to create comment")
+		if err := s.db.Order("RANDOM()").First(&randAuthor).Error; err != nil {
+			pkg.LogError("fetch", "author", err)
 			return false
 		}
 
-		//get some hashtags
-		s.factory(func() bool {
-			hashtag := models.GetRandomModel(s.db, s.f, &models.Hashtag{})
-			if tag, ok := hashtag.(*models.Hashtag); ok {
-				comment.Hashtags = append(comment.Hashtags, tag)
-				return true
-			} else {
-				log.Println("Failed to add hashtag")
-				return false
-			}
-		}, s.f.Number(1, 10), nil)
+		comment.AuthorID = randAuthor.ID
+		comment.Content = s.f.Sentence(10)
 
-		// overwrite comment with hashtags
-		if err := s.db.Save(&comment).Error; err != nil {
-			log.Println("Failed to save comment")
+		limit := s.f.Number(1, 10)
+		var hashtags []*models.Hashtag
+		if err := s.db.Order("RANDOM()").Limit(limit).Find(&hashtags).Error; err != nil {
+			pkg.LogError("get", "hashtags", err)
+			return false
+		}
+
+		comment.Hashtags = hashtags
+
+		if err := s.db.Create(&comment).Error; err != nil {
+			pkg.LogError("create", "comment", err)
 			return false
 		}
 
@@ -377,11 +305,15 @@ func (s *seederServiceImpl) FillReels(count int) {
 		var reel models.Reel = models.Reel{
 			Content: s.f.SentenceSimple(),
 		}
+
 		var a models.Author
 
-		if randomAuthor := a.GetRandomAuthor(s.db, s.f, nil); randomAuthor != nil {
-			reel.AuthorID = randomAuthor.ID
+		if err := s.db.Order("RANDOM()").First(&a).Error; err != nil {
+			pkg.LogError("fetch", "author", err)
+			return false
 		}
+
+		reel.AuthorID = a.ID
 
 		return s.db.Create(&reel).Error == nil
 	}, count, &info)
@@ -392,21 +324,21 @@ func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
 
 	var users []models.User
 	if err := s.db.Find(&users).Error; err != nil {
-		log.Println("Failed to fetch users from db:", err)
+		pkg.LogError("fetch", "users", err)
 		return
 	}
 
 	usersAmount := len(users)
 
 	if usersAmount < 2 {
-		log.Println("Not enough users to create friends")
+		pkg.LogError("create", "friends", errors.New("not enough users to create friends"))
 		return
 	}
 
 	// new transaction
 	tx := s.db.Begin()
 	if tx.Error != nil {
-		log.Println("Failed to start transaction:", tx.Error)
+		pkg.LogError("start", "transaction", tx.Error)
 		return
 	}
 
@@ -422,7 +354,7 @@ func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
 		}
 
 		if err := tx.Create(&friendRequest).Error; err != nil {
-			log.Println("Failed to save friend request:", err)
+			pkg.LogError("save", "friend request", err)
 			tx.Rollback()
 			return false
 		}
@@ -435,38 +367,38 @@ func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
 		user2 := users[s.f.Number(0, usersAmount-1)]
 
 		if user1.AuthorID == user2.AuthorID {
-			log.Println("Cant be in friendship with himself")
+			pkg.LogError("create", "relation", errors.New("cant be in friendship with himself"))
 			return false
 		}
 
 		// check if a friend request exists
 		var existingRequest models.FriendRequest
 		if err := tx.Where("sender_id = ? AND receiver_id = ?", user1.AuthorID, user2.AuthorID).Or("sender_id = ? AND receiver_id = ?", user2.AuthorID, user1.AuthorID).First(&existingRequest).Error; err == nil {
-			//log.Printf("Already exists this (%d, %d) of relation in friends requests\n", user1.AuthorID, user2.AuthorID)
+			pkg.LogError("create", "relation", fmt.Errorf("Already exists this (%d, %d) of relation in friends requests\n", user1.AuthorID, user2.AuthorID))
 			return false
 		}
 
 		// def friendship (user1, user2) <=> (user2, user1)
 		if err := tx.Model(&user1).Association("Friends").Append(&user2); err != nil {
-			log.Println("Failed to add friend:", err)
+			pkg.LogError("add", "friend", err)
 			tx.Rollback()
 			return false
 		}
 
 		if err := tx.Model(&user2).Association("Friends").Append(&user1); err != nil {
-			log.Println("Failed to add friend:", err)
+			pkg.LogError("add", "friend", err)
 			tx.Rollback()
 			return false
 		}
 
 		if err := tx.Save(&user1).Error; err != nil {
-			log.Println("Failed to save user1:", err)
+			pkg.LogError("save", "user1", err)
 			tx.Rollback()
 			return false
 		}
 
 		if err := tx.Save(&user2).Error; err != nil {
-			log.Println("Failed to save user2:", err)
+			pkg.LogError("save", "user2", err)
 			tx.Rollback()
 			return false
 		}
@@ -476,7 +408,7 @@ func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
 
 	if tx.Error == nil {
 		if err := tx.Commit().Error; err != nil {
-			log.Println("Failed to commit transaction:", err)
+			pkg.LogError("commit", "transation", err)
 			tx.Rollback()
 			return
 		}
@@ -489,7 +421,7 @@ func (s *seederServiceImpl) FillPostAndReactions(count int) {
 	// fetch all authors from the database
 	authors := []*models.Author{}
 	if err := s.db.Find(&authors).Error; err != nil {
-		log.Println("Failed to fetch authors from db")
+		pkg.LogError("424. fetch", "authors", err)
 		return
 	}
 
@@ -504,7 +436,7 @@ func (s *seederServiceImpl) FillPostAndReactions(count int) {
 		author.Posts = append(author.Posts, posts...)
 
 		if err := s.db.Save(&author).Error; err != nil {
-			log.Println("Failed to save author")
+			pkg.LogError("save", "author", err)
 			return false
 		}
 
@@ -523,16 +455,27 @@ func (s *seederServiceImpl) createPostsForAuthor(author *models.Author, count in
 			IsPublic: s.f.Bool(),
 		}
 
-		randLocation := models.GetRandomModel(s.db, s.f, &models.Location{})
-		if location, ok := randLocation.(*models.Location); ok {
-			post.Location = location
-			post.LocationID = location.ID
+		var randLocation models.Location
+
+		if err := s.db.Order("RANDOM()").First(&randLocation).Error; err != nil {
+			pkg.LogError("fetch", "location", err)
+			return false
 		}
 
-		s.addHashtagsToPost(&post)
+		post.Location = &randLocation
+		post.LocationID = randLocation.ID
+
+		var hashtags []*models.Hashtag
+		limit := s.f.Number(1, 10)
+		if err := s.db.Order("RANDOM()").Limit(limit).Find(&hashtags).Error; err != nil {
+			pkg.LogError("get", "hashtags", err)
+			return false
+		}
+
+		post.Hashtags = append(post.Hashtags, hashtags...)
 
 		if err := s.db.Save(&post).Error; err != nil {
-			log.Println("Failed to save post")
+			pkg.LogError("save", "post", err)
 			return false
 		}
 
@@ -545,24 +488,10 @@ func (s *seederServiceImpl) createPostsForAuthor(author *models.Author, count in
 	return posts
 }
 
-func (s *seederServiceImpl) addHashtagsToPost(post *models.Post) {
-	randHashtagAmount := s.f.Number(1, 10)
-
-	s.factory(func() bool {
-		hashtag := models.GetRandomModel(s.db, s.f, &models.Hashtag{})
-		if tag, ok := hashtag.(*models.Hashtag); ok {
-			post.Hashtags = append(post.Hashtags, tag)
-			return true
-		}
-		log.Println("Failed to add hashtag")
-		return false
-	}, randHashtagAmount, nil)
-}
-
 func (s *seederServiceImpl) createReactionsForPost(post models.Post, count int, author *models.Author) {
 	authors := []*models.Author{}
 	if err := s.db.Find(&authors).Error; err != nil {
-		log.Println("Failed to fetch authors for reactions")
+		pkg.LogError("494. fetch", "authors", err)
 		return
 	}
 
@@ -577,7 +506,7 @@ func (s *seederServiceImpl) createReactionsForPost(post models.Post, count int, 
 			}
 
 			if err := s.db.Save(&reaction).Error; err != nil {
-				log.Println("Failed to save reaction")
+				pkg.LogError("save", "reaction", err)
 				return false
 			}
 
@@ -601,12 +530,12 @@ func (s *seederServiceImpl) FillGroups(count int) {
 
 		var authors []*models.Author
 		if err := s.db.Limit(authorCount).Find(&authors).Error; err != nil {
-			log.Println("Error fetching authors:", err)
+			pkg.LogError("533. fetch", "authors", err)
 			return false
 		}
 
 		if len(authors) < 1 {
-			log.Println("Not enough authors to create a group")
+			pkg.LogError("create", "group", fmt.Errorf("not enough authors to create group: %d < 1", len(authors)))
 			return false
 		}
 
@@ -616,11 +545,10 @@ func (s *seederServiceImpl) FillGroups(count int) {
 		}
 
 		if err := s.db.Create(group).Error; err != nil {
-			log.Println("Error creating group:", err)
+			pkg.LogError("create", "group", err)
 			return false
 		}
 
-		fmt.Printf("Group '%s' created with %d members.\n", groupName, len(authors))
 		return true
 	}, count, nil)
 }
@@ -631,7 +559,7 @@ func (s *seederServiceImpl) FillMessagesAndConversations(count int) {
 		var title faker.Title
 		var authors []*models.Author
 		if err := s.db.Limit(s.f.Number(1, 20)).Find(&authors).Error; err != nil {
-			log.Println("Error fetching authors:", err)
+			pkg.LogError("562. fetch", "authors", err)
 			return false
 		}
 
@@ -643,7 +571,7 @@ func (s *seederServiceImpl) FillMessagesAndConversations(count int) {
 		}
 
 		if err := s.db.Create(conversation).Error; err != nil {
-			log.Println("Error creating conversation:", err)
+			pkg.LogError("create", "conversation", err)
 			return false
 		}
 
@@ -652,8 +580,8 @@ func (s *seederServiceImpl) FillMessagesAndConversations(count int) {
 		// get random author
 		rAuhtor := &models.Author{}
 
-		if err := s.db.Order("RANDOM()").First(&rAuhtor).Error; err != nil {
-			log.Println("Failed to get random author")
+		if err := s.db.Order("RANDOM()").First(rAuhtor).Error; err != nil {
+			pkg.LogError("get", "author", err)
 			return false
 		}
 
@@ -666,7 +594,7 @@ func (s *seederServiceImpl) FillMessagesAndConversations(count int) {
 			}
 
 			if err := s.db.Create(message).Error; err != nil {
-				log.Println("Error creating message:", err)
+				pkg.LogError("create", "message", err)
 				return false
 			}
 		}
@@ -681,7 +609,7 @@ func (s *seederServiceImpl) FillAuthorLists() {
 	// get all authors from db
 	var authors []*models.Author
 	if err := s.db.Find(&authors).Error; err != nil {
-		log.Println("No authors found. Please create authors before calling this function!")
+		pkg.LogError("get", "authors", err)
 		return
 	}
 
@@ -733,7 +661,7 @@ func (s *seederServiceImpl) findAuthorsComments(authorID uint) []models.Comment 
 	var comments []models.Comment
 
 	if err := s.db.Model(&models.Comment{}).Find(&comments, "author_id = ?", authorID).Error; err != nil {
-		log.Println("Author has no comments")
+		pkg.LogError("get", "comments", errors.New("author has no comments"))
 		return nil
 	}
 
@@ -743,8 +671,8 @@ func (s *seederServiceImpl) findAuthorsComments(authorID uint) []models.Comment 
 func (s *seederServiceImpl) findAuthorsReels(authorID uint) []models.Reel {
 	var reels []models.Reel
 
-	if err := s.db.Model(&models.Reel{}).Find(&reels, "author_id = ?", authorID).Error; err != nil {
-		log.Println("Author has no comments")
+	if err := s.db.Where("author_id = ?", authorID).Find(&reels).Error; err != nil {
+		pkg.LogError("fetch", "reels", err)
 		return nil
 	}
 
@@ -759,7 +687,6 @@ func (s *seederServiceImpl) createEventsForAuthor(authorID uint) []models.Event 
 		var rd faker.DateRange
 		dates := rd.Faker(s.f)
 
-		randLocation := models.GetRandomModel(s.db, s.f, &models.Location{})
 		event := models.Event{
 			AuthorID:    authorID,
 			Name:        e.Faker(s.f),
@@ -768,28 +695,30 @@ func (s *seederServiceImpl) createEventsForAuthor(authorID uint) []models.Event 
 			EndDate:     &dates.EndDate,
 		}
 
-		if location, ok := randLocation.(*models.Location); ok {
-			event.Location = location
-			event.LocationID = location.ID
+		var randLocation models.Location
+
+		if err := s.db.Order("RANDOM()").First(&randLocation).Error; err != nil {
+			pkg.LogError("fetch", "location", err)
+			return false
 		}
 
+		event.Location = &randLocation
+		event.LocationID = randLocation.ID
+
 		if err := s.db.Save(&event).Error; err != nil {
-			log.Println(err)
+			pkg.LogError("save", "event", err)
 			return false
 		}
 
 		// take n ppl
-		s.factory(func() bool {
-			var chosen models.Author
+		var members []*models.Author
+		limit := s.f.Number(1, 10)
+		if err := s.db.Where("id != ?", authorID).Order("RANDOM()").Limit(limit).Find(&members).Error; err != nil {
+			pkg.LogError("716. fetch", "authors", err)
+			return false
+		}
 
-			if err := s.db.Where("id <> ?", authorID).Order("RANDOM()").First(&chosen).Error; err != nil {
-				log.Println("Failed to find random author")
-				return false
-			}
-
-			event.Members = append(event.Members, &chosen)
-			return true
-		}, s.f.Number(1, 10), nil)
+		event.Members = append(event.Members, members...)
 
 		events = append(events, event)
 		return true
@@ -811,7 +740,7 @@ func (s *seederServiceImpl) createExternalLinksForAuthor(authorID uint) []models
 		}
 
 		if err := s.db.Create(&link).Error; err != nil {
-			log.Println("Failed to create link for author")
+			pkg.LogError("create", "link", err)
 			return false
 		}
 
