@@ -95,6 +95,12 @@ func (s *seederServiceImpl) FillPages(count int) {
 		page.Likes = uint(likes)
 		page.Views = uint(views)
 
+		pictureUrl := s.f.ImageURL(800, 600)
+		page.PictureUrl = &pictureUrl
+
+		background := s.f.ImageURL(1920, 1080)
+		page.BackgroundUrl = &background
+
 		if err := s.db.Create(&page).Error; err != nil {
 			pkg.LogError("create", "page", err)
 			return false
