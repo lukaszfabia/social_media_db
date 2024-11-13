@@ -27,6 +27,7 @@ type Group struct {
 	gorm.Model
 	Name    string    `gorm:"not null;size:100"`
 	Members []*Author `gorm:"many2many:group_members;constraint:OnDelete:CASCADE;check:member_count >= 1 AND member_count <= 10000000"`
+	Posts   []*Post   `gorm:"foreignKey:GroupID;constraint:OnDelete:CASCADE"`
 }
 
 type User struct {
@@ -91,6 +92,9 @@ type Post struct {
 	LocationID uint
 
 	Hashtags []*Hashtag `gorm:"many2many:post_hashtags;constraint:OnDelete:CASCADE"`
+
+	Group   *Group `gorm:"foreignKey:GroupID;references:ID;constraint:OnDelete:CASCADE"`
+	GroupID *uint
 }
 
 type Tag struct {
@@ -167,8 +171,10 @@ type Page struct {
 	AuthorID uint
 	Author   Author `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 
-	Title          string `gorm:"not null;size:100"`
-	Tags           []*Tag `gorm:"many2many:page_tags"`
+	Title          string  `gorm:"not null;size:100"`
+	PictureUrl     *string `gorm:"size:255"`
+	BackgroundUrl  *string `gorm:"size:255"`
+	Tags           []*Tag  `gorm:"many2many:page_tags"`
 	Advertisements []*Advertisement
 	Views          uint `gorm:"default:0"`
 	Likes          uint `gorm:"default:0"`

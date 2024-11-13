@@ -465,6 +465,22 @@ func (s *seederServiceImpl) createPostsForAuthor(author *models.Author, count in
 		post.Location = &randLocation
 		post.LocationID = randLocation.ID
 
+		var groups []models.Group
+		if err := s.db.Model(&author).Association("Groups").Find(&groups); err != nil {
+			pkg.LogError("fetch", "groups", err)
+			return false
+		}
+
+		var chanceToBeFromGroup float64 = 0.5
+
+		if s.f.Float64Range(0, 1) < chanceToBeFromGroup {
+			if len(groups) > 0 {
+				group := groups[s.f.Number(0, len(groups)-1)]
+				post.GroupID = &group.ID
+				post.Group = &group
+			}
+		}
+
 		var hashtags []*models.Hashtag
 		limit := s.f.Number(1, 10)
 		if err := s.db.Order("RANDOM()").Limit(limit).Find(&hashtags).Error; err != nil {

@@ -178,16 +178,16 @@ func (s *service) Cook() {
 	// for test purposes
 
 	s.seederService.FillPrivileges()
-	s.seederService.FillUsers(10)
+	s.seederService.FillUsers(100)
 	// s.seederService.FillFriendsAndFriendRequests(100)
-	s.seederService.FillTags(2)
-	s.seederService.FillPages(1)
-	s.seederService.FillLocations(2)
-	s.seederService.FillHashtags(3)
-	s.seederService.FillComments(2)
-	s.seederService.FillReels(3)
-	s.seederService.FillPostAndReactions(1)         // quite slow
-	s.seederService.FillMessagesAndConversations(4) // quite slow
-	s.seederService.FillGroups(2)
+	s.seederService.FillTags(20)
+	s.seederService.FillPages(10)
+	s.seederService.FillLocations(20)
+	s.seederService.FillHashtags(30)
+	s.seederService.FillComments(20)
+	s.seederService.FillReels(30)
+	s.seederService.FillGroups(20)
+	s.seederService.FillPostAndReactions(10)         // quite slow
+	s.seederService.FillMessagesAndConversations(40) // quite slow
 	s.seederService.FillAuthorLists()
 }

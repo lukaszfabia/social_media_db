@@ -6,6 +6,10 @@ run:
 docker-run:
 	@echo "Starting database..."
 	@bash ../stop_postgres.sh
+	@make docker-up
+
+docker-up:
+	@echo "Starting database..."
 	@docker-compose --env-file ../.env up 
 
 docker-down:
