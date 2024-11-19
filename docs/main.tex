@@ -153,7 +153,7 @@ Do stworzenia struktury bazy wykorzystano mechanizm ORM - (\href{https://gorm.io
 \end{figure}
 
 
-\section{Faza Fizyczna cd.}
+\section{Etap 4: Faza fizyczna 2}
 
 \quad Standardowo kod można zobaczyć w repoztorium na gicie: \href{https://github.com/lukaszfabia/social_media_db}{social media db}. \\
 
@@ -182,5 +182,66 @@ Reszta rzeczy, które zostały wykonane:
     \item Konfiguracja loggera 
     \item Funkcja haszująca hasło 
 \end{itemize}
+
+\section{Etap 5: Faza fizyczna 3}
+
+\quad W tej fazie projektu stworzyliśmy projekt interfejsu graficznego w programie Figma oraz napisaliśmy 10 nietrywialnych kwerend w SQL.
+
+\subsection{Projekt interfejsu graficznego}
+\quad Zaprojektowaliśmy następujące 10 widoków do aplikacji mobilnej: 
+
+\begin{itemize}
+    \item Strona główna
+    \item Strona komentarzy i rekacji
+    \item Strona profilu
+    \item Strona strony (page)
+    \item Strona grupy
+    \item Strona wydarzenia
+    \item Strona konwersacji
+    \item Strona panelu konwersacji
+    \item Strona rolek (reel)
+    \item Strona ze znajomymi
+\end{itemize}
+
+\quad Podczas projektowania zauważyliśmy parę drobnych rzeczy, które można by było poprawić - np. brak ikony czy grafiki tła dla strony. Tak więc poprawiliśmy takie nieścisłości i zaktualizowaliśmy kod seeder.go, który zajmuje się generowaniem tych danych.
+
+\quad Pełny projekt interfejsu graficznego znajduje się w załączonym pliku "figma.pdf".
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.25\textwidth]{images/figma.png}
+    \caption{1 z widoków interfejsu graficznego}
+    \label{fig:figma}
+\end{figure}
+
+\subsection{Kwerendy SQL}
+\quad Poniżej znajdują się 10 kwerend SQL, które zostały napisane w celu przeszukania i stworzenia raportów na podstawie bazy danych:
+
+\begin{itemize}
+    \item 10 najpopularniejszych hashtagów z ostatnich 7 dni
+    \item Konwersacje autora
+    \item Publiczne posty autora
+    \item Średnia liczba znajomych
+    \item Średnia liczba reakcji na post w ostatnim miesiącu
+    \item Wydarzenia w danym mieście (np. Saint Petersburg)
+    \item Wydarzenia, w których wezmą udział znajomi autora
+    \item Tagi stron, posortowane po liczbie polubień i wyświetleń
+    \item Ludzie ze wspólnymi znajomymi
+    \item Użytkownicy z najwiekszą średnią liczbą reakcji na posty
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/mutual_friends_sql.png}
+    \caption{Wynik kwerendy wyszukującej użytkowników z dużą liczbą wspólnych znajomych}
+    \label{fig:sql_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/event_mutuals_sql.png}
+    \caption{Wynik kwerendy wyszukującej wydarzenia, na które zapisali się znajomi użytkownika}
+    \label{fig:sql_2}
+\end{figure}
 
 \end{document}
