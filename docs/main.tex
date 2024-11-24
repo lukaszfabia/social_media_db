@@ -239,9 +239,118 @@ Reszta rzeczy, które zostały wykonane:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/event_mutuals_sql.png}
+    \includegraphics[width=0.7\textwidth]{images/event_mutuals_sql.png}
     \caption{Wynik kwerendy wyszukującej wydarzenia, na które zapisali się znajomi użytkownika}
     \label{fig:sql_2}
 \end{figure}
+
+\section{Etap 5: Faza fizyczna 4}
+
+Przykładowy wynik działania \texttt{EXPLAIN}
+
+\begin{verbatim}
+    Seq Scan on foo  (cost=0.00..155.00 rows=10000 width=4)
+\end{verbatim}
+
+Ogólnie można powiedzieć, że komenda do dostarcza bardzo dokładne informacje w porównaniu np. do \textbf{MySQL}.\\
+
+Powyższa komenda to sposób w jaki zapytanie może zostać wykonane. W tym wypadku mamy wykonanie sekwencyjne, czyli skanujemy całą tabelę w celu znalezienia wierszy spełniających warunki w kwerendzie.\\
+
+\textbf{Koszt}(cost) - wartość po lewej to koszt początkowy zapytania tutaj jest on równy 0.00, kolejna wartość to szacowany koszt operacji, wartość ta jest obliczana przez system bazodanowy.
+
+\textbf{Wiersze}(rows) - ilość wierszy spełniająca dane kryteria.
+
+\textbf{Szerokość}(width) - waga wiersza w \underline{bajtach}\\
+
+Zatem optymalizacja zapytań będzie polegała na minimalizacji tych "kosztów". W tym celu wykorzystuje się \textbf{indeksy}. \\
+
+\subsection{Różne typy indeksów i ich zastosowanie}
+
+\begin{table}[htbp]
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{1}{|c|}{\textbf{Typ indeksu}} & \textbf{Zastosowanie}                                               \\ \hline
+\textbf{B-Tree}                            & Wyszukiwanie, sortowanie, zakresy, klucze główne, indeksy unikalne. \\ \hline
+\textbf{Hash}                              & Szybkie porównania równości (=).                                    \\ \hline
+\textbf{GiST}                              & Dane przestrzenne, zakresy, hierarchie.                             \\ \hline
+\textbf{BRIN}                              & Duże tabele z posortowanymi danymi, dane archiwalne.                \\ \hline
+\end{tabular}
+\end{table}
+
+
+\newpage
+
+\subsection{Obserwacje}
+
+Indeksy nie pomogą w każdej operacji - na przykład dla kwerend, gdzie największym kosztem jest grupowanie, mogą niekoniecznie pomóc.
+
+Hash nie przynosi znaczącej poprawy wydajności w naszych zapytaniach w porównaniu z B-tree.
+
+Zapytania wykorzystujące funkcje agregujące są trudne do optymalizacji, a dodanie indeksów w większości przypadków nie przyniosło zauważalnych korzyści.
+
+Wyjątek stanowi zapytanie \textbf{show\_events\_in\_st\_petersburg}, gdzie zastosowanie indeksu złożonego przyniosło wyraźną poprawę:
+\begin{itemize}
+    \item Zastosowanie indeksu typu \textbf{B-tree} zmniejszyło koszt zapytania o około 10\%.
+    \item Dodanie indeksu typu \textbf{BRIN} dodatkowo obniżyło koszt o kolejne 10\%.
+\end{itemize}
+
+Dla zapytań niewykorzystujących funkcji agregujących, dodanie indeksów pozwoliło na kilkukrotne zmniejszenie kosztów ich wykonania.
+
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/index_show_authors_posts_before.png}
+        \label{fig:index_show_authors_posts_before}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/index_show_authors_posts_after.png}
+        \label{fig:index_show_authors_posts_after}
+    \end{minipage}
+    \caption{Przykładowe czasy zapytań bez i z indeksami.}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/index_show_events_with_friends_before.png}
+        \label{fig:index_show_events_with_friends_before}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/index_show_events_with_friends_after.png}
+        \label{fig:index_show_events_with_friends_after}
+    \end{minipage}
+    \caption{Przykładowe czasy zapytań bez i z indeksami.}
+\end{figure}
+
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/show_events_in_st_petersburg with composite index (end_date, start_date) using brin.png}
+        \label{fig:show_events_in_st_petersburg1}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/show_events_in_st_petersburg with composite index (end_date, start_date).png}
+        \label{fig:show_events_in_st_petersburg3}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/show_events_in_st_petersburg without composite index.png}
+        \label{fig:show_events_in_st_petersburg2}
+    \end{minipage}
+    \caption{Optymalizacja zapytania z wydarzeniami w Piotrogrodzie}
+\end{figure}
+
 
 \end{document}
