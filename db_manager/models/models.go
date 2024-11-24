@@ -196,5 +196,5 @@ type Reaction struct {
 
 type Hashtag struct {
 	gorm.Model
-	TagName string `gorm:"not null;unique;size:200"`
+	TagName string `gorm:"not null;unique;size:200;uniqueIndex"`
 }
