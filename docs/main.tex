@@ -244,7 +244,7 @@ Reszta rzeczy, które zostały wykonane:
     \label{fig:sql_2}
 \end{figure}
 
-\section{Etap 5: Faza fizyczna 4}
+\section{Etap 6: Faza fizyczna 4}
 
 Przykładowy wynik działania \texttt{EXPLAIN}
 
@@ -351,6 +351,40 @@ Dla zapytań niewykorzystujących funkcji agregujących, dodanie indeksów pozwo
     \end{minipage}
     \caption{Optymalizacja zapytania z wydarzeniami w Piotrogrodzie}
 \end{figure}
+
+\newpage
+
+\section{Etap 7: Faza fizyczna 5}
+
+\subsection{Mocne strony projektu (S)}
+
+
+Jedną z pierwszych mocnych stron projektu jest wydzielenie tabeli \texttt{authors}. Pozwoliło to na rozszerzenie możliwości tworzenia nowych tabel dla użytkowników (\texttt{user}, \texttt{page}). Dodatkowo w ten sposób pozbyto się \textit{redundantnych} relacji, poniważ \textbf{strona} jak i \textbf{użytkownik} mogli w domyśle wykonywać te same czynności na innych tabelach.
+
+Zastosowanie usuwania kaskadowego również okazało się być bardzo pomocne, ponieważ w ten sposób przy usuwaniu jakichkolwiek danych mieliśmy pewność, że dane będą spójne.
+
+Będąc w temacie usuwania, dane z bazy nie były całkowicie usuwane(\textit{hard delete}). Co pozwoli na przywrcanie np. konta niezdecydowanego użytkownika, ale także pozowli śledzić historię danych. Ponadto dane, które nie są widoczne dla użytkonika mogą posłużyć np. do analiz biznesowych. Jako ostani plus można powiedzieć, że nasza baza spełnia przepisy dot. RODO.
+
+Skrypt również jest mocną stroną projektu, ponieważ to on generuje tabele w bazie danych, dodając potrzebne ograniczenia do atrybutów czy enumeracje. Jest on solidną bazą pod część backendową (związaną z warstwą modeli np. dla \textit{architektury warstwowej}) aplikacji. Dodatkowo można w prosty sposób zmienić system dla którego ma być generowana baza oraz napisany został również skrpty, który uruchomi bazę w kontenerze \texttt{Dockerowym}, dzięki czemu nie trzeba posiadać samego postgresa, pgadmina czy innych pluginów, żeby zarządzać tą bazą.
+
+Co do wybranego systemu, system PostgreSQL, okazał się on być całkiem wydajnym pod względem operacji typu \textit{CRUD} na tabelach.
+
+
+\subsection{Słabe strony projektu (W)}
+
+Pierwszą rzeczą może być wolno działający skrpyt generujący dane, jest skutek zagnieżdżonych wywołań z losową liczbą danych do wygenerowania lub biblioteki, która nie bardzo radziła sobie z generowaniem bardzo losowych, często unikalnych danych. 
+
+Niewykorzystanie draw.io - narzędzia do modelowania diagrmów, w naszym wypadku diagramów ERD, które mogłoby pomóc przy łatwiejszym zintegrowaniu ORM'u z ERD'em, po przez przeciąganie modeli na edytor. 
+
+\subsection{Możliwości (O)}
+
+Tak jak już wcześniej wspomniałem, baza jest dobrą podstawą do stworzenia systemu na wzór \textbf{Facebooka} czy \textbf{Twittera} po przez zbudowanie jakiegoś prostego serwisu REST'owego, który mógłby być lepiej testowany przez społeczność. Pozwoliłoby to na dopracowanie bazy danych w miejscach gdzie brakowałoby wydajności.
+
+Jeśli chodzi o możliwości rozbudowy bazy to możnaby dodać np. lepszą obsługę mediów(wydzielenie osobnej tabeli), można być też poprawić tabele związane z lokalizacjami i zamiast przechowywania danych koordynatów przechowywać typ \texttt{Point}, do obsługi współrzędnych geograficznych wykorzystując plugin \textbf{PostGIS}. Możnaby wtedy ulpeszyć sposób wyszukiwania wydarzeń użytkownikowi, po przez szukanie ich w promieniu \textit{n} m/km.
+
+\subsection{Zagrożenia (T)}
+
+Tabela, która może być problematyczna w utrzymaniu to tabela z wiadomościami. Problemem baz relacyjnych jest brak horyzontalnej skalowalności, czyli nie możemy wyjść poza jedną maszynę, możemy tą maszynę tylko ulepszać dodając lepsze podzespoły. W przypadku tabeli z wiadomościami może być problem, ponieważ może ona gwałtownie rosnąć. Dlatego lepszym rozwiązaniem byłoby podejeście hybrdowe, czyli niektóre tabele przenosimy do baz NOSQL, dzięki czemu możmy rozproszyć obliczenia a nasz system nie będzie "puchł".
 
 
 \end{document}
