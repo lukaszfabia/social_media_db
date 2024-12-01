@@ -359,32 +359,65 @@ Dla zapytań niewykorzystujących funkcji agregujących, dodanie indeksów pozwo
 \subsection{Mocne strony projektu (S)}
 
 
-Jedną z pierwszych mocnych stron projektu jest wydzielenie tabeli \texttt{authors}. Pozwoliło to na rozszerzenie możliwości tworzenia nowych tabel dla użytkowników (\texttt{user}, \texttt{page}). Dodatkowo w ten sposób pozbyto się \textit{redundantnych} relacji, poniważ \textbf{strona} jak i \textbf{użytkownik} mogli w domyśle wykonywać te same czynności na innych tabelach.
+Jedną z pierwszych mocnych stron projektu jest wydzielenie tabeli \texttt{authors}. Pozwoliło to na rozszerzenie możliwości tworzenia nowych tabel dla użytkowników (\texttt{user}, \texttt{page}). Dodatkowo w ten sposób pozbyto się \textit{redundantnych} relacji, ponieważ zarówno \textbf{strona}, jak i \textbf{użytkownik} mogli w domyśle wykonywać te same czynności na innych tabelach.
 
-Zastosowanie usuwania kaskadowego również okazało się być bardzo pomocne, ponieważ w ten sposób przy usuwaniu jakichkolwiek danych mieliśmy pewność, że dane będą spójne.
+Zastosowanie usuwania kaskadowego również okazało się być bardzo pomocne, ponieważ w ten sposób przy usuwaniu jakichkolwiek danych mielibyśmy pewność, że dane pozostaną spójne.
 
-Będąc w temacie usuwania, dane z bazy nie były całkowicie usuwane(\textit{hard delete}). Co pozwoli na przywrcanie np. konta niezdecydowanego użytkownika, ale także pozowli śledzić historię danych. Ponadto dane, które nie są widoczne dla użytkonika mogą posłużyć np. do analiz biznesowych. Jako ostani plus można powiedzieć, że nasza baza spełnia przepisy dot. RODO.
+Będąc w temacie usuwania, dane z bazy nie były całkowicie usuwane(\textit{hard delete}). To nie tylko pozwoliłoby na przywrócenie danych, na przykład konta niezdecydowanego użytkownika, ale również pozwoliłoby śledzić historię danych. Ponadto dane, które nie są widoczne dla użytkonika mogą posłużyć np. do analiz biznesowych.
 
-Skrypt również jest mocną stroną projektu, ponieważ to on generuje tabele w bazie danych, dodając potrzebne ograniczenia do atrybutów czy enumeracje. Jest on solidną bazą pod część backendową (związaną z warstwą modeli np. dla \textit{architektury warstwowej}) aplikacji. Dodatkowo można w prosty sposób zmienić system dla którego ma być generowana baza oraz napisany został również skrpty, który uruchomi bazę w kontenerze \texttt{Dockerowym}, dzięki czemu nie trzeba posiadać samego postgresa, pgadmina czy innych pluginów, żeby zarządzać tą bazą.
+Uzyskanie zgodności z przepisami, w tym z RODO w naszym projekcie wydaje się ułatwione przez dwa czynniki:
+\begin{itemize}
+    \item Haszowanie haseł
+    \item Wydzielenie danych osobowych do osobnej tabeli, dzięki czemu można łatwo zarządzać dostępem do tych danych, a także przeprowadzić \textit{soft delete} użytkownika bez usuwania wszystkich rzeczy, które wytworzył.
+    \item Usuwanie kaskadowe, które pozwala na szybkie usunięcie wszystkich danych związanych z użytkownikiem.
+    \item Ograniczenie zbieranych danych do niezbędnych, co pozwala na zminimalizowanie ryzyka naruszenia RODO.
+\end{itemize}
 
-Co do wybranego systemu, system PostgreSQL, okazał się on być całkiem wydajnym pod względem operacji typu \textit{CRUD} na tabelach.
+Skrypt generujący dane również jest mocną stroną projektu. Skrypt generuje tabele w bazie danych, dodając potrzebne ograniczenia do atrybutów, enumeracje oraz dość sensowne dane. Jest on solidną bazą pod część backendową (związaną z warstwą modeli np. dla \textit{architektury warstwowej}) aplikacji. Dodatkowym atutem jest to, że generacja danych nie jest destruktywna - mając już dane w bazie danych, możemy spokojnie wywołać metodę odpowiedzialną za generowanie dodatkowych danych w określonych przez nas tabelach.
+
+Dodatkowo można w prosty sposób zmienić system, dla którego ma być generowana baza - my korzystaliśmy z PostgreSQL, ale bez większych problemów dałoby się zmienić system na inny (na przykład SQLite, MySQL czy SQLServer) dzięki używaniu GORM'a, który jest właśnie kompatybilny z wieloma systemami. 
+
+Został napisany również skrpty, który automatycznie uruchomi bazę w kontenerze \texttt{Dockerowym}, dzięki czemu nie trzeba instalować samego PostgreSQL, PGAdmin czy innych pluginów, żeby zarządzać tą bazą - wystarczy podać parę podstawowych danych w pliku \texttt{.env} i uruchomić skrypt. Dodatkową zaletą jest to, że baza jest uruchamiana w izolowanym środowisku, co pozwala na łatwe testowanie różnych wersji bazy danych, a także na łatwe przenoszenie bazy na inne środowisko (np. z lokalnego na serwer produkcyjny).
+
+Dodatkową automatyzacją jest integracja backendu z komendami umieszczonymi w Makefile'u. Dzięki temu można w prosty sposób uruchomić skrypt generujący dane, uruchomić bazę danych, przeczyścić bazę i inne.
+
+Co do wybranego systemu, system PostgreSQL, okazał się on być całkiem wydajnym pod względem operacji typu \textit{CRUD} na tabelach. Dzięki dodaniu indeksów, kwerendy zostały jeszcze bardziej zoptymalizowane.
+
+Wydaje nam się, że dzięki uogólnieniu wszystkich czatów do grupowych (czat 1-1 nie różni się formalnie od czatu wieloosobowego w naszej bazie) zmniejszamy ryzyko błędów przez utrzymywanie dwóch wersji konwersacji. Nie powinno to sprawić nam problemów implementacyjnych w przyszłości, a dodatkowo dodanie lub usunięcie użytkownika z konwersacji będzie bardzo proste.
+
+Nasz projekt stara się oczywiście spełniać podstawowe założenia dobrej bazy danych - jest spójny, niepowtarzalny, znormalizowany, a także ma ograniczenia integralnościowe. Żadne dane nie występują niepotrzebnie więcej niż raz. Encje wydają się być dobrze znormalizowane. Ograniczenia integralnościowe są zaimplementowane w postaci kluczy obcych, ograniczeń CHECK oraz unikalności. Wszędzie, gdzie to miało sens, wprowadziliśmy tabele asocjacyjne, aby uniknąć problemów związanych z relacjami wieloma do wielu - udało się je wszystkie usunąć z naszego projektu.
 
 
 \subsection{Słabe strony projektu (W)}
 
-Pierwszą rzeczą może być wolno działający skrpyt generujący dane, jest skutek zagnieżdżonych wywołań z losową liczbą danych do wygenerowania lub biblioteki, która nie bardzo radziła sobie z generowaniem bardzo losowych, często unikalnych danych. 
+Największą słabą stroną projektu jest dość wolno działający skrypt generujący dane. Dzieje się tak, gdy chcemy dodać więcej wierszy do tabeli - przez to, że skrypt wybiera foreign keys losowo wśród istniejących już elementów, często jest duża szansa niepowodzenia przez złamanie jakiejś zasady - dałoby się to ulepszyć dzięki bardziej inteligentemu wybieraniu foreign keys. Wygenerowanie niektórych danych wymaga też skomplikowanej i zagnieżdżonej logiki tworzenia elementów. Być może problemem jest też biblioteka \textit{faker}, która nie bardzo radziła sobie z generowaniem bardzo losowych, często unikalnych danych. 
 
-Niewykorzystanie draw.io - narzędzia do modelowania diagrmów, w naszym wypadku diagramów ERD, które mogłoby pomóc przy łatwiejszym zintegrowaniu ORM'u z ERD'em, po przez przeciąganie modeli na edytor. 
+Okazuje się, że draw.io (narzędzie do modelowania diagrmów, w naszym wypadku diagramów ERD) ma wbudowaną integrację z GORM'em, dzięki której wystarczyłoby przesunąć diagram nad okienko z kodem. Ostatecznie nie oszczędziłoby nam to dużo czasu, ale z pewnością ułatwiłoby pracę i zmniejszyłoby ryzyko literówek.
 
 \subsection{Możliwości (O)}
 
-Tak jak już wcześniej wspomniałem, baza jest dobrą podstawą do stworzenia systemu na wzór \textbf{Facebooka} czy \textbf{Twittera} po przez zbudowanie jakiegoś prostego serwisu REST'owego, który mógłby być lepiej testowany przez społeczność. Pozwoliłoby to na dopracowanie bazy danych w miejscach gdzie brakowałoby wydajności.
+Tak jak już wcześniej wspominaliśmy, baza jest dobrą podstawą do stworzenia systemu na wzór \textbf{Facebooka} czy \textbf{Twittera/X} poprzez zbudowanie jakiegoś prostego serwisu REST'owego. Dzięki temu, że serwis byłby faktycznie używany na większą skalę, zauważylibyśmy więcej problemów optymalizacyjnych. Pozwoliłoby to na dopracowanie bazy danych w miejscach, gdzie brakowałoby wydajności.
 
-Jeśli chodzi o możliwości rozbudowy bazy to możnaby dodać np. lepszą obsługę mediów(wydzielenie osobnej tabeli), można być też poprawić tabele związane z lokalizacjami i zamiast przechowywania danych koordynatów przechowywać typ \texttt{Point}, do obsługi współrzędnych geograficznych wykorzystując plugin \textbf{PostGIS}. Możnaby wtedy ulpeszyć sposób wyszukiwania wydarzeń użytkownikowi, po przez szukanie ich w promieniu \textit{n} m/km.
+Jeśli chodzi o możliwości rozbudowy bazy to można by dodać np. lepszą obsługę mediów (wydzielenie osobnej tabeli). Można być też poprawić tabele związane z lokalizacjami i zamiast przechowywania danych koordynatów przechowywać typ \texttt{Point} do obsługi współrzędnych geograficznych wykorzystując plugin \textbf{PostGIS}. Można by wtedy ulepszyć sposób wyszukiwania wydarzeń użytkownikowi, poprzez szukanie ich w promieniu \textit{n} m/km od wybranego punktu.
 
 \subsection{Zagrożenia (T)}
 
-Tabela, która może być problematyczna w utrzymaniu to tabela z wiadomościami. Problemem baz relacyjnych jest brak horyzontalnej skalowalności, czyli nie możemy wyjść poza jedną maszynę, możemy tą maszynę tylko ulepszać dodając lepsze podzespoły. W przypadku tabeli z wiadomościami może być problem, ponieważ może ona gwałtownie rosnąć. Dlatego lepszym rozwiązaniem byłoby podejeście hybrdowe, czyli niektóre tabele przenosimy do baz NOSQL, dzięki czemu możmy rozproszyć obliczenia a nasz system nie będzie "puchł".
+Problemem baz relacyjnych jest brak horyzontalnej skalowalności, czyli nie możemy wyjść poza jedną maszynę, możemy tą maszynę tylko ulepszać dodając lepsze podzespoły. Tabela, która może być problematyczna w utrzymaniu to, na przykład, tabela z wiadomościami, które użytkownicy wysyłają sobie wzajemnie.  W przypadku tabeli z wiadomościami może to być problem, ponieważ może ona gwałtownie rosnąć. Dlatego lepszym rozwiązaniem byłoby podejście hybrydowe - przeniesienie niektórych tabel do baz NOSQL, dzięki czemu można by rozproszyć obliczenia, a nasz system nie miałby problemów z powolnym przeszukiwaniem bazy.
 
+Baza wymagałaby też dużo optymalizacji, by wspierać miliony użytkowników stabilnie - aktualnie ciężko powiedzieć, jak dobrze by sobie radziła w takiej sytuacji - można by wprowadzać więcej indeksów które najlepiej radzą sobie z konkretną sytuacją, ale ciężko powiedzieć, czy to by wystarczyło.
+
+\subsection{Podsumowanie}
+
+Próbując wprowadzić produkt z taką bazą danych w życie, mielibyśmy wielki problem z konkurencją - Facebook, Twitter, Instagram, TikTok, LinkedIn, Pinterest, Reddit, Snapchat, Tumblr, WhatsApp, YouTube, czyli największe platformy społecznościowe, mają już swoje miejsce na rynku. Nasz produkt musiałby być bardzo innowacyjny, aby przyciągnąć użytkowników. 
+
+Jednakże, nasz projekt jest dobrym punktem wyjścia do stworzenia takiego produktu. Baza danych jest solidna, choć wymagałaby jeszcze sporo optymalizacji. Skrypt generujący dane jest bardzo pomocny do debuggowania i byłby krytycznie potrzebny tworząc MVP, ale wymagałby jeszcze sporo pracy, aby działał szybciej i bardziej efektywnie.
+
+Czym mógłby wyróżniać się potencjalny produkt oparty na naszej bazie danych? Dobrym punktem wyjścia jest to, że nasza baza jest dość generyczna - większość wcześniej wymienionych serwisów ma już podobne encje. Tak więc można by rozwinąć tą bazę w jednym z tych 3 przykładowych kierunków:
+
+\begin{itemize}
+    \item \textbf{Baza danych dla serwisu społecznościowego dla programistów} - dodanie tabeli związanej z projektami, repozytoriami, commitami, pull requestami, itd. Można by też dodać tabelę związane z technologiami, językami programowania, frameworkami, itd.
+    \item \textbf{Baza danych dla serwisu społecznościowego dla naukowców} - dodanie tabeli związanej z publikacjami, konferencjami, grantami, itd. Można by też dodać tabelę związane z dziedzinami nauki, konferencjami, itd.
+    \item \textbf{Lepszy Twitter} - przez ostatnie zamieszanie w serwisie Twitter/X, można by stworzyć serwis, który byłby bardziej przejrzysty, miałby lepsze algorytmy rekomendacji, byłby bardziej stabilny i bardziej moderowany, itd.
+\end{itemize}
 
 \end{document}
