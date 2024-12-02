@@ -356,7 +356,9 @@ Dla zapytań niewykorzystujących funkcji agregujących, dodanie indeksów pozwo
 
 \section{Etap 7: Faza fizyczna 5}
 
-\subsection{Mocne strony projektu (S)}
+\subsection{Sprawozdanie powykonawcze}
+
+\subsubsection{Mocne strony projektu (S)}
 
 
 Jedną z pierwszych mocnych stron projektu jest wydzielenie tabeli \texttt{authors}. Pozwoliło to na rozszerzenie możliwości tworzenia nowych tabel dla użytkowników (\texttt{user}, \texttt{page}). Dodatkowo w ten sposób pozbyto się \textit{redundantnych} relacji, ponieważ zarówno \textbf{strona}, jak i \textbf{użytkownik} mogli w domyśle wykonywać te same czynności na innych tabelach.
@@ -388,25 +390,25 @@ Wydaje nam się, że dzięki uogólnieniu wszystkich czatów do grupowych (czat 
 Nasz projekt stara się oczywiście spełniać podstawowe założenia dobrej bazy danych - jest spójny, niepowtarzalny, znormalizowany, a także ma ograniczenia integralnościowe. Żadne dane nie występują niepotrzebnie więcej niż raz. Encje wydają się być dobrze znormalizowane. Ograniczenia integralnościowe są zaimplementowane w postaci kluczy obcych, ograniczeń CHECK oraz unikalności. Wszędzie, gdzie to miało sens, wprowadziliśmy tabele asocjacyjne, aby uniknąć problemów związanych z relacjami wieloma do wielu - udało się je wszystkie usunąć z naszego projektu.
 
 
-\subsection{Słabe strony projektu (W)}
+\subsubsection{Słabe strony projektu (W)}
 
 Największą słabą stroną projektu jest dość wolno działający skrypt generujący dane. Dzieje się tak, gdy chcemy dodać więcej wierszy do tabeli - przez to, że skrypt wybiera foreign keys losowo wśród istniejących już elementów, często jest duża szansa niepowodzenia przez złamanie jakiejś zasady - dałoby się to ulepszyć dzięki bardziej inteligentemu wybieraniu foreign keys. Wygenerowanie niektórych danych wymaga też skomplikowanej i zagnieżdżonej logiki tworzenia elementów. Być może problemem jest też biblioteka \textit{faker}, która nie bardzo radziła sobie z generowaniem bardzo losowych, często unikalnych danych. 
 
 Okazuje się, że draw.io (narzędzie do modelowania diagrmów, w naszym wypadku diagramów ERD) ma wbudowaną integrację z GORM'em, dzięki której wystarczyłoby przesunąć diagram nad okienko z kodem. Ostatecznie nie oszczędziłoby nam to dużo czasu, ale z pewnością ułatwiłoby pracę i zmniejszyłoby ryzyko literówek.
 
-\subsection{Możliwości (O)}
+\subsubsection{Możliwości (O)}
 
 Tak jak już wcześniej wspominaliśmy, baza jest dobrą podstawą do stworzenia systemu na wzór \textbf{Facebooka} czy \textbf{Twittera/X} poprzez zbudowanie jakiegoś prostego serwisu REST'owego. Dzięki temu, że serwis byłby faktycznie używany na większą skalę, zauważylibyśmy więcej problemów optymalizacyjnych. Pozwoliłoby to na dopracowanie bazy danych w miejscach, gdzie brakowałoby wydajności.
 
 Jeśli chodzi o możliwości rozbudowy bazy to można by dodać np. lepszą obsługę mediów (wydzielenie osobnej tabeli). Można być też poprawić tabele związane z lokalizacjami i zamiast przechowywania danych koordynatów przechowywać typ \texttt{Point} do obsługi współrzędnych geograficznych wykorzystując plugin \textbf{PostGIS}. Można by wtedy ulepszyć sposób wyszukiwania wydarzeń użytkownikowi, poprzez szukanie ich w promieniu \textit{n} m/km od wybranego punktu.
 
-\subsection{Zagrożenia (T)}
+\subsubsection{Zagrożenia (T)}
 
 Problemem baz relacyjnych jest brak horyzontalnej skalowalności, czyli nie możemy wyjść poza jedną maszynę, możemy tą maszynę tylko ulepszać dodając lepsze podzespoły. Tabela, która może być problematyczna w utrzymaniu to, na przykład, tabela z wiadomościami, które użytkownicy wysyłają sobie wzajemnie.  W przypadku tabeli z wiadomościami może to być problem, ponieważ może ona gwałtownie rosnąć. Dlatego lepszym rozwiązaniem byłoby podejście hybrydowe - przeniesienie niektórych tabel do baz NOSQL, dzięki czemu można by rozproszyć obliczenia, a nasz system nie miałby problemów z powolnym przeszukiwaniem bazy.
 
 Baza wymagałaby też dużo optymalizacji, by wspierać miliony użytkowników stabilnie - aktualnie ciężko powiedzieć, jak dobrze by sobie radziła w takiej sytuacji - można by wprowadzać więcej indeksów które najlepiej radzą sobie z konkretną sytuacją, ale ciężko powiedzieć, czy to by wystarczyło.
 
-\subsection{Podsumowanie}
+\subsubsection{Podsumowanie}
 
 Próbując wprowadzić produkt z taką bazą danych w życie, mielibyśmy wielki problem z konkurencją - Facebook, Twitter, Instagram, TikTok, LinkedIn, Pinterest, Reddit, Snapchat, Tumblr, WhatsApp, YouTube, czyli największe platformy społecznościowe, mają już swoje miejsce na rynku. Nasz produkt musiałby być bardzo innowacyjny, aby przyciągnąć użytkowników. 
 
@@ -419,5 +421,22 @@ Czym mógłby wyróżniać się potencjalny produkt oparty na naszej bazie danyc
     \item \textbf{Baza danych dla serwisu społecznościowego dla naukowców} - dodanie tabeli związanej z publikacjami, konferencjami, grantami, itd. Można by też dodać tabelę związane z dziedzinami nauki, konferencjami, itd.
     \item \textbf{Lepszy Twitter} - przez ostatnie zamieszanie w serwisie Twitter/X, można by stworzyć serwis, który byłby bardziej przejrzysty, miałby lepsze algorytmy rekomendacji, byłby bardziej stabilny i bardziej moderowany, itd.
 \end{itemize}
+
+\subsection{Wprowadzone modyfikacje}
+
+\subsubsection{Porzucone pomysły}
+Już w początkowej fazie tworzenia projektu doszliśmy do wniosku że opcja zgłaszania postów/treści przez użytkowników wymaga nieadekwatnego nakładu pracy w stosunku do korzyści jakie nasz projekt na tym etapie mógłby z tego zyskać. Może być to dobra funkcjonalność do dodania w ramach rozwoju aplikacji, jednak na początkowych etapach stwierdziliśmy, że postawimy na jakość, a nie ilość. Dlatego zrezygnowaliśmy z tego pomysłu, aby w pełni skupić się na pozostałych funkcjonalnościach. 
+Podobnie stało się z encją “Story”. Jako że jej atrybuty praktycznie nie różniłyby się od obecnych już encji (Post, Reel) zdecydowaliśmy się na jej pominięcie w późniejszych etapach projektu. Jednak tak jak w przypadku zgłaszania postów jest to jak najbardziej funkcjonalność możliwa do dodania w przyszłości, a dzięki podobieństwu do obecnych już encji wdrożenie Story do naszej bazy danych powinno być nawet prostsze niż dodanie opcji zgłaszania postów. 
+
+
+\subsubsection{Nowe encje}
+Na pierwszym diagramie ERD naszego projektu nie uwzględniliśmy encji “Tag”, która została dodana w następnym etapie. Encja ta określa typ prowadzonej strony. Nie uwzględniliśmy również encji “UserPrivilege”, która została dodana dopiero w fazie logicznej. Zdecydowaliśmy się wyodrębnić User Privilege do osobnej encji zamiast używać enuma, aby ułatwić modyfikację czy rozbudowę bazy danych oraz zmniejszyć ryzyko niespójności. 
+Pojawiła się też encja “ExternalAuthorLinks” która pozwala przechowywać linki do innych social mediów użytkownika. 
+
+
+\subsubsection{Rozdzielenie lokacji na 3 table}
+Encja związana z lokacją została rozdzielona na 3 osobne encje: Location, Geolocation, Address. Taka struktura danych niweluje powielanie informacji, ponieważ miasta, kody pocztowe czy nawet współrzędne geograficzne mogą być takie same dla wielu adresów. Dodatkowo możemy teraz w bardzo precyzyjny sposób określić adres, do jakiego się odwołujemy -  mamy możliwość sprecyzowania ulicy, budynku, klatki schodowej, piętra i mieszkania. Dzięki temu, niezależnie od konwencji zapisu adresu (które mogą się różnić w zależności od kraju) użytkownik będzie w stanie wprowadzić go do naszej bazy danych. 
+Poza tym rozdzielenie lokacji na osobne encje zmniejsza ryzyko niespójności, ułatwia modyfikacje i rozszerzanie bazy danych oraz sprawia, że zapytania na tabeli Location są bardziej wydajne. Jako że atrybuty tej encji zostały ograniczone do minimum, a bardziej złożone dane przechowywane są w osobnych tabelach, podczas wykonywania na przykład zapytań dotyczących wydarzeń w danym mieście nie potrzebujemy importować danych ze wszystkich tabel - wystarczy nam sama tabela Location co zwiększa wydajność zapytań.
+
 
 \end{document}
