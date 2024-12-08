@@ -404,7 +404,7 @@ Jeśli chodzi o możliwości rozbudowy bazy to można by dodać np. lepszą obs�
 
 \subsubsection{Zagrożenia (T)}
 
-Problemem baz relacyjnych jest brak horyzontalnej skalowalności, czyli nie możemy wyjść poza jedną maszynę, możemy tą maszynę tylko ulepszać dodając lepsze podzespoły. Tabela, która może być problematyczna w utrzymaniu to, na przykład, tabela z wiadomościami, które użytkownicy wysyłają sobie wzajemnie.  W przypadku tabeli z wiadomościami może to być problem, ponieważ może ona gwałtownie rosnąć. Dlatego lepszym rozwiązaniem byłoby podejście hybrydowe - przeniesienie niektórych tabel do baz NOSQL, dzięki czemu można by rozproszyć obliczenia, a nasz system nie miałby problemów z powolnym przeszukiwaniem bazy.
+Problemem baz relacyjnych jest trudność w horyzontalnym skalowaniu, ponieważ zapewnienie spójności danych i transakcyjności (ACID) w rozproszonej architekturze jest skomplikowane. Tradycyjnie łatwiej jest skalować je pionowo, czyli ulepszać pojedynczą maszynę, dodając więcej zasobów, takich jak pamięć RAM, mocniejszy procesor czy szybsze dyski. Jednak przy zastosowaniu odpowiednich technik, takich jak sharding czy replikacja, możliwe jest również skalowanie horyzontalne baz relacyjnych. Tabela, która może być problematyczna w utrzymaniu to, na przykład, tabela z wiadomościami, które użytkownicy wysyłają sobie wzajemnie.  W przypadku tabeli z wiadomościami może to być problem, ponieważ może ona gwałtownie rosnąć. Dlatego lepszym rozwiązaniem byłoby podejście hybrydowe - przeniesienie niektórych tabel do baz NOSQL, dzięki czemu można by rozproszyć obliczenia, a nasz system nie miałby problemów z powolnym przeszukiwaniem bazy.
 
 Baza wymagałaby też dużo optymalizacji, by wspierać miliony użytkowników stabilnie - aktualnie ciężko powiedzieć, jak dobrze by sobie radziła w takiej sytuacji - można by wprowadzać więcej indeksów które najlepiej radzą sobie z konkretną sytuacją, ale ciężko powiedzieć, czy to by wystarczyło.
 
@@ -438,6 +438,33 @@ Pojawiła się też encja “ExternalAuthorLinks” która pozwala przechowywać
 \subsubsection{Rozdzielenie lokacji na 3 table}
 Encja związana z lokacją została rozdzielona na 3 osobne encje: Location, Geolocation, Address. Taka struktura danych niweluje powielanie informacji, ponieważ miasta, kody pocztowe czy nawet współrzędne geograficzne mogą być takie same dla wielu adresów. Dodatkowo możemy teraz w bardzo precyzyjny sposób określić adres, do jakiego się odwołujemy -  mamy możliwość sprecyzowania ulicy, budynku, klatki schodowej, piętra i mieszkania. Dzięki temu, niezależnie od konwencji zapisu adresu (które mogą się różnić w zależności od kraju) użytkownik będzie w stanie wprowadzić go do naszej bazy danych. 
 Poza tym rozdzielenie lokacji na osobne encje zmniejsza ryzyko niespójności, ułatwia modyfikacje i rozszerzanie bazy danych oraz sprawia, że zapytania na tabeli Location są bardziej wydajne. Jako że atrybuty tej encji zostały ograniczone do minimum, a bardziej złożone dane przechowywane są w osobnych tabelach, podczas wykonywania na przykład zapytań dotyczących wydarzeń w danym mieście nie potrzebujemy importować danych ze wszystkich tabel - wystarczy nam sama tabela Location co zwiększa wydajność zapytań.
+
+
+\section{Etap 8: Faza logiczna I}
+
+\subsection{Update ERD'a}
+
+Diagram erd został zaktualizowany - odzwierciedla schemat relacji w bazie oraz jest czytelniejszy względem poprzedniego. Zdecydowaliśmy się nie umieszać szczątkowych artybutów dla encji, ponieważ wprowadziło by to zbędne zamieszanie i wpłyneło by to na czytelność. 
+
+Zmieniono: 
+
+\begin{itemize}
+  \item Dodano \texttt{User Privilege}
+  \item Rozbito \texttt{Location}, na pomniejsze encje
+  \item Wyodrębniono nową encje \texttt{Tag}
+  \item Usunięto encje \texttt{Story}
+  \item Pokazaliśmy na diagramie relacje użytkownika z innymi użytkownikami (asocjacja \textit{likes (as buddy)}) oraz podobnie pokazaliśmy wysyłanie zaproszeń do znajomych (asocjacji \textit{receives}, \textit{sends}).
+  \item No i usuneliśmy encje \texttt{Process}, dodaną losowo. 
+\end{itemize}
+
+
+\begin{figure}[htbt]
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{images/new_erd.png} 
+  \end{center}
+  \caption{Zaktualizowany ERD}
+  \label{fig:new_erd}
+\end{figure}
 
 
 \end{document}
