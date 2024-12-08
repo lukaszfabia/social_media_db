@@ -440,4 +440,31 @@ Encja związana z lokacją została rozdzielona na 3 osobne encje: Location, Geo
 Poza tym rozdzielenie lokacji na osobne encje zmniejsza ryzyko niespójności, ułatwia modyfikacje i rozszerzanie bazy danych oraz sprawia, że zapytania na tabeli Location są bardziej wydajne. Jako że atrybuty tej encji zostały ograniczone do minimum, a bardziej złożone dane przechowywane są w osobnych tabelach, podczas wykonywania na przykład zapytań dotyczących wydarzeń w danym mieście nie potrzebujemy importować danych ze wszystkich tabel - wystarczy nam sama tabela Location co zwiększa wydajność zapytań.
 
 
+\section{Etap 8: Faza logiczna I}
+
+\subsection{Update ERD'a}
+
+Diagram erd został zaktualizowany - odzwierciedla schemat relacji w bazie oraz jest czytelniejszy względem poprzedniego. Zdecydowaliśmy się nie umieszać szczątkowych artybutów dla encji, ponieważ wprowadziło by to zbędne zamieszanie i wpłyneło by to na czytelność. 
+
+Zmieniono: 
+
+\begin{itemize}
+  \item Dodano \texttt{User Privilege}
+  \item Rozbito \texttt{Location}, na pomniejsze encje
+  \item Wyodrębniono nową encje \texttt{Tag}
+  \item Usunięto encje \texttt{Story}
+  \item Pokazaliśmy na diagramie relacje użytkownika z innymi użytkownikami (asocjacja \textit{likes (as buddy)}) oraz podobnie pokazaliśmy wysyłanie zaproszeń do znajomych (asocjacji \textit{receives}, \textit{sends}).
+  \item No i usuneliśmy encje \texttt{Process}, dodaną losowo. 
+\end{itemize}
+
+
+\begin{figure}[htbt]
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{images/new_erd.png} 
+  \end{center}
+  \caption{Zaktualizowany ERD}
+  \label{fig:new_erd}
+\end{figure}
+
+
 \end{document}
