@@ -460,7 +460,7 @@ Zmieniono:
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[width=0.95\textwidth]{images/new_erd.png} 
+    \includegraphics[width=0.95\textwidth]{docs/images/erd_8_1.png} 
   \end{center}
   \caption{Zaktualizowany ERD}
   \label{fig:new_erd}
@@ -473,11 +473,21 @@ Na podstawie nowego ERD'a \ref{fig:schemat_relacji} stary schemat relacji zosta�
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[width=0.95\textwidth]{images/diagram.png}
+    \includegraphics[width=0.95\textwidth]{docs/images/DiagramBazyDanych_8_2.png}
   \end{center}
   \caption{Poprawiony schemat relacji bazy danych serwisu społecznościowego}
   \label{fig:schemat_relacji}
 \end{figure}
+
+\subsection{Weryfikacja i aktualizacja więzów integralności}
+
+Aby zapewnić integralność więzłów upewniliśmy się, że:
+\begin{itemize}
+    \item Każda encja ma unikalny identyfikator \texttt{PK}, który jest unikalny i nie może być pusty
+    \item Dla encji asocjacyjnych kluczem głównym jest para kluczy obcych, których dotyczy ta encja (np. \texttt{Group Members} identyfikowana jest prze \texttt{Group ID} i \texttt{Author ID})
+    \item W przypadku relacji \texttt{1-N}  i \texttt{1-1} uwzględniamy \texttt{FK} jednej z encji w atrybutach drugiej z nich
+    \item Zastosowanie \texttt{usuwania kaskadowego} sprawia, że rekordy podrzędne usuną się automatycznie, gdy usunięty zostanie rekord nadrzędny (np. gdy zostanie usunięty \texttt{Author} usunięte zostaną też jego \texttt{Posty}, a co za tym idzie też \texttt{Komentarze} i \texttt{Reakcje} dotyczące tych postów)
+\end{itemize}
 
 \subsection{Weryfikacja i aktualizacja więzów integralności}
 
