@@ -444,7 +444,7 @@ Poza tym rozdzielenie lokacji na osobne encje zmniejsza ryzyko niespójności, u
 
 \subsection{Update ERD'a}
 
-Diagram erd został zaktualizowany - odzwierciedla schemat relacji w bazie oraz jest czytelniejszy względem poprzedniego. Zdecydowaliśmy się nie umieszać szczątkowych artybutów dla encji, ponieważ wprowadziło by to zbędne zamieszanie i wpłyneło by to na czytelność. 
+Diagram ERD \ref{fig:new_erd} został zaktualizowany - odzwierciedla schemat relacji w bazie oraz jest czytelniejszy względem poprzedniego. Zdecydowaliśmy się nie umieszać szczątkowych artybutów dla encji, ponieważ wprowadziło by to zbędne zamieszanie i wpłyneło by to na czytelność. 
 
 Zmieniono: 
 
@@ -458,13 +458,27 @@ Zmieniono:
 \end{itemize}
 
 
-\begin{figure}[htbt]
+\begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=0.95\textwidth]{images/new_erd.png} 
   \end{center}
   \caption{Zaktualizowany ERD}
   \label{fig:new_erd}
 \end{figure}
+
+
+\subsection{Update schematu relacji}
+
+Na podstawie nowego ERD'a \ref{fig:schemat_relacji} stary schemat relacji został uaktualniony, zostały usunięte błędy z poprzedniego oraz zwiększona czytelność. 
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{images/diagram.png}
+  \end{center}
+  \caption{Poprawiony schemat relacji bazy danych serwisu społecznościowego}
+  \label{fig:schemat_relacji}
+\end{figure}
+
 
 
 \end{document}
