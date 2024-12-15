@@ -43,6 +43,8 @@ type User struct {
 	Bio             string          `gorm:"default:'Edit bio';size:512;check:bio <> ''"`
 	Friends         []User          `gorm:"many2many:user_friends;constraint:OnDelete:CASCADE"`
 	FriendRequests  []FriendRequest `gorm:"foreignKey:ReceiverID;constraint:OnDelete:CASCADE"`
+	BlockedUsers    []User          `gorm:"many2many:user_blocked;constraint:OnDelete:CASCADE"`
+	FollowedUsers   []User          `gorm:"many2many:user_followed;constraint:OnDelete:CASCADE"`
 	UserPrivilegeID uint            `gorm:"not null"`
 
 	Author Author `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
@@ -95,6 +97,25 @@ type Post struct {
 
 	Group   *Group `gorm:"foreignKey:GroupID;references:ID;constraint:OnDelete:CASCADE"`
 	GroupID *uint
+}
+
+type Article struct {
+	gorm.Model
+	AuthorID uint   `gorm:"not null"`
+	Title    string `gorm:"not null;size:255"`
+	IsPublic bool   `gorm:"default:true"`
+
+	Hashtags []*Hashtag `gorm:"many2many:article_hashtags;constraint:OnDelete:CASCADE"`
+
+	Sections []Section `gorm:"foreignKey:ArticleID;constraint:OnDelete:CASCADE"`
+	Author   Author    `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+}
+
+type Section struct {
+	gorm.Model
+	ArticleID uint   `gorm:"not null"`
+	Header    string `gorm:"not null;size:255"`
+	Content   string `gorm:"not null"`
 }
 
 type Tag struct {
