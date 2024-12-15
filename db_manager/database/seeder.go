@@ -27,6 +27,7 @@ type SeederService interface {
 	FillAuthorLists()
 	FillGroups(count int)
 	FillMessagesAndConversations(count int)
+	FillArticles(count int)
 }
 
 type seederServiceImpl struct {
@@ -426,18 +427,22 @@ func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
 func (s *seederServiceImpl) FillPostAndReactions(count int) {
 	// fetch all authors from the database
 	authors := []*models.Author{}
-	if err := s.db.Find(&authors).Error; err != nil {
+	if err := s.db.Find(&authors).Order("RANDOM()").Error; err != nil {
 		pkg.LogError("424. fetch", "authors", err)
 		return
 	}
 
-	var ptr int = 0
+	authorsToPostsProportion := 0.2
+	authorsCount := int(authorsToPostsProportion * float64(len(authors)))
 
+	averagePostsPerAuthor := authorsCount / count
+
+	ptr := 0
 	s.factory(func() bool {
+		// get random author
 		author := authors[ptr]
-		ptr++
 
-		posts := s.createPostsForAuthor(author, count)
+		posts := s.createPostsForAuthor(author, s.f.Number(1, averagePostsPerAuthor*2))
 
 		author.Posts = append(author.Posts, posts...)
 
@@ -447,7 +452,7 @@ func (s *seederServiceImpl) FillPostAndReactions(count int) {
 		}
 
 		return true
-	}, len(authors), nil)
+	}, authorsCount, nil)
 }
 
 func (s *seederServiceImpl) createPostsForAuthor(author *models.Author, count int) []models.Post {
@@ -623,6 +628,33 @@ func (s *seederServiceImpl) FillMessagesAndConversations(count int) {
 
 		return true
 	}, count, nil)
+}
+
+func (s *seederServiceImpl) FillArticles(count int) {
+	// fetch all authors from the database
+	authors := []*models.Author{}
+	if err := s.db.Find(&authors).Error; err != nil {
+		pkg.LogError("424. fetch", "authors", err)
+		return
+	}
+
+	var ptr int = 0
+
+	s.factory(func() bool {
+		author := authors[ptr]
+		ptr++
+
+		posts := s.createPostsForAuthor(author, count)
+
+		author.Posts = append(author.Posts, posts...)
+
+		if err := s.db.Save(&author).Error; err != nil {
+			pkg.LogError("save", "author", err)
+			return false
+		}
+
+		return true
+	}, len(authors), nil)
 }
 
 func (s *seederServiceImpl) FillAuthorLists() {

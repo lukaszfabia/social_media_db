@@ -20,7 +20,7 @@ import (
 
 func main() {
 	if err := godotenv.Load("../.env"); err != nil {
-		panic("No .env file")
+		panic("Error with .env file")
 	}
 	file, err := os.OpenFile("../logs/gorm.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
