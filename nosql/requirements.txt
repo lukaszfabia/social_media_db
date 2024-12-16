@@ -1,0 +1,5 @@
+python-dotenv
+pymongo
+faker 
+pydantic
+dnspython
