@@ -27,6 +27,8 @@ type SeederService interface {
 	FillAuthorLists()
 	FillGroups(count int)
 	FillMessagesAndConversations(count int)
+	FillArticles(count int)
+	FillFollowed(count int)
 }
 
 type seederServiceImpl struct {
@@ -132,12 +134,20 @@ func (s *seederServiceImpl) FillLocations(count int) {
 
 	s.factory(func() bool {
 		dummyAddress := s.f.Address()
+
+		// Create a valid geometry point
+		point := fmt.Sprintf("SRID=4326;POINT(%f %f)", dummyAddress.Longitude, dummyAddress.Latitude)
+
 		var geolocation *models.Geolocation = &models.Geolocation{
 			Latitude:  dummyAddress.Latitude,
 			Longitude: dummyAddress.Longitude,
+			Geom:      point,
 		}
 
-		s.db.Create(&geolocation)
+		if err := s.db.Save(&geolocation).Error; err != nil {
+			pkg.LogError("create", "geolocation", err)
+			return false
+		}
 
 		var address *models.Address = &models.Address{
 			StreetName: s.f.StreetName(),
@@ -423,21 +433,63 @@ func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
 	}
 }
 
+func (s *seederServiceImpl) FillFollowed(count int) {
+	var info string = fmt.Sprintf("%d followed have been added", count)
+
+	var users []models.User
+	if err := s.db.Find(&users).Error; err != nil {
+		pkg.LogError("fetch", "users", err)
+		return
+	}
+
+	usersAmount := len(users)
+
+	if usersAmount < 2 {
+		pkg.LogError("create", "friends", errors.New("not enough users to create followed"))
+		return
+	}
+
+	s.factory(func() bool {
+		user1 := users[s.f.Number(0, usersAmount-1)]
+		user2 := users[s.f.Number(0, usersAmount-1)]
+
+		if user1.AuthorID == user2.AuthorID {
+			return false
+		}
+
+		if err := s.db.Model(&user1).Association("FollowedUsers").Append(&user2); err != nil {
+			pkg.LogError("add", "followed", err)
+			return false
+		}
+
+		if err := s.db.Save(&user1).Error; err != nil {
+			pkg.LogError("save", "user1", err)
+			return false
+		}
+
+		return true
+	}, int(len(users)/4), &info)
+}
+
 func (s *seederServiceImpl) FillPostAndReactions(count int) {
 	// fetch all authors from the database
 	authors := []*models.Author{}
-	if err := s.db.Find(&authors).Error; err != nil {
+	if err := s.db.Find(&authors).Order("RANDOM()").Error; err != nil {
 		pkg.LogError("424. fetch", "authors", err)
 		return
 	}
 
-	var ptr int = 0
+	authorsToPostsProportion := 0.2
+	authorsCount := int(authorsToPostsProportion * float64(len(authors)))
 
+	averagePostsPerAuthor := authorsCount / count
+
+	ptr := 0
 	s.factory(func() bool {
+		// get random author
 		author := authors[ptr]
-		ptr++
 
-		posts := s.createPostsForAuthor(author, count)
+		posts := s.createPostsForAuthor(author, s.f.Number(1, averagePostsPerAuthor*2))
 
 		author.Posts = append(author.Posts, posts...)
 
@@ -447,7 +499,7 @@ func (s *seederServiceImpl) FillPostAndReactions(count int) {
 		}
 
 		return true
-	}, len(authors), nil)
+	}, authorsCount, nil)
 }
 
 func (s *seederServiceImpl) createPostsForAuthor(author *models.Author, count int) []models.Post {
@@ -508,6 +560,66 @@ func (s *seederServiceImpl) createPostsForAuthor(author *models.Author, count in
 	}, s.f.Number(1, count), nil)
 
 	return posts
+}
+
+func (s *seederServiceImpl) createSectionsForArticle(article *models.Article, count int) []models.Section {
+	var sections []models.Section
+
+	s.factory(func() bool {
+		section := models.Section{
+			ArticleID: article.ID,
+			Header:    s.f.Question(),
+			Content:   s.f.HipsterSentence(50),
+		}
+
+		if err := s.db.Save(&section).Error; err != nil {
+			pkg.LogError("save", "section", err)
+			return false
+		}
+
+		sections = append(sections, section)
+		return true
+	}, count, nil)
+
+	return sections
+}
+
+func (s *seederServiceImpl) createArticlesForAuthor(author *models.Author, count int) []models.Article {
+	var articles []models.Article
+
+	s.factory(func() bool {
+		article := models.Article{
+			AuthorID: author.ID,
+			Title:    s.f.Question(),
+			IsPublic: s.f.Bool(),
+		}
+
+		var hashtags []*models.Hashtag
+		limit := s.f.Number(1, 10)
+		if err := s.db.Order("RANDOM()").Limit(limit).Find(&hashtags).Error; err != nil {
+			pkg.LogError("get", "hashtags", err)
+			return false
+		}
+
+		article.Hashtags = append(article.Hashtags, hashtags...)
+
+		if err := s.db.Save(&article).Error; err != nil {
+			pkg.LogError("save", "article", err)
+			return false
+		}
+
+		article.Sections = s.createSectionsForArticle(&article, s.f.Number(1, 10))
+
+		if err := s.db.Save(&article).Error; err != nil {
+			pkg.LogError("save", "article", err)
+			return false
+		}
+
+		articles = append(articles, article)
+		return true
+	}, count, nil)
+
+	return articles
 }
 
 func (s *seederServiceImpl) createReactionsForPost(post models.Post, count int, author *models.Author) {
@@ -623,6 +735,37 @@ func (s *seederServiceImpl) FillMessagesAndConversations(count int) {
 
 		return true
 	}, count, nil)
+}
+
+func (s *seederServiceImpl) FillArticles(count int) {
+	// fetch all authors from the database
+	authors := []*models.Author{}
+	if err := s.db.Find(&authors).Order("RANDOM()").Error; err != nil {
+		pkg.LogError("424. fetch", "authors", err)
+		return
+	}
+
+	authorsToPostsProportion := 0.2
+	authorsCount := int(authorsToPostsProportion * float64(len(authors)))
+
+	averagePostsPerAuthor := authorsCount / count
+
+	ptr := 0
+	s.factory(func() bool {
+		// get random author
+		author := authors[ptr]
+
+		articles := s.createArticlesForAuthor(author, s.f.Number(1, averagePostsPerAuthor*2))
+
+		author.Articles = append(author.Articles, articles...)
+
+		if err := s.db.Save(&author).Error; err != nil {
+			pkg.LogError("save", "author", err)
+			return false
+		}
+
+		return true
+	}, authorsCount, nil)
 }
 
 func (s *seederServiceImpl) FillAuthorLists() {

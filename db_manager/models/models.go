@@ -14,6 +14,7 @@ type Author struct {
 
 	Comments            []Comment            `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 	Posts               []Post               `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Articles            []Article            `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 	Reactions           []Reaction           `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 	Messages            []Message            `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 	Conversations       []Conversation       `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
@@ -43,6 +44,7 @@ type User struct {
 	Bio             string          `gorm:"default:'Edit bio';size:512;check:bio <> ''"`
 	Friends         []User          `gorm:"many2many:user_friends;constraint:OnDelete:CASCADE"`
 	FriendRequests  []FriendRequest `gorm:"foreignKey:ReceiverID;constraint:OnDelete:CASCADE"`
+	FollowedUsers   []User          `gorm:"many2many:user_followed;constraint:OnDelete:CASCADE"`
 	UserPrivilegeID uint            `gorm:"not null"`
 
 	Author Author `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
@@ -97,6 +99,25 @@ type Post struct {
 	GroupID *uint
 }
 
+type Article struct {
+	gorm.Model
+	AuthorID uint   `gorm:"not null"`
+	Title    string `gorm:"not null;size:255"`
+	IsPublic bool   `gorm:"default:true"`
+
+	Hashtags []*Hashtag `gorm:"many2many:article_hashtags;constraint:OnDelete:CASCADE"`
+
+	Sections []Section `gorm:"foreignKey:ArticleID;constraint:OnDelete:CASCADE"`
+	Author   Author    `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+}
+
+type Section struct {
+	gorm.Model
+	ArticleID uint   `gorm:"not null"`
+	Header    string `gorm:"not null;size:255"`
+	Content   string `gorm:"not null"`
+}
+
 type Tag struct {
 	gorm.Model
 	TagName string  `gorm:"not null;unique;size:100"`
@@ -105,21 +126,20 @@ type Tag struct {
 
 type Location struct {
 	gorm.Model
-	City       string `gorm:"size:100"`
-	Country    string `gorm:"size:100"`
-	PostalCode string `gorm:"size:20"`
-
+	City          string       `gorm:"size:100"`
+	Country       string       `gorm:"size:100"`
+	PostalCode    string       `gorm:"size:20"`
 	Geolocation   *Geolocation `gorm:"foreignKey:GeolocationID;references:ID;constraint:OnDelete:CASCADE"`
 	GeolocationID uint
-
-	Address   *Address `gorm:"foreignKey:AddressID;references:ID;constraint:OnDelete:CASCADE"`
-	AddressID uint
+	Address       *Address `gorm:"foreignKey:AddressID;references:ID;constraint:OnDelete:CASCADE"`
+	AddressID     uint
 }
 
 type Geolocation struct {
 	gorm.Model
-	Latitude  float64 `gorm:"not null"`
-	Longitude float64 `gorm:"not null"`
+	Latitude  float64 `gorm:"not null" json:"latitude"`
+	Longitude float64 `gorm:"not null" json:"longitude"`
+	Geom      string  `gorm:"column:geom;type:geometry(Point,4326)" json:"-"`
 }
 
 type Address struct {
