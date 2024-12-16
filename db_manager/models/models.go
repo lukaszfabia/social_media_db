@@ -14,6 +14,7 @@ type Author struct {
 
 	Comments            []Comment            `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 	Posts               []Post               `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Articles            []Article            `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 	Reactions           []Reaction           `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 	Messages            []Message            `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 	Conversations       []Conversation       `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
@@ -43,7 +44,6 @@ type User struct {
 	Bio             string          `gorm:"default:'Edit bio';size:512;check:bio <> ''"`
 	Friends         []User          `gorm:"many2many:user_friends;constraint:OnDelete:CASCADE"`
 	FriendRequests  []FriendRequest `gorm:"foreignKey:ReceiverID;constraint:OnDelete:CASCADE"`
-	BlockedUsers    []User          `gorm:"many2many:user_blocked;constraint:OnDelete:CASCADE"`
 	FollowedUsers   []User          `gorm:"many2many:user_followed;constraint:OnDelete:CASCADE"`
 	UserPrivilegeID uint            `gorm:"not null"`
 

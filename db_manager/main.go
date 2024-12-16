@@ -19,7 +19,7 @@ import (
 // }
 
 func main() {
-	if err := godotenv.Load("../.env"); err != nil {
+	if err := godotenv.Load(); err != nil {
 		panic("Error with .env file")
 	}
 	file, err := os.OpenFile("../logs/gorm.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -33,7 +33,7 @@ func main() {
 
 	// s.ClearAllTables()
 	s.InitEnums()
-	s.DropTables()
+	//s.DropTables()
 
 	if err := s.Sync(); err != nil {
 		log.Println("Failed to migrate tables!")
