@@ -489,4 +489,41 @@ Aby zapewnić integralność więzłów upewniliśmy się, że:
     \item Zastosowanie \texttt{usuwania kaskadowego} sprawia, że rekordy podrzędne usuną się automatycznie, gdy usunięty zostanie rekord nadrzędny (np. gdy zostanie usunięty \texttt{Author} usunięte zostaną też jego \texttt{Posty}, a co za tym idzie też \texttt{Komentarze} i \texttt{Reakcje} dotyczące tych postów)
 \end{itemize}
 
+\section{Etap 9: Faza logiczna II}
+
+
+
+
+\section{Etap 10: Nierelacyjne bazy danych - faza wstępna}
+
+Wybór padł na \textbf{MongoDB}, które dobrze sprawdzi się przy okazji tworzenia bazy dla serwisu społecznościowego. Do komunikacji z bazą wykorzstamy \textit{Pythona}.
+
+Oczywiście najlepszym rozwiązaniem byłoby wydzielenie tabel do odpowiednich baz danych. To znaczy niektóre tabele przechowywać w bazie relacyjnej a niektóre w nie relacyjnej a jeszcze inne w np. Grafowej. 
+
+\begin{table}[htbp]
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{1}{|c|}
+                    {\textbf{Zalety}}                            & \multicolumn{1}{c|}{\textbf{Wady}}                        \\ \hline
+Skalowanie horyzontalne                                          & Brak zdefiniowanego schematu jaki jest w SQL              \\ \hline
+Wysoka wydajność odczytu i zapisu                                & Większe zużycie pamięci (denormalizacja niektórych tabel) \\ \hline
+Obsługa ACID                                                     & Duży ruch = duże koszty                                   \\ \hline
+Duży wybór jeśli chodzi o zapytania agregacyjne (match, project) &                                                           \\ \hline
+Dobre wsparcie dla technologii np. Python                        &                                                           \\ \hline
+\end{tabular}
+
+
+
+
+\end{table}
+
+
+
+
+
+
+
+
+
+
 \end{document}
