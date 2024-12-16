@@ -134,12 +134,20 @@ func (s *seederServiceImpl) FillLocations(count int) {
 
 	s.factory(func() bool {
 		dummyAddress := s.f.Address()
+
+		// Create a valid geometry point
+		point := fmt.Sprintf("SRID=4326;POINT(%f %f)", dummyAddress.Longitude, dummyAddress.Latitude)
+
 		var geolocation *models.Geolocation = &models.Geolocation{
 			Latitude:  dummyAddress.Latitude,
 			Longitude: dummyAddress.Longitude,
+			Geom:      point,
 		}
 
-		s.db.Create(&geolocation)
+		if err := s.db.Save(&geolocation).Error; err != nil {
+			pkg.LogError("create", "geolocation", err)
+			return false
+		}
 
 		var address *models.Address = &models.Address{
 			StreetName: s.f.StreetName(),

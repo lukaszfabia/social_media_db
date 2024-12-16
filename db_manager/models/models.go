@@ -126,21 +126,20 @@ type Tag struct {
 
 type Location struct {
 	gorm.Model
-	City       string `gorm:"size:100"`
-	Country    string `gorm:"size:100"`
-	PostalCode string `gorm:"size:20"`
-
+	City          string       `gorm:"size:100"`
+	Country       string       `gorm:"size:100"`
+	PostalCode    string       `gorm:"size:20"`
 	Geolocation   *Geolocation `gorm:"foreignKey:GeolocationID;references:ID;constraint:OnDelete:CASCADE"`
 	GeolocationID uint
-
-	Address   *Address `gorm:"foreignKey:AddressID;references:ID;constraint:OnDelete:CASCADE"`
-	AddressID uint
+	Address       *Address `gorm:"foreignKey:AddressID;references:ID;constraint:OnDelete:CASCADE"`
+	AddressID     uint
 }
 
 type Geolocation struct {
 	gorm.Model
-	Latitude  float64 `gorm:"not null"`
-	Longitude float64 `gorm:"not null"`
+	Latitude  float64 `gorm:"not null" json:"latitude"`
+	Longitude float64 `gorm:"not null" json:"longitude"`
+	Geom      string  `gorm:"column:geom;type:geometry(Point,4326)" json:"-"`
 }
 
 type Address struct {
