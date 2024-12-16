@@ -180,17 +180,19 @@ func (s *service) Cook() {
 	// add an count multiplier
 	count_multiplier := 1
 
-	s.seederService.FillPrivileges()
-	s.seederService.FillUsers(100 * count_multiplier)
-	// s.seederService.FillFriendsAndFriendRequests(100 * 50)
-	s.seederService.FillTags(20 * count_multiplier)
-	s.seederService.FillPages(10 * count_multiplier)
+	//s.seederService.FillPrivileges()
+	//s.seederService.FillUsers(100 * count_multiplier)
+	//s.seederService.FillFriendsAndFriendRequests(100 * 50)
+	//s.seederService.FillTags(20 * count_multiplier)
+	//s.seederService.FillPages(10 * count_multiplier)
 	s.seederService.FillLocations(20 * count_multiplier)
-	s.seederService.FillHashtags(30 * count_multiplier)
-	s.seederService.FillComments(20 * count_multiplier)
-	s.seederService.FillReels(30 * count_multiplier)
-	s.seederService.FillGroups(20 * count_multiplier)
-	s.seederService.FillPostAndReactions(10 * count_multiplier)         // quite slow
-	s.seederService.FillMessagesAndConversations(40 * count_multiplier) // quite slow
-	s.seederService.FillAuthorLists()
+	//s.seederService.FillHashtags(30 * count_multiplier)
+	//s.seederService.FillComments(20 * count_multiplier)
+	//s.seederService.FillReels(30 * count_multiplier)
+	//s.seederService.FillGroups(20 * count_multiplier)
+	//s.seederService.FillPostAndReactions(10 * count_multiplier)         // quite slow
+	//s.seederService.FillMessagesAndConversations(40 * count_multiplier) // quite slow
+	//s.seederService.FillArticles(3 * count_multiplier)
+	//s.seederService.FillFollowed(2 * count_multiplier)
+	//s.seederService.FillAuthorLists()
 }

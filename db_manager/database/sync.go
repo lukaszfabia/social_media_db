@@ -26,6 +26,8 @@ var AllModels = []any{
 	&models.Group{},
 	&models.Reaction{},
 	&models.Hashtag{},
+	&models.Article{},
+	&models.Section{},
 }
 
 // register your models

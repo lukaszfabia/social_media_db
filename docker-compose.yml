@@ -1,7 +1,7 @@
 services:
   db:
     container_name: social_media_postgres
-    image: postgres:16
+    image: postgis/postgis
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
