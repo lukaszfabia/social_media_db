@@ -39,5 +39,5 @@ func main() {
 		log.Println("Failed to migrate tables!")
 	}
 
-	s.Cook()
+	// s.Cook()
 }

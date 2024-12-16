@@ -489,4 +489,57 @@ Aby zapewnić integralność więzłów upewniliśmy się, że:
     \item Zastosowanie \texttt{usuwania kaskadowego} sprawia, że rekordy podrzędne usuną się automatycznie, gdy usunięty zostanie rekord nadrzędny (np. gdy zostanie usunięty \texttt{Author} usunięte zostaną też jego \texttt{Posty}, a co za tym idzie też \texttt{Komentarze} i \texttt{Reakcje} dotyczące tych postów)
 \end{itemize}
 
+\newpage 
+
+\section{Etap 9: Faza logiczna II}
+
+Naszą bazę wzbogaciliśmy o tabele:
+
+\begin{itemize}
+  \item user\_followers
+  \item article, w tym section 
+\end{itemize}
+
+Nasi użytkownicy mogą tworzyć artykuły podobnie jak na Twitterze oraz okraszać je hashtagami, aby można było je łatwiej wyszukać. 
+
+Oraz teraz geoloakacja jest dodatkowo wyrażana przez Point z PostGIS, pozwoli to nam na wykonanie zapytania o np. wydarzenia w promieniu \textit{n} metrów. 
+
+
+\section{Etap 10: Nierelacyjne bazy danych - faza wstępna}
+
+Wybór padł na \textbf{MongoDB}, które dobrze sprawdzi się przy okazji tworzenia bazy dla serwisu społecznościowego. Do komunikacji z bazą wykorzstamy \textit{Pythona}.
+
+Oczywiście najlepszym rozwiązaniem byłoby wydzielenie tabel do odpowiednich baz danych. To znaczy niektóre tabele przechowywać w bazie relacyjnej a niektóre w nierelacyjnej a jeszcze inne w np. Grafowej.  \\ 
+
+\begin{table}[htbp]
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{1}{|c|}
+                    {\textbf{Zalety}}                            & \multicolumn{1}{c|}{\textbf{Wady}}                        \\ \hline
+Skalowanie horyzontalne                                          & Brak zdefiniowanego schematu jaki jest w SQL              \\ \hline
+Wysoka wydajność odczytu i zapisu                                & Denormalizacja niektórych tabel \\ \hline
+Obsługa ACID                                                     & Duży ruch = duże koszty                                   \\ \hline
+Dobre wsparcie dla technologii np. Python                        &                                                           \\ \hline
+\end{tabular}
+  \caption{Plusy i minusy MongoDB}
+  \label{table:prosAndConsOfMongoDB}
+
+  \textbf{Założenia} (podobnie jak w przypadku relacyjnej bazy): chcemy aby baza mogłabyć wdrożona w jakiś serwis społecznościowy oraz aby miała dobry performance, ponieważ wpyłwa to na doświadczenie użytkownika.
+
+
+  \textbf{Ograniczenia}: moim zdaniem, tak jak poprzednio ogranicza nas to, że baza musi być w całości w NoSQL, gdzie tak jak już wspominałem - najlepiej stworzyć bazy dedykowane dla danych tabel. Problematyczne może być tworzenie \texttt{contraints}, poniważ bazy NoSQL nie wymagają od nas tworzenia schematów danych, w tym wypadku będziemy mieli \textbf{kolekcje} zamiast tabel i \textbf{dokumenty} zamiast wierszy. Oznacza to, że będziemy musieli zadbać sami o \textbf{integralność danych}.  
+
+
+
+\end{table}
+
+
+
+
+
+
+
+
+
+
 \end{document}
