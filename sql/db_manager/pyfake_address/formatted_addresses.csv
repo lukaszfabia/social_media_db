@@ -1,0 +1,88 @@
+Latitude,Longitude,StreetName,Building,City,Country,PostalCode,Gate,Floor,Apartment
+40.7127281,-74.0060152,Street 22,,City of New York,United States,,7,13,22
+43.1561681,-75.8449946,Street 32,,,United States,,3,15,71
+34.0536909,-118.242766,Street 52,,Los Angeles,United States,,2,2,91
+34.3155072,-118.209681,Street 3,,,United States,,1,2,50
+41.8755616,-87.6244212,Street 3,,Chicago,United States,,5,7,65
+43.6534817,-79.3839347,Street 47,,Toronto,Canada,,2,7,14
+43.6534817,-79.3839347,Street 86,,Old Toronto,Canada,,8,9,51
+49.2608724,-123.113952,Street 90,,Vancouver,Canada,,2,1,66
+49.592949450000006,-125.70255696124094,Street 2,,,Canada,,3,1,38
+19.4326296,-99.1331785,Street 51,,,México,,1,0,52
+19.4326296,-99.1331785,Street 36,,Ciudad de México,México,,5,5,78
+25.6802019,-100.315258,Street 45,,Monterrey,México,64010,10,12,93
+25.63978365,-100.29310162906569,Street 82,,,México,,2,10,49
+-23.5506507,-46.6333824,Street 59,,,Brasil,,3,10,52
+-1.2043218,-47.1583944,São Paulo,,Capanema,Brasil,68700-540,5,2,95
+-22.0702705,-48.4333875,Street 83,,,Brasil,,10,1,73
+-22.9110137,-43.2093727,Street 86,,,Brasil,,7,11,80
+-22.2752762,-42.419415,Street 8,,,Brasil,,7,9,89
+-34.6083696,-58.4440583,Street 13,,Buenos Aires,Argentina,,4,2,90
+-37.14984035,-60.1319456430117,Street 76,,,Argentina,,10,10,38
+-12.0621065,-77.0365256,Street 21,,Lima Metropolitana,Perú,,10,13,33
+-12.2001093,-76.2850579,Street 79,,,Perú,,9,10,86
+-12.0002116,-76.8330796,Street 70,,Lima Metropolitana,Perú,,6,18,33
+-12.055075899999999,-77.02654314209849,Lima,,Lima Metropolitana,Perú,,5,7,90
+4.6533816,-74.0836333,Street 47,,"Bogotá, Distrito Capital",Colombia,,1,1,89
+4.6533816,-74.0836333,Street 93,,Bogotá Distrito Capital - Municipio,Colombia,11001,8,16,40
+4.6533816,-74.0836333,Street 86,,Bogotá,Colombia,,10,4,46
+-33.4377756,-70.6504502,Street 78,,Santiago,Chile,,6,9,13
+51.5074456,-0.1277653,Street 53,,London,United Kingdom,,7,10,58
+51.5156177,-0.0919983,Street 48,,City of London,United Kingdom,,3,18,33
+48.8588897,2.3200410217200766,Paris,,Paris,France,,6,16,34
+48.8534951,2.3483915,Street 85,,Paris,France,,5,13,10
+48.8588897,2.3200410217200766,Street 47,,Paris,France,,3,5,3
+52.510885,13.3989367,Street 40,,Berlin,Deutschland,,5,9,57
+41.8933203,12.4829321,Street 82,,Roma,Italia,,9,12,34
+41.85204125,12.631211666658155,Street 17,,,Italia,,8,4,42
+40.4167047,-3.7035825,Street 45,,Madrid,España,,4,9,46
+52.3730796,4.8924534,Street 78,,Amsterdam,Nederland,,6,5,77
+52.37454030000001,4.897975505617977,Street 39,,,Nederland,,3,14,49
+52.2319581,21.0067249,Street 76,,Warszawa,Polska,,5,16,87
+52.2337172,21.071432235636493,Street 63,,,Polska,,8,11,100
+48.2083537,16.3725042,Street 88,,Wien,Österreich,,4,1,42
+59.3251172,18.0710935,Street 59,,Stockholm,Sverige,111 29,8,8,72
+59.3336173,18.027697348913556,Street 19,,,Sverige,,8,7,79
+50.0874654,14.4212535,Street 20,,Hlavní město Praha,Česko,,3,12,21
+50.0596288,14.446459273258009,Praha,,Hlavní město Praha,Česko,,5,18,62
+53.3493795,-6.2605593,Street 47,,Dublin,Éire / Ireland,,9,0,58
+35.6768601,139.7638947,Street 61,,,日本,,7,1,31
+34.6937569,135.5014539,Street 21,,大阪市,日本,,6,12,18
+34.6198813,135.490357,Street 86,,,日本,,8,0,51
+37.5666791,126.9782914,Street 59,,서울특별시,대한민국,,3,12,72
+40.190632,116.412144,Street 6,,,中国,,3,9,83
+39.9057136,116.3912972,Street 33,,北京市,中国,100010,9,17,29
+31.2312707,121.4700152,Street 49,,,中国,,4,13,67
+31.2323437,121.4691024,Street 44,,上海市,中国,200001,3,4,20
+13.7524938,100.4935089,Street 34,,กรุงเทพมหานคร,ประเทศไทย,,2,7,89
+-6.175247,106.8270488,Street 20,,Daerah Khusus ibukota Jakarta,Indonesia,,2,10,90
+3.1516964,101.6942371,Street 26,,,Malaysia,,10,8,87
+14.5904492,120.9803621,Street 6,,Manila,Pilipinas,,3,14,11
+19.054999,72.8692035,Street 90,,Mumbai Suburban,India,,10,11,84
+18.9733536,72.82810491917377,Street 14,,Mumbai City,India,,7,17,26
+28.64308585,77.21926705734865,Babu Ram Solanki Marg,,,India,110055,8,2,70
+28.6419258,77.2217499,Bhavbhuti Marg,,,India,110006,7,18,83
+28.6138954,77.2090057,Street 87,,New Delhi,India,,1,1,23
+28.6434826,77.2227421,Jawaharlal Nehru Marg,,,India,110006,9,0,94
+19.0624996,72.9288123,Road No. 13,,Mumbai Suburban,India,400043,1,5,21
+30.0443879,31.2357257,Street 10,,القاهرة,مصر,,2,0,93
+30.0332516,31.562165102291935,Street 19,,,مصر,,8,3,83
+6.4550575,3.3941795,Street 96,,Lagos,Nigeria,100242,2,6,73
+6.5269033,3.5774005,Street 49,,Lagos,Nigeria,,8,9,76
+-1.2832533,36.8172449,Street 38,,Nairobi,Kenya,,10,17,7
+-1.3026148499999999,36.82884201813725,Street 61,,Nairobi,Kenya,,5,5,26
+-1.3026148499999999,36.82884201813725,Street 28,,,Kenya,,6,16,9
+-33.9288301,18.4172197,Street 59,,Cape Town,South Africa,8001,6,6,25
+-26.205,28.049722,Street 59,,Johannesburg,South Africa,2001,7,14,9
+33.5945144,-7.6200284,Street 64,,Casablanca ⵜⴰⴷⴷⴰⵔⵜ ⵜⵓⵎⵍⵉⵍⵜ الدار البيضاء,Maroc ⵍⵎⵖⵔⵉⴱ المغرب,,9,4,63
+5.5571096,-0.2012376,Street 8,,Accra,Ghana,,7,9,17
+-33.8698439,151.2082848,Street 34,,Sydney,Australia,,7,10,22
+-33.8890382,151.2050386296839,Street 46,,,Australia,,5,17,28
+-37.8142454,144.9631732,Street 62,,Melbourne,Australia,,9,16,39
+-37.8123825,144.94826486608156,Street 72,,,Australia,,3,6,34
+-37.8141705,144.9655616,Melbourne,,Melbourne,Australia,,6,3,67
+-36.852095,174.7631803,Street 26,,Auckland,New Zealand / Aotearoa,1010,5,2,22
+-36.5412811,174.5506104914412,Street 82,,,New Zealand / Aotearoa,,1,6,24
+-36.5412811,174.5506104914412,Street 53,,,New Zealand / Aotearoa,,9,10,84
+-41.2887953,174.7772114,Street 86,,Wellington,New Zealand / Aotearoa,6011,2,12,83
+-41.223547350000004,175.4157575526262,Street 92,,,New Zealand / Aotearoa,,2,15,90

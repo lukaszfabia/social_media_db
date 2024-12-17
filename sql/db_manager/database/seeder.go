@@ -3,9 +3,15 @@ package database
 import (
 	"errors"
 	"fmt"
+	"log"
+	"math/rand"
 	"social_media/faker"
 	"social_media/models"
 	"social_media/pkg"
+	"strconv"
+
+	"encoding/csv"
+	"os"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"gorm.io/gorm"
@@ -131,16 +137,47 @@ func (s *seederServiceImpl) FillPages(count int) {
 // Generates fake entire locations
 func (s *seederServiceImpl) FillLocations(count int) {
 	var info string = fmt.Sprintf("%d Locations have been added", count)
+	file, err := os.Open("pyfake_address/formatted_addresses.csv")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	_, err = reader.Read()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	records, err := reader.ReadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	s.factory(func() bool {
-		dummyAddress := s.f.Address()
+		if len(records) == 0 {
+			return false
+		}
 
-		// Create a valid geometry point
-		point := fmt.Sprintf("SRID=4326;POINT(%f %f)", dummyAddress.Longitude, dummyAddress.Latitude)
+		randomIndex := rand.Intn(len(records))
+		record := records[randomIndex]
+
+		latitude, _ := strconv.ParseFloat(record[0], 64)
+		longitude, _ := strconv.ParseFloat(record[1], 64)
+		streetName := record[2]
+		building := record[3]
+		city := record[4]
+		country := record[5]
+		postalCode := record[6]
+		gate := record[7]
+		floor := record[8]
+		apartment := record[9]
+
+		point := fmt.Sprintf("SRID=4326;POINT(%f %f)", longitude, latitude)
 
 		var geolocation *models.Geolocation = &models.Geolocation{
-			Latitude:  dummyAddress.Latitude,
-			Longitude: dummyAddress.Longitude,
+			Latitude:  latitude,
+			Longitude: longitude,
 			Geom:      point,
 		}
 
@@ -150,24 +187,22 @@ func (s *seederServiceImpl) FillLocations(count int) {
 		}
 
 		var address *models.Address = &models.Address{
-			StreetName: s.f.StreetName(),
-			Building:   fmt.Sprintf("%d", s.f.Number(1, 100)),
-			Gate:       fmt.Sprintf("%d", s.f.Number(1, 10)),
-			Floor:      fmt.Sprintf("%d", s.f.Number(0, 20)),
-			Apartment:  fmt.Sprintf("%d", s.f.Number(1, 100)),
+			City:       city,
+			Country:    country,
+			PostalCode: postalCode,
+			StreetName: streetName,
+			Building:   building,
+			Gate:       gate,
+			Floor:      floor,
+			Apartment:  apartment,
 		}
 		s.db.Create(&address)
 
 		var loc models.Location = models.Location{
-			City:       s.f.City(),
-			Country:    s.f.Country(),
-			PostalCode: dummyAddress.Zip,
-
 			Geolocation:   geolocation,
 			GeolocationID: geolocation.ID,
-
-			Address:   address,
-			AddressID: address.ID,
+			Address:       address,
+			AddressID:     address.ID,
 		}
 
 		return s.db.Create(&loc).Error == nil

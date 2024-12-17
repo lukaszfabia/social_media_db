@@ -126,9 +126,6 @@ type Tag struct {
 
 type Location struct {
 	gorm.Model
-	City          string       `gorm:"size:100"`
-	Country       string       `gorm:"size:100"`
-	PostalCode    string       `gorm:"size:20"`
 	Geolocation   *Geolocation `gorm:"foreignKey:GeolocationID;references:ID;constraint:OnDelete:CASCADE"`
 	GeolocationID uint
 	Address       *Address `gorm:"foreignKey:AddressID;references:ID;constraint:OnDelete:CASCADE"`
@@ -144,6 +141,9 @@ type Geolocation struct {
 
 type Address struct {
 	gorm.Model
+	City       string `gorm:"size:100"`
+	Country    string `gorm:"size:100"`
+	PostalCode string `gorm:"size:20"`
 	StreetName string `gorm:"not null;size:255"`
 	Building   string `gorm:"size:20"`
 	Gate       string `gorm:"size:20"`
