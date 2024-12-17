@@ -493,6 +493,8 @@ Aby zapewnić integralność więzłów upewniliśmy się, że:
 
 \section{Etap 9: Faza logiczna II}
 
+\subsection{Przetworzenie struktury bazy danych sprzed modyfikacji do zgodnej z nowymi wymaganiami}
+
 Naszą bazę wzbogaciliśmy o tabele:
 
 \begin{itemize}
@@ -504,6 +506,36 @@ Nasi użytkownicy mogą tworzyć artykuły podobnie jak na Twitterze oraz okrasz
 
 Oraz teraz geoloakacja jest dodatkowo wyrażana przez Point z PostGIS, pozwoli to nam na wykonanie zapytania o np. wydarzenia w promieniu \textit{n} metrów. 
 
+\subsection{Przykładowe zapytania}
+\begin{itemize}
+    \item 10 najdłuższych artykułów z ostatnich 30dni
+    \item Artykuły najbardziej popularnego autora
+    \item Wydarzenia w promieniu 100km
+    \item Autorzy, którzy napisali najwięcej artykułów
+    \item Posty z 5 najbliższych lokalizacji 
+    \item Użytkownik z największą liczbą obserwujących
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{docs/images/top_10_longest_articles_from_last_30days.png}
+    \caption{Wynik kwerendy wyszukującej 10 najdłuższych artykułów z ostatnich 30dni}
+    \label{fig:sql9_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{docs/images/post_from_5_nearest_locations.png}
+    \caption{Wynik kwerendy wyszukującej posty z najbliższych 5 lokalizacji}
+    \label{fig:sql9_2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{docs/images/user_with_most_follows.png}
+    \caption{Wynik kwerendy wyszukującej użytkownika z największą ilością obserwujących}
+    \label{fig:sql9_3}
+\end{figure}
 
 \section{Etap 10: Nierelacyjne bazy danych - faza wstępna}
 
@@ -527,7 +559,7 @@ Dobre wsparcie dla technologii np. Python                        &              
   \textbf{Założenia} (podobnie jak w przypadku relacyjnej bazy): chcemy aby baza mogłabyć wdrożona w jakiś serwis społecznościowy oraz aby miała dobry performance, ponieważ wpyłwa to na doświadczenie użytkownika.
 
 
-  \textbf{Ograniczenia}: moim zdaniem, tak jak poprzednio ogranicza nas to, że baza musi być w całości w NoSQL, gdzie tak jak już wspominałem - najlepiej stworzyć bazy dedykowane dla danych tabel. Problematyczne może być tworzenie \texttt{contraints}, poniważ bazy NoSQL nie wymagają od nas tworzenia schematów danych, w tym wypadku będziemy mieli \textbf{kolekcje} zamiast tabel i \textbf{dokumenty} zamiast wierszy. Oznacza to, że będziemy musieli zadbać sami o \textbf{integralność danych}.  
+  \textbf{Ograniczenia}: moim zdaniem, tak jak poprzednio ogranicza nas to, że baza musi być w całości w NoSQL, gdzie tak jak już wspominałem - najlepiej stworzyć bazy dedykowane dla danych tabel. Problematyczne może być tworzenie \texttt{constraints}, poniważ bazy NoSQL nie wymagają od nas tworzenia schematów danych, w tym wypadku będziemy mieli \textbf{kolekcje} zamiast tabel i \textbf{dokumenty} zamiast wierszy. Oznacza to, że będziemy musieli zadbać sami o \textbf{integralność danych}.  
 
 
 
