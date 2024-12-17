@@ -1,7 +1,8 @@
 SELECT 
     p.id,
     p.title,
-    a.city
+    a.city,
+	a.country
 FROM 
     posts p
 JOIN 

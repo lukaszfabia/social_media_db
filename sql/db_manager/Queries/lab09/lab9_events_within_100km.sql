@@ -16,8 +16,8 @@ JOIN
 WHERE 
     ST_DWithin(
         g.geom::geography, 
-        ST_MakePoint(-122.4194, 37.7749)::geography,
-        100000
+        ST_MakePoint(122.4194, 37.7749)::geography,
+        1000000
     )
 ORDER BY
     distance ASC;
