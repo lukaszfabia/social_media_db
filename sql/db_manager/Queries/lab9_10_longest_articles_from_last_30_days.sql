@@ -3,7 +3,7 @@ SELECT
    count(s.id) AS numberOfSections
 FROM
     articles a
-    JOIN section s ON s.article_id = a.id
+    JOIN sections s ON s.article_id = a.id
 WHERE
     a.created_at >= (NOW() - INTERVAL '30 days')
 GROUP BY

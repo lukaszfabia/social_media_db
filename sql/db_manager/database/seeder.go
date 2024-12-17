@@ -764,6 +764,7 @@ func (s *seederServiceImpl) FillArticles(count int) {
 			return false
 		}
 
+		ptr += 1
 		return true
 	}, authorsCount, nil)
 }

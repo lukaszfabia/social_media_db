@@ -160,39 +160,22 @@ func (s *service) InitEnums() {
 
 // Here you can stack fill funcs
 func (s *service) Cook() {
-
-	// s.seederService.FillPrivileges()
-	// s.seederService.FillUsers(2700)
-	// s.seederService.FillFriendsAndFriendRequests(100)
-	// s.seederService.FillTags(234)
-	// s.seederService.FillPages(100)
-	// s.seederService.FillLocations(12451)
-	// s.seederService.FillHashtags(345)
-	// s.seederService.FillComments(54350)
-	// s.seederService.FillReels(9000)
-	// s.seederService.FillPostAndReactions(10)         // quite slow
-	// s.seederService.FillMessagesAndConversations(10) // quite slow
-	// s.seederService.FillGroups(20)
-	// s.seederService.FillAuthorLists()
-
-	// for test purposes
-
 	// add an count multiplier
-	count_multiplier := 1
+	count_multiplier := 2
 
-	//s.seederService.FillPrivileges()
-	//s.seederService.FillUsers(100 * count_multiplier)
-	//s.seederService.FillFriendsAndFriendRequests(100 * 50)
-	//s.seederService.FillTags(20 * count_multiplier)
-	//s.seederService.FillPages(10 * count_multiplier)
+	s.seederService.FillPrivileges()
+	s.seederService.FillUsers(100 * count_multiplier)
+	s.seederService.FillFriendsAndFriendRequests(100 * count_multiplier)
+	s.seederService.FillTags(20 * count_multiplier)
+	s.seederService.FillPages(10 * count_multiplier)
 	s.seederService.FillLocations(20 * count_multiplier)
-	//s.seederService.FillHashtags(30 * count_multiplier)
-	//s.seederService.FillComments(20 * count_multiplier)
-	//s.seederService.FillReels(30 * count_multiplier)
-	//s.seederService.FillGroups(20 * count_multiplier)
-	//s.seederService.FillPostAndReactions(10 * count_multiplier)         // quite slow
-	//s.seederService.FillMessagesAndConversations(40 * count_multiplier) // quite slow
-	//s.seederService.FillArticles(3 * count_multiplier)
-	//s.seederService.FillFollowed(2 * count_multiplier)
-	//s.seederService.FillAuthorLists()
+	s.seederService.FillHashtags(30 * count_multiplier)
+	s.seederService.FillComments(20 * count_multiplier)
+	s.seederService.FillReels(30 * count_multiplier)
+	s.seederService.FillGroups(20 * count_multiplier)
+	s.seederService.FillPostAndReactions(10 * count_multiplier)         // quite slow
+	s.seederService.FillMessagesAndConversations(40 * count_multiplier) // quite slow
+	s.seederService.FillArticles(3 * count_multiplier)
+	s.seederService.FillFollowed(2 * count_multiplier)
+	s.seederService.FillAuthorLists()
 }
