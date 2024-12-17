@@ -31,13 +31,13 @@ func main() {
 	// create new service
 	s := database.Connect(file)
 
-	// s.ClearAllTables()
+	s.ClearAllTables()
 	s.InitEnums()
-	//s.DropTables()
+	s.DropTables()
 
 	if err := s.Sync(); err != nil {
 		log.Println("Failed to migrate tables!")
 	}
 
-	s.Cook()
+	//s.Cook()
 }

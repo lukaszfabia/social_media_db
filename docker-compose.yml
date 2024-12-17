@@ -3,13 +3,26 @@ services:
     container_name: social_media_postgres
     image: postgis/postgis
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_1:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
+    restart: always
+
+  db_2:
+    container_name: social_media_postgres_2
+    image: postgis/postgis
+    volumes:
+      - postgres_data_2:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5433:5433"
     restart: always
 
   pgadmin:
@@ -21,5 +34,7 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
     ports:
       - "5050:80"
+
 volumes:
-  postgres_data:
+  postgres_data_1:
+  postgres_data_2:
