@@ -12,3 +12,4 @@ WHERE u.author_id = (
 	ORDER BY COUNT(uf.friend_author_id) DESC
 	LIMIT 1
 )
+ORDER BY a.title;
