@@ -8,6 +8,10 @@ FROM
 WHERE u.author_id = (
 	SELECT uf.user_author_id
 	FROM user_friends uf
+	WHERE uf.user_author_id IN (
+		SELECT ar.author_id
+		FROM articles ar)
+		
 	GROUP BY uf.user_author_id
 	ORDER BY COUNT(uf.friend_author_id) DESC
 	LIMIT 1
