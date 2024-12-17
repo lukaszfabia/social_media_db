@@ -1,7 +1,7 @@
 
 SELECT
    a.title, 
-   u.surname,
+   u.second_name
 FROM
     articles a
     JOIN users u ON a.author_id = u.author_id

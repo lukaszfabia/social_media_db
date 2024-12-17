@@ -26,27 +26,29 @@ można użyć takiego launch.json:
 
 ```json
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Launch Package",
-            "type": "go",
-            "request": "launch",
-            "mode": "auto",
-            "program": "${workspaceFolder}/db_manager/main.go"
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Package",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/sql/db_manager/main.go"
+    }
+  ]
 }
 ```
 
 w pierwszej kolejności warto
->cd db_manager
+
+> cd db_manager
 
 uwaga na zapisanie pliku .env jako "UTF with BOM" - trzeba zwykły UTF
 
-jeśli chcecie jeszcze raz zasetupować bazę, to należy najpierw wykonać 
->make clear
-do wyczyszczenia potrzebnych danych
+jeśli chcecie jeszcze raz zasetupować bazę, to należy najpierw wykonać
+
+> make clear
+> do wyczyszczenia potrzebnych danych
 
 aby w ogóle działało, trzeba pamiętać, aby WSL 2 działał i docker desktop był włączony
 

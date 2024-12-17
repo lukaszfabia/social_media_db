@@ -420,7 +420,7 @@ func (s *seederServiceImpl) FillFriendsAndFriendRequests(count int) {
 		}
 
 		return true
-	}, int(len(users)/4), &info)
+	}, int(usersAmount/4), &info)
 
 	if tx.Error == nil {
 		if err := tx.Commit().Error; err != nil {
@@ -738,6 +738,8 @@ func (s *seederServiceImpl) FillMessagesAndConversations(count int) {
 }
 
 func (s *seederServiceImpl) FillArticles(count int) {
+	var info string = fmt.Sprintf("%d articles have been added", count)
+
 	// fetch all authors from the database
 	authors := []*models.Author{}
 	if err := s.db.Find(&authors).Order("RANDOM()").Error; err != nil {
@@ -766,11 +768,11 @@ func (s *seederServiceImpl) FillArticles(count int) {
 
 		ptr += 1
 		return true
-	}, authorsCount, nil)
+	}, authorsCount, &info)
 }
 
 func (s *seederServiceImpl) FillAuthorLists() {
-	info := fmt.Sprintf("Authors have been filled")
+	info := "Authors have been filled"
 
 	// get all authors from db
 	var authors []*models.Author
