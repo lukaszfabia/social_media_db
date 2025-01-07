@@ -34,7 +34,7 @@ var AllModels = []any{
 func (s *service) Sync() error {
 	for _, model := range AllModels {
 		if err := s.db.AutoMigrate(model); err != nil {
-			log.Fatalf("Cant migrate model %T", model)
+			log.Fatalf("Cant migrate model %T, error: %E", model, err)
 			return err
 		}
 	}

@@ -15,6 +15,28 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{listings}
+
+% SQL Code Style
+\lstdefinelanguage{SQL}{
+    keywords={SELECT, INSERT, UPDATE, DELETE, FROM, WHERE, JOIN, ON, CREATE, TABLE, VALUES, INTO},
+    keywordstyle=\color{blue}\bfseries,
+    identifierstyle=\color{black},
+    stringstyle=\color{red},
+    commentstyle=\color{gray},
+    morecomment=[l][\color{gray}]{--},
+    sensitive=true
+}
+
+\lstset{
+    language=SQL,
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{gray},
+    showstringspaces=false,
+}
 
 \title{Baza danych medium społecznościowego}
 \author{Łukasz Fabia 272724 \\ Mikołaj Kubś 272662 \\ Martyna Łopianiak 272682 \\ Piotr Schubert 272659 \\ Projektowanie baz danych wt 18:55}
@@ -60,17 +82,17 @@ Celem projektu jest stworzenie bazy danych do obsługi medium społecznościoweg
 \subsubsection{Cele projektu}
 
 \begin{tabular}{@{} l p{12cm} @{}}
-    \textbf{S (Specific)}: & Zaprojektowanie bazy danych dla medium społecznościowego. \\ \\
-    \textbf{M (Measurable)}: & Baza musi być wydajna, tzn. musi być w stanie obsługiwać dużą ilość użytkowników, co najmniej 20 000. \\ \\
+    \textbf{S (Specific)}:   & Zaprojektowanie bazy danych dla medium społecznościowego.                                                                                                                                                                       \\ \\
+    \textbf{M (Measurable)}: & Baza musi być wydajna, tzn. musi być w stanie obsługiwać dużą ilość użytkowników, co najmniej 20 000.                                                                                                                           \\ \\
     \textbf{A (Achievable)}: & Projekt zostanie zrealizowany przy użyciu PostgreSQL. Do stworzenia struktury tabel wykorzystany zostanie mechanizm ORM (Object Relational Mapping). Na koniec baza zostanie wypełniona danymi, aby przetestować jej wydajność. \\ \\
-    \textbf{R (Relevant)}: & Przechowywanie profili użytkowników oraz interakcje między nimi są kluczowe dla funkcjonowania medium społecznościowego. \\ \\
+    \textbf{R (Relevant)}:   & Przechowywanie profili użytkowników oraz interakcje między nimi są kluczowe dla funkcjonowania medium społecznościowego.                                                                                                        \\ \\
     \textbf{T (Time-bound)}: & Praca nad projektem powinna zająć 2 miesiące.
 \end{tabular}
 
 \subsubsection{Zakres projektu}
 
 \begin{tabular}{@{} l p{10cm} @{}}
-    \textbf{Multimedia}: & W bazie przechowywane będą wyłącznie linki do plików na zewnętrznym serwerze. \\
+    \textbf{Multimedia}:    & W bazie przechowywane będą wyłącznie linki do plików na zewnętrznym serwerze. \\
     \textbf{Obsługa haseł}: & Wszystkie hasła w bazie będą hashowane.
 \end{tabular}
 
@@ -113,7 +135,7 @@ Celem projektu jest stworzenie bazy danych do obsługi medium społecznościoweg
 
 \section{Etap 2: Faza logiczna}
 
-Do tabel zostały dodane atrybuty, tabele \textbf{Page} oraz \textbf{User} zostały uogólnione przez \textbf{Author}, który bierze udział w innych czynnościach. Baza została także sprowadzona do \textit{III postaci normalniej}, przez co wydzielono klika nowych tabel. 
+Do tabel zostały dodane atrybuty, tabele \textbf{Page} oraz \textbf{User} zostały uogólnione przez \textbf{Author}, który bierze udział w innych czynnościach. Baza została także sprowadzona do \textit{III postaci normalniej}, przez co wydzielono klika nowych tabel.
 
 \begin{figure}[H]
     \centering
@@ -141,7 +163,7 @@ Wykorzystano instrukcję CHECK do potwierdzenia poprawności danych w paru encja
     \item Grupa musi mieć od 1 do 10000000 członków.
 \end{itemize}
 
-Do stworzenia struktury bazy wykorzystano mechanizm ORM - (\href{https://gorm.io/}{gorm}). Sama baza wymagała dopracowania jeśli chodzi o enumeracje oraz reguły usuwania już bezpośrednio w systemie PostgreSQL (pgadmin). 
+Do stworzenia struktury bazy wykorzystano mechanizm ORM - (\href{https://gorm.io/}{gorm}). Sama baza wymagała dopracowania jeśli chodzi o enumeracje oraz reguły usuwania już bezpośrednio w systemie PostgreSQL (pgadmin).
 
 \textbf{Usuwanie}: Każdy model posiada pole \textit{DeletedAt} z indeksem. Podczas usuwania danego wiersza pole \textit{DeletedAt} jest ustawiane na znacznik czasu (timestamp) wskazujący moment, w którym dane zostały usunięte. Dzięki temu baza obsługuje soft deleting. Oznacza to, że gdy użytkownik usunie swoje konto, będzie można je przywrócić. Taką operację obsługują na przykład serwisy takie jak Facebook.
 
@@ -165,12 +187,12 @@ Do stworzenia struktury bazy wykorzystano mechanizm ORM - (\href{https://gorm.io
     \item Odpowienie ułożenie wywołań.
 \end{enumerate}
 
-Zapełnianie bazy danych dużą ilością danych zajmuje stosunkowo dużo czasu, może to być spowodowane przez unikalność niektórych atrybutów(biblioteka "męczy" się z generowaniem unikalnych sensownych danych), ale także przez wywołania które tworzą listy autorów dla np. eventów, ostatnim podejrzeniem może być nieoptymalnie napisay kod. \\ 
+Zapełnianie bazy danych dużą ilością danych zajmuje stosunkowo dużo czasu, może to być spowodowane przez unikalność niektórych atrybutów(biblioteka "męczy" się z generowaniem unikalnych sensownych danych), ale także przez wywołania które tworzą listy autorów dla np. eventów, ostatnim podejrzeniem może być nieoptymalnie napisay kod. \\
 
 
-\textbf{Język}: \href{https://go.dev/}{Go} 
+\textbf{Język}: \href{https://go.dev/}{Go}
 
-\textbf{Generowanie sztucznych danych}: \href{https://github.com/brianvoe/gofakeit}{gofakeit} 
+\textbf{Generowanie sztucznych danych}: \href{https://github.com/brianvoe/gofakeit}{gofakeit}
 
 \textbf{Object relational mapping (ORM)}: \href{https://github.com/go-gorm/gorm}{gorm} \\
 
@@ -178,9 +200,9 @@ Reszta rzeczy, które zostały wykonane:
 
 \begin{itemize}
     \item Funkcja usuwająca dane z tabel
-    \item Własne implementacje niektórych danych np. \texttt{Title}, \texttt{Birthday} 
-    \item Konfiguracja loggera 
-    \item Funkcja haszująca hasło 
+    \item Własne implementacje niektórych danych np. \texttt{Title}, \texttt{Birthday}
+    \item Konfiguracja loggera
+    \item Funkcja haszująca hasło
 \end{itemize}
 
 \section{Etap 5: Faza fizyczna 3}
@@ -188,7 +210,7 @@ Reszta rzeczy, które zostały wykonane:
 \quad W tej fazie projektu stworzyliśmy projekt interfejsu graficznego w programie Figma oraz napisaliśmy 10 nietrywialnych kwerend w SQL.
 
 \subsection{Projekt interfejsu graficznego}
-\quad Zaprojektowaliśmy następujące 10 widoków do aplikacji mobilnej: 
+\quad Zaprojektowaliśmy następujące 10 widoków do aplikacji mobilnej:
 
 \begin{itemize}
     \item Strona główna
@@ -267,14 +289,14 @@ Zatem optymalizacja zapytań będzie polegała na minimalizacji tych "kosztów".
 \subsection{Różne typy indeksów i ich zastosowanie}
 
 \begin{table}[htbp]
-\begin{tabular}{|l|l|}
-\hline
-\multicolumn{1}{|c|}{\textbf{Typ indeksu}} & \textbf{Zastosowanie}                                               \\ \hline
-\textbf{B-Tree}                            & Wyszukiwanie, sortowanie, zakresy, klucze główne, indeksy unikalne. \\ \hline
-\textbf{Hash}                              & Szybkie porównania równości (=).                                    \\ \hline
-\textbf{GiST}                              & Dane przestrzenne, zakresy, hierarchie.                             \\ \hline
-\textbf{BRIN}                              & Duże tabele z posortowanymi danymi, dane archiwalne.                \\ \hline
-\end{tabular}
+    \begin{tabular}{|l|l|}
+        \hline
+        \multicolumn{1}{|c|}{\textbf{Typ indeksu}} & \textbf{Zastosowanie}                                               \\ \hline
+        \textbf{B-Tree}                            & Wyszukiwanie, sortowanie, zakresy, klucze główne, indeksy unikalne. \\ \hline
+        \textbf{Hash}                              & Szybkie porównania równości (=).                                    \\ \hline
+        \textbf{GiST}                              & Dane przestrzenne, zakresy, hierarchie.                             \\ \hline
+        \textbf{BRIN}                              & Duże tabele z posortowanymi danymi, dane archiwalne.                \\ \hline
+    \end{tabular}
 \end{table}
 
 
@@ -377,7 +399,7 @@ Uzyskanie zgodności z przepisami, w tym z RODO w naszym projekcie wydaje się u
 
 Skrypt generujący dane również jest mocną stroną projektu. Skrypt generuje tabele w bazie danych, dodając potrzebne ograniczenia do atrybutów, enumeracje oraz dość sensowne dane. Jest on solidną bazą pod część backendową (związaną z warstwą modeli np. dla \textit{architektury warstwowej}) aplikacji. Dodatkowym atutem jest to, że generacja danych nie jest destruktywna - mając już dane w bazie danych, możemy spokojnie wywołać metodę odpowiedzialną za generowanie dodatkowych danych w określonych przez nas tabelach.
 
-Dodatkowo można w prosty sposób zmienić system, dla którego ma być generowana baza - my korzystaliśmy z PostgreSQL, ale bez większych problemów dałoby się zmienić system na inny (na przykład SQLite, MySQL czy SQLServer) dzięki używaniu GORM'a, który jest właśnie kompatybilny z wieloma systemami. 
+Dodatkowo można w prosty sposób zmienić system, dla którego ma być generowana baza - my korzystaliśmy z PostgreSQL, ale bez większych problemów dałoby się zmienić system na inny (na przykład SQLite, MySQL czy SQLServer) dzięki używaniu GORM'a, który jest właśnie kompatybilny z wieloma systemami.
 
 Został napisany również skrpty, który automatycznie uruchomi bazę w kontenerze \texttt{Dockerowym}, dzięki czemu nie trzeba instalować samego PostgreSQL, PGAdmin czy innych pluginów, żeby zarządzać tą bazą - wystarczy podać parę podstawowych danych w pliku \texttt{.env} i uruchomić skrypt. Dodatkową zaletą jest to, że baza jest uruchamiana w izolowanym środowisku, co pozwala na łatwe testowanie różnych wersji bazy danych, a także na łatwe przenoszenie bazy na inne środowisko (np. z lokalnego na serwer produkcyjny).
 
@@ -392,7 +414,7 @@ Nasz projekt stara się oczywiście spełniać podstawowe założenia dobrej baz
 
 \subsubsection{Słabe strony projektu (W)}
 
-Największą słabą stroną projektu jest dość wolno działający skrypt generujący dane. Dzieje się tak, gdy chcemy dodać więcej wierszy do tabeli - przez to, że skrypt wybiera foreign keys losowo wśród istniejących już elementów, często jest duża szansa niepowodzenia przez złamanie jakiejś zasady - dałoby się to ulepszyć dzięki bardziej inteligentemu wybieraniu foreign keys. Wygenerowanie niektórych danych wymaga też skomplikowanej i zagnieżdżonej logiki tworzenia elementów. Być może problemem jest też biblioteka \textit{faker}, która nie bardzo radziła sobie z generowaniem bardzo losowych, często unikalnych danych. 
+Największą słabą stroną projektu jest dość wolno działający skrypt generujący dane. Dzieje się tak, gdy chcemy dodać więcej wierszy do tabeli - przez to, że skrypt wybiera foreign keys losowo wśród istniejących już elementów, często jest duża szansa niepowodzenia przez złamanie jakiejś zasady - dałoby się to ulepszyć dzięki bardziej inteligentemu wybieraniu foreign keys. Wygenerowanie niektórych danych wymaga też skomplikowanej i zagnieżdżonej logiki tworzenia elementów. Być może problemem jest też biblioteka \textit{faker}, która nie bardzo radziła sobie z generowaniem bardzo losowych, często unikalnych danych.
 
 Okazuje się, że draw.io (narzędzie do modelowania diagrmów, w naszym wypadku diagramów ERD) ma wbudowaną integrację z GORM'em, dzięki której wystarczyłoby przesunąć diagram nad okienko z kodem. Ostatecznie nie oszczędziłoby nam to dużo czasu, ale z pewnością ułatwiłoby pracę i zmniejszyłoby ryzyko literówek.
 
@@ -410,14 +432,14 @@ Baza wymagałaby też dużo optymalizacji, by wspierać miliony użytkowników s
 
 \subsubsection{Podsumowanie}
 
-Próbując wprowadzić produkt z taką bazą danych w życie, mielibyśmy wielki problem z konkurencją - Facebook, Twitter, Instagram, TikTok, LinkedIn, Pinterest, Reddit, Snapchat, Tumblr, WhatsApp, YouTube, czyli największe platformy społecznościowe, mają już swoje miejsce na rynku. Nasz produkt musiałby być bardzo innowacyjny, aby przyciągnąć użytkowników. 
+Próbując wprowadzić produkt z taką bazą danych w życie, mielibyśmy wielki problem z konkurencją - Facebook, Twitter, Instagram, TikTok, LinkedIn, Pinterest, Reddit, Snapchat, Tumblr, WhatsApp, YouTube, czyli największe platformy społecznościowe, mają już swoje miejsce na rynku. Nasz produkt musiałby być bardzo innowacyjny, aby przyciągnąć użytkowników.
 
 Jednakże, nasz projekt jest dobrym punktem wyjścia do stworzenia takiego produktu. Baza danych jest solidna, choć wymagałaby jeszcze sporo optymalizacji. Skrypt generujący dane jest bardzo pomocny do debuggowania i byłby krytycznie potrzebny tworząc MVP, ale wymagałby jeszcze sporo pracy, aby działał szybciej i bardziej efektywnie.
 
 Czym mógłby wyróżniać się potencjalny produkt oparty na naszej bazie danych? Dobrym punktem wyjścia jest to, że nasza baza jest dość generyczna - większość wcześniej wymienionych serwisów ma już podobne encje. Tak więc można by rozwinąć tą bazę w jednym z tych 4 przykładowych kierunków:
 
 \begin{itemize}
-  \item \textbf{Baza danych dla GoLocal} - aplikacja do tworzenia i głosowania na wydarzenia dla samorządów i zwykłych ludzi, aplikacja w formie serwisu społecznościowego. Dodanie obsługi ankiet, opinii użytkowników o wydarzeniu, rozwinięcie tabel z lokalizacjami oraz wydarzeniami, obsługa użytkowników \textit{premium}. Usprawnienie obsługi komunikacji między użytkownikami, połączenie serwera z bazą NOSQL do zarządzania wiadomościami. W dalekiej przyszłości możnaby zastanowić się nad dedykowaną bazą do obsługi systemu rekomendacji - hurtowanie danych historycznych (usuniętych profili, rekacji, wydarzeń, postów, komentarzy). 
+    \item \textbf{Baza danych dla GoLocal} - aplikacja do tworzenia i głosowania na wydarzenia dla samorządów i zwykłych ludzi, aplikacja w formie serwisu społecznościowego. Dodanie obsługi ankiet, opinii użytkowników o wydarzeniu, rozwinięcie tabel z lokalizacjami oraz wydarzeniami, obsługa użytkowników \textit{premium}. Usprawnienie obsługi komunikacji między użytkownikami, połączenie serwera z bazą NOSQL do zarządzania wiadomościami. W dalekiej przyszłości możnaby zastanowić się nad dedykowaną bazą do obsługi systemu rekomendacji - hurtowanie danych historycznych (usuniętych profili, rekacji, wydarzeń, postów, komentarzy).
     \item \textbf{Baza danych dla serwisu społecznościowego dla programistów} - dodanie tabeli związanej z projektami, repozytoriami, commitami, pull requestami, itd. Można by też dodać tabelę związane z technologiami, językami programowania, frameworkami, itd.
     \item \textbf{Baza danych dla serwisu społecznościowego dla naukowców} - dodanie tabeli związanej z publikacjami, konferencjami, grantami, itd. Można by też dodać tabelę związane z dziedzinami nauki, konferencjami, itd.
     \item \textbf{Lepszy Twitter} - przez ostatnie zamieszanie w serwisie Twitter/X, można by stworzyć serwis, który byłby bardziej przejrzysty, miałby lepsze algorytmy rekomendacji, byłby bardziej stabilny i bardziej moderowany, itd.
@@ -426,17 +448,17 @@ Czym mógłby wyróżniać się potencjalny produkt oparty na naszej bazie danyc
 \subsection{Wprowadzone modyfikacje}
 
 \subsubsection{Porzucone pomysły}
-Już w początkowej fazie tworzenia projektu doszliśmy do wniosku że opcja zgłaszania postów/treści przez użytkowników wymaga nieadekwatnego nakładu pracy w stosunku do korzyści jakie nasz projekt na tym etapie mógłby z tego zyskać. Może być to dobra funkcjonalność do dodania w ramach rozwoju aplikacji, jednak na początkowych etapach stwierdziliśmy, że postawimy na jakość, a nie ilość. Dlatego zrezygnowaliśmy z tego pomysłu, aby w pełni skupić się na pozostałych funkcjonalnościach. 
-Podobnie stało się z encją “Story”. Jako że jej atrybuty praktycznie nie różniłyby się od obecnych już encji (Post, Reel) zdecydowaliśmy się na jej pominięcie w późniejszych etapach projektu. Jednak tak jak w przypadku zgłaszania postów jest to jak najbardziej funkcjonalność możliwa do dodania w przyszłości, a dzięki podobieństwu do obecnych już encji wdrożenie Story do naszej bazy danych powinno być nawet prostsze niż dodanie opcji zgłaszania postów. 
+Już w początkowej fazie tworzenia projektu doszliśmy do wniosku że opcja zgłaszania postów/treści przez użytkowników wymaga nieadekwatnego nakładu pracy w stosunku do korzyści jakie nasz projekt na tym etapie mógłby z tego zyskać. Może być to dobra funkcjonalność do dodania w ramach rozwoju aplikacji, jednak na początkowych etapach stwierdziliśmy, że postawimy na jakość, a nie ilość. Dlatego zrezygnowaliśmy z tego pomysłu, aby w pełni skupić się na pozostałych funkcjonalnościach.
+Podobnie stało się z encją “Story”. Jako że jej atrybuty praktycznie nie różniłyby się od obecnych już encji (Post, Reel) zdecydowaliśmy się na jej pominięcie w późniejszych etapach projektu. Jednak tak jak w przypadku zgłaszania postów jest to jak najbardziej funkcjonalność możliwa do dodania w przyszłości, a dzięki podobieństwu do obecnych już encji wdrożenie Story do naszej bazy danych powinno być nawet prostsze niż dodanie opcji zgłaszania postów.
 
 
 \subsubsection{Nowe encje}
-Na pierwszym diagramie ERD naszego projektu nie uwzględniliśmy encji “Tag”, która została dodana w następnym etapie. Encja ta określa typ prowadzonej strony. Nie uwzględniliśmy również encji “UserPrivilege”, która została dodana dopiero w fazie logicznej. Zdecydowaliśmy się wyodrębnić User Privilege do osobnej encji zamiast używać enuma, aby ułatwić modyfikację czy rozbudowę bazy danych oraz zmniejszyć ryzyko niespójności. 
-Pojawiła się też encja “ExternalAuthorLinks” która pozwala przechowywać linki do innych social mediów użytkownika. 
+Na pierwszym diagramie ERD naszego projektu nie uwzględniliśmy encji “Tag”, która została dodana w następnym etapie. Encja ta określa typ prowadzonej strony. Nie uwzględniliśmy również encji “UserPrivilege”, która została dodana dopiero w fazie logicznej. Zdecydowaliśmy się wyodrębnić User Privilege do osobnej encji zamiast używać enuma, aby ułatwić modyfikację czy rozbudowę bazy danych oraz zmniejszyć ryzyko niespójności.
+Pojawiła się też encja “ExternalAuthorLinks” która pozwala przechowywać linki do innych social mediów użytkownika.
 
 
 \subsubsection{Rozdzielenie lokacji na 3 table}
-Encja związana z lokacją została rozdzielona na 3 osobne encje: Location, Geolocation, Address. Taka struktura danych niweluje powielanie informacji, ponieważ miasta, kody pocztowe czy nawet współrzędne geograficzne mogą być takie same dla wielu adresów. Dodatkowo możemy teraz w bardzo precyzyjny sposób określić adres, do jakiego się odwołujemy -  mamy możliwość sprecyzowania ulicy, budynku, klatki schodowej, piętra i mieszkania. Dzięki temu, niezależnie od konwencji zapisu adresu (które mogą się różnić w zależności od kraju) użytkownik będzie w stanie wprowadzić go do naszej bazy danych. 
+Encja związana z lokacją została rozdzielona na 3 osobne encje: Location, Geolocation, Address. Taka struktura danych niweluje powielanie informacji, ponieważ miasta, kody pocztowe czy nawet współrzędne geograficzne mogą być takie same dla wielu adresów. Dodatkowo możemy teraz w bardzo precyzyjny sposób określić adres, do jakiego się odwołujemy -  mamy możliwość sprecyzowania ulicy, budynku, klatki schodowej, piętra i mieszkania. Dzięki temu, niezależnie od konwencji zapisu adresu (które mogą się różnić w zależności od kraju) użytkownik będzie w stanie wprowadzić go do naszej bazy danych.
 Poza tym rozdzielenie lokacji na osobne encje zmniejsza ryzyko niespójności, ułatwia modyfikacje i rozszerzanie bazy danych oraz sprawia, że zapytania na tabeli Location są bardziej wydajne. Jako że atrybuty tej encji zostały ograniczone do minimum, a bardziej złożone dane przechowywane są w osobnych tabelach, podczas wykonywania na przykład zapytań dotyczących wydarzeń w danym mieście nie potrzebujemy importować danych ze wszystkich tabel - wystarczy nam sama tabela Location co zwiększa wydajność zapytań.
 
 
@@ -444,39 +466,39 @@ Poza tym rozdzielenie lokacji na osobne encje zmniejsza ryzyko niespójności, u
 
 \subsection{Update ERD'a}
 
-Diagram ERD \ref{fig:new_erd} został zaktualizowany - odzwierciedla schemat relacji w bazie oraz jest czytelniejszy względem poprzedniego. Zdecydowaliśmy się nie umieszczać szczątkowych artybutów dla encji, ponieważ wprowadziło by to zbędne zamieszanie i wpłyneło by to na czytelność. 
+Diagram ERD \ref{fig:new_erd} został zaktualizowany - odzwierciedla schemat relacji w bazie oraz jest czytelniejszy względem poprzedniego. Zdecydowaliśmy się nie umieszczać szczątkowych artybutów dla encji, ponieważ wprowadziło by to zbędne zamieszanie i wpłyneło by to na czytelność.
 
-Zmieniono: 
+Zmieniono:
 
 \begin{itemize}
-  \item Dodano \texttt{User Privilege}
-  \item Rozbito \texttt{Location}, na pomniejsze encje (Address, Geolocation)
-  \item Wyodrębniono nową encje \texttt{Tag}
-  \item Usunięto encje \texttt{Story}
-  \item Pokazaliśmy na diagramie relacje użytkownika z innymi użytkownikami (asocjacja \textit{likes (as buddy)}) oraz podobnie pokazaliśmy wysyłanie zaproszeń do znajomych (asocjacji \textit{receives}, \textit{sends}).
-  \item No i usuneliśmy encje \texttt{Process}, dodaną przypadkiem. 
+    \item Dodano \texttt{User Privilege}
+    \item Rozbito \texttt{Location}, na pomniejsze encje (Address, Geolocation)
+    \item Wyodrębniono nową encje \texttt{Tag}
+    \item Usunięto encje \texttt{Story}
+    \item Pokazaliśmy na diagramie relacje użytkownika z innymi użytkownikami (asocjacja \textit{likes (as buddy)}) oraz podobnie pokazaliśmy wysyłanie zaproszeń do znajomych (asocjacji \textit{receives}, \textit{sends}).
+    \item No i usuneliśmy encje \texttt{Process}, dodaną przypadkiem.
 \end{itemize}
 
 
 \begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=0.95\textwidth]{images/erd_8_1.png} 
-  \end{center}
-  \caption{Zaktualizowany ERD}
-  \label{fig:new_erd}
+    \begin{center}
+        \includegraphics[width=0.95\textwidth]{images/erd_8_1.png}
+    \end{center}
+    \caption{Zaktualizowany ERD}
+    \label{fig:new_erd}
 \end{figure}
 
 
 \subsection{Update schematu relacji}
 
-Na podstawie nowego ERD'a \ref{fig:schemat_relacji} stary schemat relacji został uaktualniony, zostały usunięte błędy z poprzedniego oraz zwiększona czytelność. 
+Na podstawie nowego ERD'a \ref{fig:schemat_relacji} stary schemat relacji został uaktualniony, zostały usunięte błędy z poprzedniego oraz zwiększona czytelność.
 
 \begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=0.95\textwidth]{images/DiagramBazyDanych_8_2.png}
-  \end{center}
-  \caption{Poprawiony schemat relacji bazy danych serwisu społecznościowego}
-  \label{fig:schemat_relacji}
+    \begin{center}
+        \includegraphics[width=0.95\textwidth]{images/DiagramBazyDanych_8_2.png}
+    \end{center}
+    \caption{Poprawiony schemat relacji bazy danych serwisu społecznościowego}
+    \label{fig:schemat_relacji}
 \end{figure}
 
 \subsection{Weryfikacja i aktualizacja więzów integralności}
@@ -489,48 +511,126 @@ Aby zapewnić integralność więzłów upewniliśmy się, że:
     \item Zastosowanie \texttt{usuwania kaskadowego} sprawia, że rekordy podrzędne usuną się automatycznie, gdy usunięty zostanie rekord nadrzędny (np. gdy zostanie usunięty \texttt{Author} usunięte zostaną też jego \texttt{Posty}, a co za tym idzie też \texttt{Komentarze} i \texttt{Reakcje} dotyczące tych postów)
 \end{itemize}
 
-\newpage 
+\newpage
 
 \section{Etap 9: Faza logiczna II}
 
-Naszą bazę wzbogaciliśmy o tabele:
+\subsection{Przetworzenie struktury bazy danych sprzed modyfikacji do zgodnej z nowymi wymaganiami}
+
+Naszą bazę ulepszyliśmy w taki sposób:
 
 \begin{itemize}
-  \item user\_followers
-  \item article, w tym section 
+    \item dodaliśmy user\_followers - tabela asocjacyjna, która przechowuje informacje o tym, kto obserwuje kogo
+    \item article, w tym section
+    \item przenieśliśmy niektóre dane z tabeli Location do Address
 \end{itemize}
 
-Nasi użytkownicy mogą tworzyć artykuły podobnie jak na Twitterze oraz okraszać je hashtagami, aby można było je łatwiej wyszukać. 
+Dodaliśmy możliwość śledzenia użytkowników, którzy obserwują danego użytkownika. Dzięki temu użytkownik może śledzić swoich ulubionych autorów.
 
-Oraz teraz geoloakacja jest dodatkowo wyrażana przez Point z PostGIS, pozwoli to nam na wykonanie zapytania o np. wydarzenia w promieniu \textit{n} metrów. 
+Nasi użytkownicy mogą tworzyć długie artykuły składające się z wielu sekcji (które mają nagłówek oraz treść).
 
+Oraz teraz geoloakalizacja jest dodatkowo wyrażana przez Point z PostGIS, pozwoli to nam na wykonanie zapytania o np. wydarzenia w promieniu \textit{n} metrów. Przenieśliśmy również część danych z Location do Address, aby ułatwić zarządzanie danymi.
+
+Opracowaliśmy więc skrypt DDL przetwarzający strukturę starej bazy danych do nowej.
+
+\begin{lstlisting}
+    BEGIN;
+
+DROP TABLE IF EXISTS public.user_followed CASCADE;
+
+DROP TABLE IF EXISTS public.article_hashtags CASCADE;
+
+DROP TABLE IF EXISTS public.articles CASCADE;
+
+DROP TABLE IF EXISTS public.sections CASCADE;
+
+ALTER TABLE
+    IF EXISTS public.addresses DROP COLUMN IF EXISTS city;
+
+ALTER TABLE
+    IF EXISTS public.addresses DROP COLUMN IF EXISTS country;
+
+ALTER TABLE
+    IF EXISTS public.addresses DROP COLUMN IF EXISTS postal_code;
+
+ALTER TABLE
+    IF EXISTS public.geolocations DROP COLUMN IF EXISTS geom;
+
+ALTER TABLE
+    IF EXISTS public.locations
+ADD
+    COLUMN city character varying(100) COLLATE pg_catalog."default";
+
+ALTER TABLE
+    IF EXISTS public.locations
+ADD
+    COLUMN country character varying(100) COLLATE pg_catalog."default";
+
+ALTER TABLE
+    IF EXISTS public.locations
+ADD
+    COLUMN postal_code character varying(20) COLLATE pg_catalog."default";
+
+DROP SEQUENCE IF EXISTS public.sections_id_seq;
+
+DROP SEQUENCE IF EXISTS public.articles_id_seq;
+
+END;
+\end{lstlisting}
+
+\subsection{Przykładowe zapytania}
+\begin{itemize}
+    \item 10 najdłuższych artykułów z ostatnich 30dni
+    \item Artykuły najbardziej popularnego autora
+    \item Wydarzenia w promieniu 100km
+    \item Autorzy, którzy napisali najwięcej artykułów
+    \item Posty z 5 najbliższych lokalizacji
+    \item Użytkownik z największą liczbą obserwujących
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/top_10_longest_articles_from_last_30days.png}
+    \caption{Wynik kwerendy wyszukującej 10 najdłuższych artykułów z ostatnich 30dni}
+    \label{fig:sql9_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/post_from_5_nearest_locations.png}
+    \caption{Wynik kwerendy wyszukującej posty z najbliższych 5 lokalizacji}
+    \label{fig:sql9_2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/user_with_most_follows.png}
+    \caption{Wynik kwerendy wyszukującej użytkownika z największą ilością obserwujących}
+    \label{fig:sql9_3}
+\end{figure}
 
 \section{Etap 10: Nierelacyjne bazy danych - faza wstępna}
 
-Wybór padł na \textbf{MongoDB}, które dobrze sprawdzi się przy okazji tworzenia bazy dla serwisu społecznościowego. Do komunikacji z bazą wykorzstamy \textit{Pythona}.
+Nasz wybór padł na \textbf{MongoDB}, które według nas najlepiej sprawdzi się przy okazji tworzenia bazy dla serwisu społecznościowego. Do komunikacji z bazą wykorzystamy \textit{Pythona}.
 
-Oczywiście najlepszym rozwiązaniem byłoby wydzielenie tabel do odpowiednich baz danych. To znaczy niektóre tabele przechowywać w bazie relacyjnej a niektóre w nierelacyjnej a jeszcze inne w np. Grafowej.  \\ 
+Najbardziej optymalnym rozwiązaniem byłoby rozdzielenie danych między różne typy baz. Niektóre dane najlepiej przechowywać w bazie relacyjnej, inne w nierelacyjnej - na przykład dokumentowej lub grafowej - w zależności od ich struktury i zastosowania.
 
 \begin{table}[htbp]
-\begin{tabular}{|l|l|}
-\hline
-\multicolumn{1}{|c|}
-                    {\textbf{Zalety}}                            & \multicolumn{1}{c|}{\textbf{Wady}}                        \\ \hline
-Skalowanie horyzontalne                                          & Brak zdefiniowanego schematu jaki jest w SQL              \\ \hline
-Wysoka wydajność odczytu i zapisu                                & Denormalizacja niektórych tabel \\ \hline
-Obsługa ACID                                                     & Duży ruch = duże koszty                                   \\ \hline
-Dobre wsparcie dla technologii np. Python                        &                                                           \\ \hline
-\end{tabular}
-  \caption{Plusy i minusy MongoDB}
-  \label{table:prosAndConsOfMongoDB}
+    \begin{tabular}{|l|l|}
+        \hline
+        \multicolumn{1}{|c|}
+        {\textbf{Zalety}}                         & \multicolumn{1}{c|}{\textbf{Wady}}           \\ \hline
+        Skalowanie horyzontalne                   & Brak zdefiniowanego schematu jaki jest w SQL \\ \hline
+        Wysoka wydajność odczytu i zapisu         & Denormalizacja niektórych tabel              \\ \hline
+        Obsługa ACID                              & Duży ruch = duże koszty                      \\ \hline
+        Dobre wsparcie dla technologii np. Python &                                              \\ \hline
+    \end{tabular}
+    \caption{Plusy i minusy MongoDB}
+    \label{table:prosAndConsOfMongoDB}
 
-  \textbf{Założenia} (podobnie jak w przypadku relacyjnej bazy): chcemy aby baza mogłabyć wdrożona w jakiś serwis społecznościowy oraz aby miała dobry performance, ponieważ wpyłwa to na doświadczenie użytkownika.
+    \textbf{Założenia} (podobnie jak w przypadku relacyjnej bazy): chcemy aby baza mogła być wdrożona w jakiś serwis społecznościowy oraz aby miała dobrą wydajność, ponieważ wpyłwa to na doświadczenie użytkownika.
 
-
-  \textbf{Ograniczenia}: moim zdaniem, tak jak poprzednio ogranicza nas to, że baza musi być w całości w NoSQL, gdzie tak jak już wspominałem - najlepiej stworzyć bazy dedykowane dla danych tabel. Problematyczne może być tworzenie \texttt{contraints}, poniważ bazy NoSQL nie wymagają od nas tworzenia schematów danych, w tym wypadku będziemy mieli \textbf{kolekcje} zamiast tabel i \textbf{dokumenty} zamiast wierszy. Oznacza to, że będziemy musieli zadbać sami o \textbf{integralność danych}.  
-
-
-
+    \textbf{Ograniczenia}: naszym zdaniem, tak jak poprzednio, ogranicza nas to, że baza musi być w całości w NoSQL. Tymczasem - jak wcześniej wspomniano - najlepiej stworzyć bazy dedykowane dla danych tabel. Problematyczne może być tworzenie \texttt{constraints}, ponieważ bazy NoSQL nie wymagają od nas tworzenia schematów danych. W tym wypadku będziemy mieli \textbf{kolekcje} zamiast tabel i \textbf{dokumenty} zamiast wierszy. Oznacza to, że będziemy musieli zadbać sami o \textbf{integralność danych}.
 \end{table}
 
 \section{Etap 11 - Faza konceptualna i fizyczna}
