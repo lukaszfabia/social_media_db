@@ -15,19 +15,19 @@ class MongoDB:
         if uri is None:
             raise ValueError("Please provide valid .env")
 
-        self._client = MongoClient(uri)
+        self.__client = MongoClient(uri)
 
     @property
     def db(self) -> MongoClient:
         """
         Get instance of mongos client
         """
-        return self._client
+        return self.__client
 
     def health(self):
         """Checks connection with db"""
         try:
-            self._client.admin.command("ping")
+            self.__client.admin.command("ping")
             print("Successfully connected to MongoDB!")
         except Exception as e:
             print(e)
