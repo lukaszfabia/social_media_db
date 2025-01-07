@@ -3,3 +3,4 @@ pymongo
 faker 
 pydantic
 dnspython
+geojson
