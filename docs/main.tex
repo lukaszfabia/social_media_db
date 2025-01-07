@@ -533,13 +533,16 @@ Dobre wsparcie dla technologii np. Python                        &              
 
 \end{table}
 
+\section{Etap 11 - Faza konceptualna i fizyczna}
 
+Przykładowe kwerendy. Poniżej odpowiniki komend SQL'owych w NoSQL.
 
-
-
-
-
-
+\begin{itemize}
+  \item SELECT * FROM users \arrowright db.users.find()
+  \item SELECT * FROM users WHERE age < 18 \arrowright db.users.find({ age: { \$lt: 18 } })
+  \item INSERT INTO users (krotka) VALUES (dane) \arrowright db.users.insertOne({ dane: "w json" })
+  \item CREATE INDEX idx\_deleted\_at ON users (deleted\_at) \arrowright db.users.createIndex({ deleted\_at: 1 })
+\end{itemize}
 
 
 \end{document}
