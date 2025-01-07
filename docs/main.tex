@@ -644,5 +644,20 @@ Przykładowe kwerendy. Poniżej odpowiniki komend SQL'owych w NoSQL.
   \item CREATE INDEX idx\_deleted\_at ON users (deleted\_at) \arrowright db.users.createIndex({ deleted\_at: 1 })
 \end{itemize}
 
+Definiować związki można przez dodanie listy powiązanych \texttt{id} z obiektem lub przez denormalizację. Wybór jest zależny od tego jak będą pobierane dane np. kiedy mamy komentarz to lepiej będzie dodać autora komentarza jako mały obiekt z jego najważniejszymi danymi jak: 
+
+\begin{itemize} 
+    \item username lub imie, nazwisko albo email
+    \item zdjęcie
+\end{itemize}
+
+Umieszczanie listy intersujących nas \texttt{id} w obiekcie przyda się jeśli dane będą pobierane w serwera np. mamy zakładke z requestami do znajomych wchodzimy w nią i przed renderem widoku pobieramy dane z API, wybierając kokretne obiekty z bazy, warunkiem jest, że user jest jakoś przechowywany.  
+
+Wykorzystane mechanizmy zapewnienia spójności:
+
+
+BASE różni się od ACID tym, że koncentruje się na dostępności i ewentualnej spójności, co oznacza, że dane mogą nie być spójne przez cały czas, ale ostatecznie osiągną spójność, dlatego bazy NoSQL są popularnym rozwiązaniem w serwisach społecznościowych. Z drugiej strony, ACID zapewnia silną spójność i niezawodność transakcji w relacyjnych bazach danych, dzięki czemu jest bardziej odpowiedni dla systemów wymagających ścisłej integralności danych, takich jak systemy finansowe.
+
+\href{https://danieljeziorski.pl/pojecia-acid-oraz-base-w-kontekscie-baz-danych-nosql/}{Artykuł, którym się posiłkowałem.}
 
 \end{document}
