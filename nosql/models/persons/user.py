@@ -9,8 +9,7 @@ from bson import ObjectId
 class UserReadOnly(BaseModel):
     """Denormalization of user"""
 
-    first_name: str = Field(..., max_length=50)
-    second_name: str = Field(..., max_length=50)
+    name: str = Field(..., max_length=50)
     picture_url: Optional[str] = None
 
 

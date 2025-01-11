@@ -12,4 +12,4 @@ MONGO_URI=
     <h2>Ważne</h2>
 </div>
 
-Nadajemy `typy` oraz `docstringi`. **Wiem**, że **Python** jest dynamicznie typowany i interpretera "nie obchodzi" typ przypisany np. do zmiennej, ale aby zachować **integralność danych** oraz czytelność dodajemy typy.
+Nadajemy `typy` oraz `docstringi`. **Wiem**, że **Python** jest dynamicznie typowany i interpretera "nie obchodzi" typ przypisany np. do zmiennej, ale aby zachować **integralność danych** oraz czytelności dodajemy typy.
