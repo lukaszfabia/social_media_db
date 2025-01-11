@@ -1,19 +1,18 @@
-from model import Model
+from ..model import Model
 from pydantic import EmailStr, Field, BaseModel, HttpUrl
 from typing import List, Optional, Set
 from datetime import datetime
-from enums import UserPrivilege
+from ..enums import UserPrivilege
 from bson import ObjectId
 
 
 class UserReadOnly(BaseModel):
     """Denormalization of user"""
-
     name: str = Field(..., max_length=50)
     picture_url: Optional[str] = None
 
 
-class UserAuth(Model):
+class UserAuth(BaseModel):
     email: EmailStr
     password: Optional[str] = None
     provider: Optional[str] = None
@@ -22,7 +21,9 @@ class UserAuth(Model):
     is_verified: bool = False
 
 
-class User(Model, UserReadOnly, UserAuth):
+class User(Model):
+    user_read_only: UserReadOnly
+    user_auth: UserAuth
     background_url: Optional[HttpUrl] = None
     birthday: Optional[datetime] = None
     bio: str = Field("Edit bio", max_length=512)
@@ -44,3 +45,4 @@ class User(Model, UserReadOnly, UserAuth):
 
     class Config:
         orm_mode = True
+        arbitrary_types_allowed = True

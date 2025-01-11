@@ -1,9 +1,9 @@
 from typing import List, Optional
 from pydantic import Field
-from model import Model
+from ..model import Model
 from ..persons.user import UserReadOnly
 from ..media import Media
-from section import Section
+from .section import Section
 
 
 class Article(Model, Media):
@@ -15,3 +15,4 @@ class Article(Model, Media):
 
     class Config:
         orm_mode = True
+        arbitrary_types_allowed = True

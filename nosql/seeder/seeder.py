@@ -11,13 +11,18 @@ from models.enums import UserPrivilege
 def seed(db: MongoClient) -> None:
     # Create sample users
     user1 = User(
-        id=ObjectId(),
-        name="John Doe",
-        email="john.doe@example.com",
-        password="password123",
-        last_login=datetime.now(tz=timezone.utc),
-        user_privilege=UserPrivilege.User,
-        is_verified=True,
+        user_read_only=UserReadOnly(
+            name="John Doe",
+            picture_url=None
+        ),
+        user_auth=UserAuth(
+            email="john.doe@example.com",
+            password="password123",
+            provider=None,
+            last_login=datetime.now(tz=timezone.utc),
+            user_privilege=UserPrivilege.User,
+            is_verified=True
+        ),
         background_url=None,
         birthday=datetime(1990, 1, 1, tzinfo=timezone.utc),
         bio="This is John's bio",
@@ -34,13 +39,18 @@ def seed(db: MongoClient) -> None:
     )
 
     user2 = User(
-        id=ObjectId(),
-        name="Jane Smith",
-        email="jane.smith@example.com",
-        password="password123",
-        last_login=datetime.now(tz=timezone.utc),
-        user_privilege=UserPrivilege.Admin,
-        is_verified=True,
+        user_read_only=UserReadOnly(
+            name="Jane Smith",
+            picture_url=None
+        ),
+        user_auth=UserAuth(
+            email="jane.smith@example.com",
+            password="password123",
+            provider=None,
+            last_login=datetime.now(tz=timezone.utc),
+            user_privilege=UserPrivilege.Admin,
+            is_verified=True
+        ),
         background_url=None,
         birthday=datetime(1992, 2, 2, tzinfo=timezone.utc),
         bio="This is Jane's bio",
@@ -57,7 +67,8 @@ def seed(db: MongoClient) -> None:
     )
 
     # Insert users into the database
-    db.users.insert_many([user1.dict(), user2.dict()])
+    db.users.insert_one(user1.dict(by_alias=True))
+    db.users.insert_one(user2.dict(by_alias=True))
 
     # Create sample articles
     article1 = Article(
