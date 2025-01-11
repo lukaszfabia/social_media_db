@@ -1,4 +1,4 @@
-from model import Model
+from ..model import Model
 from ..persons.user import UserReadOnly
 from pydantic import Field, HttpUrl
 from bson import ObjectId
@@ -19,3 +19,4 @@ class Post(Model, Media):
 
     class Config:
         orm_mode = True
+        arbitrary_types_allowed = True
