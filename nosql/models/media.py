@@ -3,9 +3,6 @@ from pydantic import HttpUrl
 
 
 class Media:
-    """Contains list with medias"""
+    """Contains list with media"""
 
     media: Optional[List[HttpUrl]] = None
-
-    class Config:
-        orm_mode = True

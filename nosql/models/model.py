@@ -9,7 +9,8 @@ class Model(BaseModel):
     deleted_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+        arbitrary_types_allowed = True
 
     def update(self):
         self.updated_at = datetime.now(tz=timezone.utc)

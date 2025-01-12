@@ -1,10 +1,10 @@
 from database.connect import MongoDB
-import uuid
-from seeder import seed
+from seeder.seeder import example_seed
+
 
 if __name__ == "__main__":
     client = MongoDB()
 
     client.health()
 
-    seed(client.db)
+    example_seed(client.db)
