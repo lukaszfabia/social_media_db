@@ -2,7 +2,11 @@
 
 W baza w MongoDB w atlas jak będzie brakować miejsca no to trzeba iść lokalnie.
 
-You need to create file named ".env" in this directory, which will contain: 
+## How to run
+
+### Setup
+
+You need to create file named ".env" in this directory, which will contain:
 
 ```bash
 MONGO_URI=
@@ -16,8 +20,14 @@ MONGO_URI=mongodb+srv://<username>:<password>@cluster0.gheyk.mongodb.net/?retryW
 DATABASE_NAME=cluster0
 ```
 
-<div style="color: red">
-    <h2>Ważne</h2>
-</div>
+### Running
+
+In cmd, go to the root directory of this repository, and from there execute:
+
+```sh
+python -m nosql.main
+```
+
+## Important
 
 Nadajemy `typy` oraz `docstringi`. **Wiem**, że **Python** jest dynamicznie typowany i interpretera "nie obchodzi" typ przypisany np. do zmiennej, ale aby zachować **integralność danych** oraz czytelności dodajemy typy.

@@ -6,29 +6,31 @@ from pathlib import Path
 
 
 class MongoDB:
-    def __init__(self):
-        path = Path(__file__).parent.parent / ".env"
+    def __init__(self) -> None:
+        path: Path = Path(__file__).parent.parent / ".env"
 
         load_dotenv(path)
-        uri: str = os.getenv("MONGO_URI")
-        self.__db_name = os.getenv("DATABASE_NAME")
+        uri: str | None = os.getenv("MONGO_URI")
+        self.__db_name: str | None = os.getenv("DATABASE_NAME")
 
         if self.__db_name is None:
             raise ValueError("Please provide DATABASE_NAME")
 
         if uri is None:
             # build uri
-            username = os.getenv("USERNAME")
-            password = os.getenv("PASSWORD")
+            username: str | None = os.getenv("USERNAME")
+            password: str | None = os.getenv("PASSWORD")
 
             if username and password:
-                uri = f'mongodb+srv://{os.getenv("USERNAME")}:{os.getenv("PASSWORD")}@cluster0.gheyk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+                uri = f'mongodb+srv://{os.getenv("USERNAME")}:{os.getenv(
+                    "PASSWORD")}@cluster0.gheyk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
 
             else:
-                raise ValueError("Please provide entire URI or PASSWORD and USERNAME")
+                raise ValueError(
+                    "Please provide entire URI or PASSWORD and USERNAME")
 
-        self.__client = MongoClient(uri)
-        self.__db = self.__client[self.__db_name]
+        self.__client: MongoClient = MongoClient(uri)
+        self.__db: Database = self.__client[self.__db_name]
 
     @property
     def client(self) -> MongoClient:
@@ -46,7 +48,7 @@ class MongoDB:
         """
         return self.__db
 
-    def health(self):
+    def health(self) -> None:
         """Checks connection with db"""
         try:
             self.__client.admin.command("ping")
