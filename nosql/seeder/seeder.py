@@ -1,12 +1,12 @@
 from pymongo.database import Database
 from bson import ObjectId
 from datetime import datetime, timezone
-from models.persons.user import User, UserAuth, UserReadOnly
-from models.events.location import ShortLocation
-from models.articles.article import Article
-from models.posts.post import Post
-from models.communication.message import Message
-from models.enums import UserPrivilege
+from nosql.models.persons.user import User, UserAuth, UserReadOnly
+from nosql.models.events.location import ShortLocation
+from nosql.models.articles.article import Article
+from nosql.models.posts.post import Post
+from nosql.models.communication.message import Message
+from nosql.models.enums import UserPrivilege
 from .collection import collection
 
 
@@ -60,7 +60,8 @@ def example_seed(db: Database) -> None:
     )
 
     db[collection.ARTICLES].insert_many(
-        [article1.model_dump(by_alias=True), article2.model_dump(by_alias=True)]
+        [article1.model_dump(by_alias=True),
+         article2.model_dump(by_alias=True)]
     )
 
     post1 = Post(
@@ -68,7 +69,7 @@ def example_seed(db: Database) -> None:
         title="Sample Post 1",
         content="This is the content of sample post 1",
         is_public=True,
-        hashtags={"sample", "post"},
+        hashtags=["sample", "post"],
         group_id=ObjectId(),
         location=ShortLocation(longitude=21.37, latitude=3.13),
     )
@@ -78,7 +79,7 @@ def example_seed(db: Database) -> None:
         title="Sample Post 2",
         content="This is the content of sample post 2",
         is_public=False,
-        hashtags={"example", "post"},
+        hashtags=["example", "post"],
         group_id=ObjectId(),
         location=ShortLocation(longitude=21.37, latitude=3.13),
     )
@@ -87,14 +88,16 @@ def example_seed(db: Database) -> None:
         [post1.model_dump(by_alias=True), post2.model_dump(by_alias=True)]
     )
 
-    message1 = Message(user=user1.user_read_only, content="This is a sample message")
+    message1 = Message(user=user1.user_read_only,
+                       content="This is a sample message")
 
     message2 = Message(
         user=user2.user_read_only, content="This is another sample message"
     )
 
     db[collection.MESSAGES].insert_many(
-        [message1.model_dump(by_alias=True), message2.model_dump(by_alias=True)]
+        [message1.model_dump(by_alias=True),
+         message2.model_dump(by_alias=True)]
     )
 
     print("Seeding completed successfully.")
