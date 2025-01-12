@@ -13,4 +13,4 @@ class Comment(Model):
     # hashtags could be included in content
 
     class Config:
-        orm_mode = True
+        from_attributes = True

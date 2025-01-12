@@ -4,7 +4,6 @@ from geojson import Point
 
 
 class ShortLocation(BaseModel):
-    type: str = Point
     latitude: float = Field(
         ..., ge=0, le=90, description="Latitude must be between 0 and 90"
     )
@@ -24,7 +23,7 @@ class Address(BaseModel):
     apartment: Optional[str] = Field(None, max_length=20)
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class Location(BaseModel):
@@ -32,4 +31,4 @@ class Location(BaseModel):
     address: Address
 
     class Config:
-        orm_mode = True
+        from_attributes = True

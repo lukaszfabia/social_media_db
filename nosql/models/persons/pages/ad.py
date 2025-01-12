@@ -9,6 +9,3 @@ class Ad(Model, Media):
     content: str = Field(..., max_length=512)
     link: HttpUrl
     page_id: ObjectId
-
-    class Config:
-        orm_mode = True

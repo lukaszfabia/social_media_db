@@ -12,6 +12,3 @@ class Conversation(Model):
     author_id: ObjectId
     members: Optional[List[UserReadOnly]] = None
     message: Optional[List[Message]] = None
-
-    class Config:
-        orm_mode = True

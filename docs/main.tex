@@ -647,10 +647,27 @@ Definiować związki można przez dodanie listy powiązanych \texttt{id} z obiek
 Umieszczanie listy intersujących nas \texttt{id} w obiekcie przyda się jeśli dane będą pobierane w serwera np. mamy zakładke z requestami do znajomych wchodzimy w nią i przed renderem widoku pobieramy dane z API, wybierając kokretne obiekty z bazy, warunkiem jest, że user jest jakoś przechowywany.
 
 Wykorzystane mechanizmy zapewnienia spójności:
-//TODO
+\begin{itemize}
+  \item spójność ostateczna: w międzyczasie mogą wystąpić niespójności, ale w niedalekiej przyszłości będą one spójne
+  \item spójność natychmiastowa: wszystkie zmiany są od razu aplikowane na wszystkich serwerach
+  \item spójność przez większość: jeśli większość serwerów powie, że dane są w porządku to wtedy dane są spójne
+\end{itemize}
 
+Z tych mechanizmów wynika problem rozproszenia, tutaj pojawia się tw. CAP
 
-BASE różni się od ACID tym, że koncentruje się na dostępności i ewentualnej spójności, co oznacza, że dane mogą nie być spójne przez cały czas, ale ostatecznie osiągną spójność, dlatego bazy NoSQL są popularnym rozwiązaniem w serwisach społecznościowych. Z drugiej strony, ACID zapewnia silną spójność i niezawodność transakcji w relacyjnych bazach danych, dzięki czemu jest bardziej odpowiedni dla systemów wymagających ścisłej integralności danych, takich jak systemy finansowe.
+\begin{itemize}
+  \item C - consistent
+  \item A - available
+  \item P - partition
+\end{itemize}
+
+Nie ma jednoznaczenej odpowiedzi, które z dwóch, poniważ można spełnić tylko 2 z 3, ponieważ jest to zależne od przeznaczenia bazy.
+
+\begin{quotation}
+  "Systemy baz danych zaprojektowane z tradycyjnymi gwarancjami ACID, takimi jak RDBMS, wybierają spójność nad dostępność, natomiast systemy zaprojektowane wokół filozofii BASE, wspólne w ruchu NoSQL, na przykład, wybierają dostępność zamiast spójności \cite{wikiAboutBase}."
+  \textit{CAP\_theorem, en.wikipedia.org}
+\end{quotation}
+
 
 \subsection{Prezentacja przykładowych zapytań}
 
@@ -663,6 +680,8 @@ Poniżej odpowiedniki komend SQL w MongoDB (NoSQL).
     \item CREATE INDEX idx\_deleted\_at ON users (deleted\_at) $\rightarrow$ db.users.createIndex({ deleted\_at: 1 })
 \end{itemize}
 
-\href{https://danieljeziorski.pl/pojecia-acid-oraz-base-w-kontekscie-baz-danych-nosql/}{Artykuł, którym się posiłkowaliśmy.}
+
+\bibliography{sample}
+\bibliographystyle{abbrv}
 
 \end{document}

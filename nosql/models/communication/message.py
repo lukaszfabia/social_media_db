@@ -1,13 +1,9 @@
 from ..model import Model
 from ..media import Media
 from typing import Optional
-from bson import ObjectId
+from ..persons.user import UserReadOnly
 
 
 class Message(Model, Media):
-    author: ObjectId
+    user: UserReadOnly
     content: Optional[str] = None
-
-    class Config:
-        orm_mode = True
-        arbitrary_types_allowed = True

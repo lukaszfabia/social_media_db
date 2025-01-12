@@ -12,7 +12,3 @@ class Article(Model, Media):
     is_public: bool = False
     hashtags: Optional[List[str]] = None
     sections: Optional[List[Section]] = None
-
-    class Config:
-        orm_mode = True
-        arbitrary_types_allowed = True

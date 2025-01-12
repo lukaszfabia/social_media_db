@@ -20,6 +20,3 @@ class Reaction(Model):
     user: UserReadOnly
     post_id: ObjectId
     reaction: ReactionType
-
-    class Config:
-        orm_mode = True

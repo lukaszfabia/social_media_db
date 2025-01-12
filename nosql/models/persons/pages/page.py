@@ -1,5 +1,5 @@
 from model import Model
-from typing import Set, Optional
+from typing import List, Optional
 from models.persons.user import UserReadOnly
 from pydantic import Field, HttpUrl
 
@@ -11,12 +11,9 @@ class Page(Model):
     background_url: Optional[HttpUrl] = None
 
     # changed remove table with tags, take only strings
-    tags: Set[str] = {}
-    advertisements: Set[str] = {}
+    tags: List[str] = {}
+    advertisements: List[str] = {}
 
     # id who like it
-    likes: Set[str] = {}
+    likes: List[str] = {}
     views: int = 0
-
-    class Config:
-        orm_mode = True

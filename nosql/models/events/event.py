@@ -2,7 +2,7 @@ from model import Model
 from ..persons.user import UserReadOnly
 from pydantic import Field
 from datetime import datetime
-from typing import Set, Optional
+from typing import List, Optional
 from bson import ObjectId
 from location import Location
 from ..media import Media
@@ -15,5 +15,5 @@ class Event(Model, Media):
     s_date: datetime
     f_date: Optional[datetime] = None
 
-    members: Optional[Set[ObjectId]] = None
+    members: Optional[List[ObjectId]] = None
     location: Location

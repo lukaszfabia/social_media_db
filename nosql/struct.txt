@@ -1,0 +1,64 @@
+.
+├── database
+│   ├── connect.py
+│   ├── __init__.py
+│   └── __pycache__
+│       ├── connect.cpython-312.pyc
+│       ├── connect.cpython-313.pyc
+│       ├── __init__.cpython-312.pyc
+│       └── __init__.cpython-313.pyc
+├── __init__.py
+├── main.py
+├── models
+│   ├── articles
+│   │   ├── article.py
+│   │   ├── __pycache__
+│   │   │   ├── article.cpython-313.pyc
+│   │   │   └── section.cpython-313.pyc
+│   │   └── section.py
+│   ├── communication
+│   │   ├── conversation.py
+│   │   ├── group.py
+│   │   ├── message.py
+│   │   └── __pycache__
+│   │       └── message.cpython-313.pyc
+│   ├── enums.py
+│   ├── events
+│   │   ├── event.py
+│   │   ├── location.py
+│   │   └── __pycache__
+│   │       └── location.cpython-313.pyc
+│   ├── media.py
+│   ├── model.py
+│   ├── persons
+│   │   ├── friends
+│   │   │   └── request.py
+│   │   ├── pages
+│   │   │   ├── ad.py
+│   │   │   └── page.py
+│   │   ├── __pycache__
+│   │   │   └── user.cpython-313.pyc
+│   │   └── user.py
+│   ├── posts
+│   │   ├── comment.py
+│   │   ├── __init__.py
+│   │   ├── post.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-313.pyc
+│   │   │   └── post.cpython-313.pyc
+│   │   └── reaction.py
+│   └── __pycache__
+│       ├── enums.cpython-313.pyc
+│       ├── media.cpython-313.pyc
+│       └── model.cpython-313.pyc
+├── README.md
+├── requirements.txt
+├── seeder
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-313.pyc
+│   │   └── seeder.cpython-313.pyc
+│   └── seeder.py
+└── struct.txt
+
+19 directories, 43 files

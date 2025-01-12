@@ -1,6 +1,6 @@
 from ..model import Model
 from pydantic import EmailStr, Field, BaseModel, HttpUrl
-from typing import List, Optional, Set
+from typing import List, Optional, List
 from datetime import datetime
 from ..enums import UserPrivilege
 from bson import ObjectId
@@ -8,6 +8,7 @@ from bson import ObjectId
 
 class UserReadOnly(BaseModel):
     """Denormalization of user"""
+
     name: str = Field(..., max_length=50)
     picture_url: Optional[str] = None
 
@@ -29,20 +30,16 @@ class User(Model):
     bio: str = Field("Edit bio", max_length=512)
 
     # only links cuz in link we have platform (preprocess on fronted)
-    external_links: Optional[Set[HttpUrl]] = None
+    external_links: Optional[List[HttpUrl]] = None
 
     # ids to other collections
-    friends: Optional[Set[ObjectId]] = None
-    friend_requests: Optional[Set[ObjectId]] = None
-    followed_users: Optional[Set[ObjectId]] = None
+    friends: Optional[List[ObjectId]] = None
+    friend_requests: Optional[List[ObjectId]] = None
+    followed_users: Optional[List[ObjectId]] = None
 
-    posts: Optional[Set[ObjectId]] = None
-    articles: Optional[Set[ObjectId]] = None
-    reactions: Optional[Set[ObjectId]] = None
-    conversations: Optional[Set[ObjectId]] = None
-    groups: Optional[Set[ObjectId]] = None
-    events: Optional[Set[ObjectId]] = None
-
-    class Config:
-        orm_mode = True
-        arbitrary_types_allowed = True
+    posts: Optional[List[ObjectId]] = None
+    articles: Optional[List[ObjectId]] = None
+    reactions: Optional[List[ObjectId]] = None
+    conversations: Optional[List[ObjectId]] = None
+    groups: Optional[List[ObjectId]] = None
+    events: Optional[List[ObjectId]] = None
