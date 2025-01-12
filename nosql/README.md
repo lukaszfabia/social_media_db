@@ -2,10 +2,18 @@
 
 W baza w MongoDB w atlas jak będzie brakować miejsca no to trzeba iść lokalnie.
 
-W pliku `.env` mamy tylko URI.
+You need to create file named ".env" in this directory, which will contain: 
 
 ```bash
 MONGO_URI=
+DATABASE_NAME=
+```
+
+example:
+
+```sh
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.gheyk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+DATABASE_NAME=cluster0
 ```
 
 <div style="color: red">
