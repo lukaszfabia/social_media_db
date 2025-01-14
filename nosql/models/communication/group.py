@@ -1,6 +1,6 @@
 from typing import List, Optional
 from pydantic import Field
-from model import Model
+from nosql.models.model import Model
 from bson import ObjectId
 
 

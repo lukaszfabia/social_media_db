@@ -1,9 +1,9 @@
-from model import Model
+from nosql.models.model import Model
 from pydantic import Field, HttpUrl
 from typing import List, Optional
 from bson import ObjectId
 from ..persons.user import UserReadOnly
-from message import Message
+from nosql.models.communication.message import Message
 
 
 class Conversation(Model):
