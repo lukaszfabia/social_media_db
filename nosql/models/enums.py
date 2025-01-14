@@ -2,17 +2,17 @@ from enum import Enum
 
 
 class AuthorType(str, Enum):
-    Page = "page"
-    User = "user"
+    Page: str = "page"
+    User: str = "user"
 
 
 class FriendRequestStatus(str, Enum):
-    Pending = "pending"
-    Rejected = "rejected"
-    Accepted = "accepted"
+    Pending: str = "pending"
+    Rejected: str = "rejected"
+    Accepted: str = "accepted"
 
 
 class UserPrivilege(str, Enum):
-    Mod = "mod"
-    Admin = "admin"
-    User = "user"
+    Mod: str = "mod"
+    Admin: str = "admin"
+    User: str = "user"
