@@ -637,41 +637,60 @@ Najbardziej optymalnym rozwiązaniem byłoby rozdzielenie danych między różne
 
 \subsection{Definicja i wdrożenie struktur przechowywania danych w wybranej technologii nierelacyjnej.}
 
-Definiować związki można przez dodanie listy powiązanych \texttt{id} z obiektem lub przez denormalizację. Wybór jest zależny od tego jak będą pobierane dane np. kiedy mamy komentarz to lepiej będzie dodać autora komentarza jako mały obiekt z jego najważniejszymi danymi jak:
+Wdrożyliśmy odpowiedniki struktur SQL w MongoDB (NoSQL). W bazie danych MongoDB nie ma tabel, a dokumenty, które są przechowywane w kolekcjach. Dokumenty są przechowywane w formacie JSON, co pozwala na przechowywanie zagnieżdżonych obiektów. Ten bardziej elastyczny sposób przechowywania danych pozwolił nam między innymi na przechowywanie User'a i Page'a w bardziej wygodny sposób.
+
+Definiować związki można przez dodanie listy powiązanych \texttt{id} z obiektem lub przez denormalizację. Wybór jest zależny od tego, jak będą pobierane dane. Na przykład, kiedy mamy komentarz, lepiej będzie dodać autora komentarza jako mały obiekt z jego najważniejszymi danymi, takimi jak:
 
 \begin{itemize}
     \item username lub imie, nazwisko albo email
     \item zdjęcie
 \end{itemize}
 
-Umieszczanie listy intersujących nas \texttt{id} w obiekcie przyda się jeśli dane będą pobierane w serwera np. mamy zakładke z requestami do znajomych wchodzimy w nią i przed renderem widoku pobieramy dane z API, wybierając kokretne obiekty z bazy, warunkiem jest, że user jest jakoś przechowywany.
+Umieszczanie listy interesujących nas \texttt{id} w obiekcie przyda się, jeśli dane będą pobierane z serwera. Na przykład mamy zakładke z requestami do znajomych, wchodzimy w nią i przed renderem widoku pobieramy dane z API, wybierając kokretne obiekty z bazy. Warunkiem jest to, że user jest jakoś przechowywany.
 
 Wykorzystane mechanizmy zapewnienia spójności:
 \begin{itemize}
-  \item spójność ostateczna: w międzyczasie mogą wystąpić niespójności, ale w niedalekiej przyszłości będą one spójne
-  \item spójność natychmiastowa: wszystkie zmiany są od razu aplikowane na wszystkich serwerach
-  \item spójność przez większość: jeśli większość serwerów powie, że dane są w porządku to wtedy dane są spójne
+    \item spójność ostateczna: w międzyczasie mogą wystąpić niespójności, ale w niedalekiej przyszłości będą one spójne
+    \item spójność natychmiastowa: wszystkie zmiany są od razu aplikowane na wszystkich serwerach
+    \item spójność przez większość: jeśli większość serwerów powie, że dane są w porządku, to wtedy dane są spójne
 \end{itemize}
 
-Z tych mechanizmów wynika problem rozproszenia, tutaj pojawia się tw. CAP
+Z tych mechanizmów wynika problem rozproszenia, tutaj pojawia się twierdzenie CAP, mówiące, że w systemie rozproszonym można spełnić maksymalnie 2 z 3 warunków:
 
 \begin{itemize}
-  \item C - consistent
-  \item A - available
-  \item P - partition
+    \item C - consistent (spójność)
+    \item A - available (dostępność)
+    \item P - partition (tolerancja na partycjonowanie)
 \end{itemize}
 
-Nie ma jednoznaczenej odpowiedzi, które z dwóch, poniważ można spełnić tylko 2 z 3, ponieważ jest to zależne od przeznaczenia bazy.
+Nie ma jednoznaczenej odpowiedzi, które najlepiej wybrać z tych dwóch, ponieważ jest to zależne od przeznaczenia bazy.
 
 \begin{quotation}
-  "Systemy baz danych zaprojektowane z tradycyjnymi gwarancjami ACID, takimi jak RDBMS, wybierają spójność nad dostępność, natomiast systemy zaprojektowane wokół filozofii BASE, wspólne w ruchu NoSQL, na przykład, wybierają dostępność zamiast spójności \cite{wikiAboutBase}."
-  \textit{CAP\_theorem, en.wikipedia.org}
+    "Systemy baz danych zaprojektowane z tradycyjnymi gwarancjami ACID, takimi jak RDBMS, wybierają spójność nad dostępność, natomiast systemy zaprojektowane wokół filozofii BASE, wspólne w ruchu NoSQL, na przykład, wybierają dostępność zamiast spójności \cite{wikiAboutBase}."
+    \textit{CAP\_theorem, en.wikipedia.org}
 \end{quotation}
 
+ACID (Atomicity, Consistency, Isolation, Durability) to dobrze znany z tradycyjnych baz danych model, który zapewnia pełną spójność danych. W przypadku NoSQL, zamiast ACID, mówimy o BASE (Basically Available, Soft state, Eventually consistent), który skupia się bardziej na dostępności danych.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Cechy}           & \textbf{ACID}                   & \textbf{BASE}                   \\ \hline
+        \textbf{Spójność danych} & Natychmiastowa                  & Ostateczna                      \\ \hline
+        \textbf{Dostępność}      & Ograniczona w razie problemów   & Zawsze dostępne                 \\ \hline
+        \textbf{Wydajność}       & Mniejsza, szczególnie w skali   & Wyższa, dzięki kompromisom      \\ \hline
+        \textbf{Zastosowanie}    & Bankowość, finanse, systemy ERP & Media społecznościowe, big data \\ \hline
+    \end{tabular}
+    \caption{Porównanie paradygmatów ACID i BASE}
+    \label{tab:acid_base_comparison}
+\end{table}
+
+Model Base zdecydowanie bardziej pasuje do dynamicznej struktury serwisów społecznościowych, gdzie dostępność danych jest kluczowa, a spójność danych nie jest tak ważna.
 
 \subsection{Prezentacja przykładowych zapytań}
 
-Poniżej odpowiedniki komend SQL w MongoDB (NoSQL).
+Poniżej podaliśmy odpowiedniki komend SQL w MongoDB (NoSQL).
 
 \begin{itemize}
     \item SELECT * FROM users $\rightarrow$ db.users.find()
