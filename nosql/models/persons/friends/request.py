@@ -1,4 +1,4 @@
-from model import Model
+from ...model import Model
 from bson import ObjectId
 from ...enums import FriendRequestStatus
 

@@ -1,4 +1,4 @@
-from model import Model
+from ..model import Model
 from ..persons.user import UserReadOnly
 from pydantic import Field
 from datetime import datetime

@@ -1,5 +1,5 @@
 from typing import List
-from model import Model
+from ..model import Model
 from ..persons.user import UserReadOnly
 from pydantic import HttpUrl, Field
 from bson import ObjectId

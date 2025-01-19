@@ -1,6 +1,6 @@
-from model import Model
+from ...model import Model
 from typing import List, Optional
-from models.persons.user import UserReadOnly
+from ....models.persons.user import UserReadOnly
 from pydantic import Field, HttpUrl
 
 

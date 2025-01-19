@@ -101,3 +101,7 @@ def example_seed(db: Database) -> None:
     )
 
     print("Seeding completed successfully.")
+
+def createUser(db: Database, user: User) -> None:
+    user = User()
+    db[collection.USERS].insert_one(user.model_dump(by_alias=True))

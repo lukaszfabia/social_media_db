@@ -1,4 +1,4 @@
-from model import Model
+from ..model import Model
 from enum import Enum
 from ..persons.user import UserReadOnly
 from bson import ObjectId

@@ -1,5 +1,5 @@
 from typing import Optional
-from model import Model
+from ...model import Model
 from pydantic import Field, HttpUrl
 from bson import ObjectId
 from ...media import Media
