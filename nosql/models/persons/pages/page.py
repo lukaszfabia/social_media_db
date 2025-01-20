@@ -11,9 +11,9 @@ class Page(Model):
     background_url: Optional[HttpUrl] = None
 
     # changed remove table with tags, take only strings
-    tags: List[str] = {}
-    advertisements: List[str] = {}
+    tags: List[str] = None
+    advertisements: List[str] = None
 
     # id who like it
-    likes: List[str] = {}
+    likes: List[str] = None
     views: int = 0

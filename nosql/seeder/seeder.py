@@ -13,7 +13,7 @@ from ..models.articles.article import Article
 from ..models.posts.comment import Comment
 from ..models.posts.post import Post
 from ..models.communication.message import Message
-from ..models.enums import UserPrivilege
+from ..models.enums import UserPrivilege, FriendRequestStatus
 from .collection import collection
 from faker import Faker
 
@@ -163,7 +163,7 @@ def add_group(db: Database) -> None:
     name = faker.text(max_nb_chars=32)
     members = []
 
-    random_users = db[collection.USERS].aggregate([{"$sample": {"size": faker.random_int(min=1, max=100)}}])
+    random_users = db[collection.USERS].aggregate([{"$sample": {"size": faker.random_int(min=1, max=200)}}])
     for user in random_users:
         members.append(user)
 
@@ -180,7 +180,7 @@ def add_group(db: Database) -> None:
         db[collection.USERS].update_one({"_id": member_id}, {"$push": {"groups": group_id}})
 
     # generating posts
-    for i in range(faker.random_int(min=1, max=10)):
+    for i in range(faker.random_int(min=0, max=20)):
         user = members[faker.random_int(min=0, max=len(members) - 1)]
         title = faker.text(max_nb_chars=128)
         content = faker.text(max_nb_chars=512)
@@ -208,7 +208,7 @@ def add_group(db: Database) -> None:
         db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"posts": post_id}})
 
         # generating reactions
-        for i in range(faker.random_int(min=1, max=10)):
+        for i in range(faker.random_int(min=0, max=20)):
             user = members[faker.random_int(min=0, max=len(members) - 1)]
             reaction_type = ReactionType(faker.random_element(elements=REACTION_TYPE_LIST))
             reaction = Reaction(
@@ -221,7 +221,7 @@ def add_group(db: Database) -> None:
             db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"reactions": reaction_id}})
 
         # generating comments
-        for i in range(faker.random_int(min=1, max=10)):
+        for i in range(faker.random_int(min=0, max=10)):
             user = members[faker.random_int(min=0, max=len(members) - 1)]
             content = faker.text(max_nb_chars=256)
             media = []
@@ -239,3 +239,94 @@ def add_group(db: Database) -> None:
             db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"comments": comment_id}})
 
     print("Group created successfully.")
+
+def add_friends_requests_and_friends(db: Database, max_number_of_requests: int = 20) -> None:
+    faker = Faker()
+
+    users = list(db[collection.USERS].find())
+    for user in users:
+        for i in range(faker.random_int(min=0, max=max_number_of_requests)):
+            friend = db[collection.USERS].aggregate([{"$sample": {"size": 1}}]).next()
+            if friend["_id"] != user["_id"] and friend["_id"] not in user["friends"] and friend["_id"] not in user["friend_requests"]:
+                status = FriendRequestStatus(faker.random_element(elements=["pending", "rejected", "accepted"]))
+                friend_request = {
+                    "sender_id": user["_id"],
+                    "receiver_id": friend["_id"],
+                    "status": status
+                }
+                result_request = db[collection.FRIEND_REQUESTS].insert_one(friend_request)
+                request_id = result_request.inserted_id
+                db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"friend_requests": request_id}})
+                if status == "accepted":
+                    db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"friends": friend["_id"]}})
+                    db[collection.USERS].update_one({"_id": friend["_id"]}, {"$push": {"friends": user["_id"]}})
+        print("Friend requests and friends created successfully.")
+
+def add_post(db: Database):
+    faker = Faker()
+
+    user = db[collection.USERS].aggregate([{"$sample": {"size": 1}}]).next()
+    title = faker.text(max_nb_chars=128)
+    content = faker.text(max_nb_chars=512)
+    if should_event_occur(0.9):
+        is_public = True
+    else:
+        is_public = False
+    if should_event_occur(0.9):
+        hashtags = faker.words(nb=faker.random_int(min=1, max=5), ext_word_list=None)
+    else:
+        hashtags = []
+    if should_event_occur(0.2):
+        location = ShortLocation(latitude=faker.random.uniform(0, 90), longitude=faker.random.uniform(-180, 180))
+    else:
+        location = ShortLocation(latitude=0, longitude=0)
+    post = Post(
+        user=user["user_read_only"],
+        title=title,
+        content=content,
+        is_public=is_public,
+        hashtags=hashtags,
+        group_id=None,
+        location=location
+    )
+    result_post = db[collection.POSTS].insert_one(post.model_dump(by_alias=True))
+    post_id = result_post.inserted_id
+    db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"posts": post_id}})
+    print("Post created successfully.")
+
+    # generating reactions
+    for i in range(faker.random_int(min=0, max=20)):
+        if is_public:
+            reaction_user = db[collection.USERS].aggregate([{"$sample": {"size": 1}}]).next()
+        else:
+             reaction_user = db[collection.USERS].find_one({"_id": user["friends"][faker.random_int(min=0, max=len(user["friends"]) - 1)]})
+        reaction_type = ReactionType(faker.random_element(elements=REACTION_TYPE_LIST))
+        reaction = Reaction(
+            user=reaction_user["user_read_only"],
+            post_id=post_id,
+            reaction=reaction_type
+        )
+        result_reaction = db[collection.REACTIONS].insert_one(reaction.model_dump(by_alias=True))
+        reaction_id = result_reaction.inserted_id
+        db[collection.USERS].update_one({"_id": reaction_user["_id"]}, {"$push": {"reactions": reaction_id}})
+
+    # generating comments
+    for i in range(faker.random_int(min=0, max=10)):
+        if is_public:
+            comment_user = db[collection.USERS].aggregate([{"$sample": {"size": 1}}]).next()
+        else:
+            comment_user = db[collection.USERS].find_one({"_id": user["friends"][faker.random_int(min=0, max=len(user["friends"]) - 1)]})
+        content = faker.text(max_nb_chars=256)
+        media = []
+        if should_event_occur(0.5):
+            for i in range(faker.random_int(min=1, max=5)):
+                media.append(faker.image_url())
+        comment = Comment(
+            user=comment_user["user_read_only"],
+            post_id=post_id,
+            content=content,
+            media=media
+        )
+        result_comment = db[collection.COMMENTS].insert_one(comment.model_dump(by_alias=True))
+        comment_id = result_comment.inserted_id
+        db[collection.USERS].update_one({"_id": comment_user["_id"]}, {"$push": {"comments": comment_id}})
