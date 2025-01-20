@@ -1,9 +1,12 @@
 from calendar import month
+from typing import List
 
-from pydantic import EmailStr
+from pydantic import EmailStr, HttpUrl
 from pymongo.database import Database
 from bson import ObjectId
 from datetime import datetime, timezone, timedelta, tzinfo
+
+from ..models.articles.section import Section
 from ..models.persons.user import User, UserAuth, UserReadOnly
 from ..models.events.location import ShortLocation
 from ..models.articles.article import Article
@@ -17,99 +20,7 @@ def should_event_occur(probability: float) -> bool:
     faker = Faker()
     return faker.random.random() < probability
 
-def example_seed(db: Database) -> None:
-    """Fill with example data
-
-    Args:
-        db (Database): db connection
-    """
-    user1 = User(
-        user_read_only=UserReadOnly(name="John Doe"),
-        user_auth=UserAuth(
-            email="john.doe@example.com",
-            password="password123",
-            last_login=datetime.now(tz=timezone.utc),
-            user_privilege=UserPrivilege.User,
-            is_verified=True,
-        ),
-        birthday=datetime(1990, 1, 1, tzinfo=timezone.utc),
-        bio="This is John's bio",
-    )
-
-    user2 = User(
-        user_read_only=UserReadOnly(name="Jane Smith"),
-        user_auth=UserAuth(
-            email="jane.smith@example.com",
-            password="password123",
-            last_login=datetime.now(tz=timezone.utc),
-            user_privilege=UserPrivilege.Admin,
-            is_verified=True,
-        ),
-        birthday=datetime(1992, 2, 2, tzinfo=timezone.utc),
-        bio="This is Jane's bio",
-    )
-
-    db[collection.USERS].insert_one(user1.model_dump(by_alias=True))
-    db[collection.USERS].insert_one(user2.model_dump(by_alias=True))
-
-    article1 = Article(
-        user=user1.user_read_only,
-        title="Sample Article 1",
-        is_public=True,
-        hashtags=["sample", "article"],
-    )
-
-    article2 = Article(
-        user=user2.user_read_only,
-        title="Sample Article 2",
-        is_public=False,
-        hashtags=["example", "article"],
-    )
-
-    db[collection.ARTICLES].insert_many(
-        [article1.model_dump(by_alias=True),
-         article2.model_dump(by_alias=True)]
-    )
-
-    post1 = Post(
-        user=user1.user_read_only,
-        title="Sample Post 1",
-        content="This is the content of sample post 1",
-        is_public=True,
-        hashtags=["sample", "post"],
-        group_id=ObjectId(),
-        location=ShortLocation(longitude=21.37, latitude=3.13),
-    )
-
-    post2 = Post(
-        user=user2.user_read_only,
-        title="Sample Post 2",
-        content="This is the content of sample post 2",
-        is_public=False,
-        hashtags=["example", "post"],
-        group_id=ObjectId(),
-        location=ShortLocation(longitude=21.37, latitude=3.13),
-    )
-
-    db[collection.POSTS].insert_many(
-        [post1.model_dump(by_alias=True), post2.model_dump(by_alias=True)]
-    )
-
-    message1 = Message(user=user1.user_read_only,
-                       content="This is a sample message")
-
-    message2 = Message(
-        user=user2.user_read_only, content="This is another sample message"
-    )
-
-    db[collection.MESSAGES].insert_many(
-        [message1.model_dump(by_alias=True),
-         message2.model_dump(by_alias=True)]
-    )
-
-    print("Seeding completed successfully.")
-
-def addUser(db: Database) -> None:
+def add_user(db: Database) -> None:
     faker = Faker()
 
     # generating user_read_only
@@ -159,9 +70,9 @@ def addUser(db: Database) -> None:
 
     # generating birthday
     if should_event_occur(0.9):
-        if should_event_occur(0.9):
+        if should_event_occur(0.7):
             birthday = faker.date_of_birth(minimum_age=13,
-                                           maximum_age=40,
+                                           maximum_age=50,
                                            tzinfo=timezone.utc)
         else:
             birthday = faker.date_of_birth(minimum_age=13,
@@ -176,13 +87,73 @@ def addUser(db: Database) -> None:
     else:
         bio = ""
 
+    # generating external_links
+    external_links = []
+    if should_event_occur(0.7):
+        for i in range(faker.random_int(min=1, max=5)):
+            external_links.append(faker.url())
+
     user = User(
         user_read_only=user_read_only,
         user_auth=user_auth,
         background_url=background_url,
         birthday=birthday,
         bio=bio,
+        external_links=external_links,
+        friends=[],
+        friend_requests=[],
+        followed_users=[],
+        posts=[],
+        articles=[],
+        reactions=[],
+        conversations=[],
+        groups=[],
+        events=[]
     )
 
     db[collection.USERS].insert_one(user.model_dump(by_alias=True))
     print("User created successfully.")
+
+def add_article(db: Database) -> None:
+    faker = Faker()
+
+    user = db[collection.USERS].find_one()
+
+    title = faker.text(max_nb_chars=32)
+
+    if should_event_occur(0.7):
+        is_public = True
+    else:
+        is_public = False
+
+    # generating hashtags
+    if should_event_occur(0.9):
+        hashtags = faker.words(nb=faker.random_int(min=1, max=5), ext_word_list=None)
+    else:
+        hashtags = None
+
+    # generating sections
+    sections = []
+    if should_event_occur(0.5):
+        for i in range(faker.random_int(min=1, max=5)):
+            sections.append(Section(header=faker.text(max_nb_chars=32),
+                                    content=faker.text(max_nb_chars=256))
+            )
+
+    article = Article(
+        user=user["user_read_only"],
+        title=title,
+        is_public=is_public,
+        hashtags=hashtags,
+        sections=sections,
+    )
+
+    db[collection.ARTICLES].insert_one(article.model_dump(by_alias=True))
+
+    if 'articles' not in user or user['articles'] is None:
+        db[collection.USERS].update_one(
+            {"_id": user["_id"]},
+            {"$set": {"articles": []}}
+        )
+    db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"articles": article.model_dump(by_alias=True)}})
+    print("Article created successfully.")

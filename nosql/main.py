@@ -1,10 +1,14 @@
 from .database.connect import MongoDB
-from .seeder.seeder import example_seed, addUser
+from .seeder.seeder import add_user, add_article
 from pymongo.database import Database
 
 def generate_users(db: Database, how_many: int):
     for i in range(how_many):
-        addUser(db=db)
+        add_user(db=db)
+
+def generate_articles(db: Database, how_many: int):
+    for i in range(how_many):
+        add_article(db=db)
 
 
 if __name__ == "__main__":
@@ -12,4 +16,6 @@ if __name__ == "__main__":
 
     client.health()
 
-    generate_users(db=client.db, how_many=5000)
+
+    #generate_users(db=client.db, how_many=10000)
+    generate_articles(db=client.db, how_many=10000)
