@@ -12,7 +12,7 @@ class Post(Model, Media):
     title: str = Field(..., max_length=128)
     content: str = Field(..., max_length=512)
     is_public: bool = True
-    hashtags: Optional[List[str]] = {}
+    hashtags: Optional[List[str]] = None
 
     group_id: Optional[ObjectId] = None
     location: ShortLocation

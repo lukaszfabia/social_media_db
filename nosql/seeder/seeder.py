@@ -10,11 +10,15 @@ from ..models.articles.section import Section
 from ..models.persons.user import User, UserAuth, UserReadOnly
 from ..models.events.location import ShortLocation
 from ..models.articles.article import Article
+from ..models.posts.comment import Comment
 from ..models.posts.post import Post
 from ..models.communication.message import Message
 from ..models.enums import UserPrivilege
 from .collection import collection
 from faker import Faker
+
+from ..models.posts.reaction import REACTION_TYPE_LIST, ReactionType, Reaction
+
 
 def should_event_occur(probability: float) -> bool:
     faker = Faker()
@@ -117,7 +121,7 @@ def add_user(db: Database) -> None:
 def add_article(db: Database) -> None:
     faker = Faker()
 
-    user = db[collection.USERS].find_one()
+    user = db[collection.USERS].aggregate([{"$sample": {"size": 1}}]).next()
 
     title = faker.text(max_nb_chars=32)
 
@@ -130,7 +134,7 @@ def add_article(db: Database) -> None:
     if should_event_occur(0.9):
         hashtags = faker.words(nb=faker.random_int(min=1, max=5), ext_word_list=None)
     else:
-        hashtags = None
+        hashtags = []
 
     # generating sections
     sections = []
@@ -148,12 +152,90 @@ def add_article(db: Database) -> None:
         sections=sections,
     )
 
-    db[collection.ARTICLES].insert_one(article.model_dump(by_alias=True))
-
-    if 'articles' not in user or user['articles'] is None:
-        db[collection.USERS].update_one(
-            {"_id": user["_id"]},
-            {"$set": {"articles": []}}
-        )
-    db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"articles": article.model_dump(by_alias=True)}})
+    result = db[collection.ARTICLES].insert_one(article.model_dump(by_alias=True))
+    article_id = result.inserted_id
+    db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"articles": article_id}})
     print("Article created successfully.")
+
+def add_group(db: Database) -> None:
+    faker = Faker()
+
+    name = faker.text(max_nb_chars=32)
+    members = []
+
+    random_users = db[collection.USERS].aggregate([{"$sample": {"size": faker.random_int(min=1, max=100)}}])
+    for user in random_users:
+        members.append(user)
+
+    members_ids = [member["_id"] for member in members]
+    group = {
+        "name": name,
+        "members": members_ids,
+        "posts": []
+    }
+
+    result_group = db[collection.GROUP].insert_one(group)
+    group_id = result_group.inserted_id
+    for member_id in members_ids:
+        db[collection.USERS].update_one({"_id": member_id}, {"$push": {"groups": group_id}})
+
+    # generating posts
+    for i in range(faker.random_int(min=1, max=10)):
+        user = members[faker.random_int(min=0, max=len(members) - 1)]
+        title = faker.text(max_nb_chars=128)
+        content = faker.text(max_nb_chars=512)
+        is_public = True
+        if should_event_occur(0.9):
+            hashtags = faker.words(nb=faker.random_int(min=1, max=5), ext_word_list=None)
+        else:
+            hashtags = []
+        if should_event_occur(0.2):
+            location = ShortLocation(latitude=faker.random.uniform(0, 90), longitude=faker.random.uniform(-180, 180))
+        else:
+            location = ShortLocation(latitude=0, longitude=0)
+        post = Post(
+            user=user["user_read_only"],
+            title=title,
+            content=content,
+            is_public=is_public,
+            hashtags=hashtags,
+            group_id=group_id,
+            location=location
+        )
+        result_post = db[collection.POSTS].insert_one(post.model_dump(by_alias=True))
+        post_id = result_post.inserted_id
+        db[collection.GROUP].update_one({"_id": group["_id"]}, {"$push": {"posts": post_id}})
+        db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"posts": post_id}})
+
+        # generating reactions
+        for i in range(faker.random_int(min=1, max=10)):
+            user = members[faker.random_int(min=0, max=len(members) - 1)]
+            reaction_type = ReactionType(faker.random_element(elements=REACTION_TYPE_LIST))
+            reaction = Reaction(
+                user=user["user_read_only"],
+                post_id=post_id,
+                reaction=reaction_type
+            )
+            result_reaction = db[collection.REACTIONS].insert_one(reaction.model_dump(by_alias=True))
+            reaction_id = result_reaction.inserted_id
+            db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"reactions": reaction_id}})
+
+        # generating comments
+        for i in range(faker.random_int(min=1, max=10)):
+            user = members[faker.random_int(min=0, max=len(members) - 1)]
+            content = faker.text(max_nb_chars=256)
+            media = []
+            if should_event_occur(0.5):
+                for i in range(faker.random_int(min=1, max=5)):
+                    media.append(faker.image_url())
+            comment = Comment(
+                user=user["user_read_only"],
+                post_id=post_id,
+                content=content,
+                media=media
+            )
+            result_comment = db[collection.COMMENTS].insert_one(comment.model_dump(by_alias=True))
+            comment_id = result_comment.inserted_id
+            db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"comments": comment_id}})
+
+    print("Group created successfully.")

@@ -9,7 +9,7 @@ class Comment(Model):
     user: UserReadOnly
     post_id: ObjectId
     content: str = Field(..., max_length=256)
-    media: List[HttpUrl] = []
+    media: List[HttpUrl] = None
     # hashtags could be included in content
 
     class Config:
