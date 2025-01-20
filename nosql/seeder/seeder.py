@@ -1,14 +1,21 @@
+from calendar import month
+
+from pydantic import EmailStr
 from pymongo.database import Database
 from bson import ObjectId
-from datetime import datetime, timezone
-from nosql.models.persons.user import User, UserAuth, UserReadOnly
-from nosql.models.events.location import ShortLocation
-from nosql.models.articles.article import Article
-from nosql.models.posts.post import Post
-from nosql.models.communication.message import Message
-from nosql.models.enums import UserPrivilege
+from datetime import datetime, timezone, timedelta, tzinfo
+from ..models.persons.user import User, UserAuth, UserReadOnly
+from ..models.events.location import ShortLocation
+from ..models.articles.article import Article
+from ..models.posts.post import Post
+from ..models.communication.message import Message
+from ..models.enums import UserPrivilege
 from .collection import collection
+from faker import Faker
 
+def should_event_occur(probability: float) -> bool:
+    faker = Faker()
+    return faker.random.random() < probability
 
 def example_seed(db: Database) -> None:
     """Fill with example data
@@ -102,6 +109,80 @@ def example_seed(db: Database) -> None:
 
     print("Seeding completed successfully.")
 
-def createUser(db: Database, user: User) -> None:
-    user = User()
+def addUser(db: Database) -> None:
+    faker = Faker()
+
+    # generating user_read_only
+    if should_event_occur(0.7):
+        user_read_only = UserReadOnly(name=faker.name(),
+                                      picture_url=faker.image_url())
+    else:
+        user_read_only = UserReadOnly(name=faker.name())
+
+    # generating user_auth
+    email = faker.email()
+    password = faker.password()
+    provider = email.split('@')[1]
+    if should_event_occur(0.7):
+        last_login = faker.date_time_between_dates(datetime_start=datetime.now(tz=timezone.utc) - timedelta(days=7),
+                                                   datetime_end=datetime.now(tz=timezone.utc))
+    else:
+        last_login = faker.date_time_between_dates(datetime_start=datetime(2024, 1, 1),
+                                                   datetime_end=datetime.now(tz=timezone.utc))
+    if should_event_occur(0.999):
+        user_privilege = UserPrivilege.User
+    else:
+        if should_event_occur(0.9):
+            user_privilege = UserPrivilege.Mod
+        else:
+            user_privilege = UserPrivilege.Admin
+
+    if should_event_occur(0.99):
+        is_verified = True
+    else:
+        is_verified = False
+
+    user_auth = UserAuth(
+        email=email,
+        password=password,
+        provider=provider,
+        last_login=last_login,
+        user_privilege=user_privilege,
+        is_verified=is_verified,
+    )
+
+    # generating background_url
+    if should_event_occur(0.5):
+        background_url = faker.image_url()
+    else:
+        background_url = None
+
+    # generating birthday
+    if should_event_occur(0.9):
+        if should_event_occur(0.9):
+            birthday = faker.date_of_birth(minimum_age=13,
+                                           maximum_age=40,
+                                           tzinfo=timezone.utc)
+        else:
+            birthday = faker.date_of_birth(minimum_age=13,
+                                           maximum_age=100,
+                                           tzinfo=timezone.utc)
+    else:
+        birthday = None
+
+    # generating bio
+    if should_event_occur(0.4):
+        bio = faker.text(max_nb_chars=512)
+    else:
+        bio = ""
+
+    user = User(
+        user_read_only=user_read_only,
+        user_auth=user_auth,
+        background_url=background_url,
+        birthday=birthday,
+        bio=bio,
+    )
+
     db[collection.USERS].insert_one(user.model_dump(by_alias=True))
+    print("User created successfully.")
