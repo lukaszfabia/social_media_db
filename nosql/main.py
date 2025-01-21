@@ -40,4 +40,4 @@ if __name__ == "__main__":
     # generate_posts(db=client.db, how_many=1000)
     # generate_events(db=client.db, how_many=500)
     # generate_pages(db=client.db, how_many=200)
-    # add_conversations(db=client.db, max_conversations=10)
+    # add_conversations(db=client.db, max_conversations=5)

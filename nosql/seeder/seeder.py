@@ -8,7 +8,9 @@ from datetime import datetime, timezone, timedelta, tzinfo
 
 from ..models.articles.section import Section
 from ..models.communication.conversation import Conversation
+from ..models.communication.group import Group
 from ..models.events.event import Event
+from ..models.persons.friends.request import FriendRequest
 from ..models.persons.pages.ad import Ad
 from ..models.persons.pages.page import Page
 from ..models.persons.user import User, UserAuth, UserReadOnly
@@ -172,13 +174,13 @@ def add_group(db: Database) -> None:
         members.append(user)
 
     members_ids = [member["_id"] for member in members]
-    group = {
-        "name": name,
-        "members": members_ids,
-        "posts": []
-    }
+    group = Group(
+        name=name,
+        members=members_ids,
+        posts=[]
+    )
 
-    result_group = db[collection.GROUP].insert_one(group)
+    result_group = db[collection.GROUP].insert_one(group.model_dump(by_alias=True))
     group_id = result_group.inserted_id
     for member_id in members_ids:
         db[collection.USERS].update_one({"_id": member_id}, {"$push": {"groups": group_id}})
@@ -253,12 +255,12 @@ def add_friends_requests_and_friends(db: Database, max_number_of_requests: int =
             friend = db[collection.USERS].aggregate([{"$sample": {"size": 1}}]).next()
             if friend["_id"] != user["_id"] and friend["_id"] not in user["friends"] and friend["_id"] not in user["friend_requests"]:
                 status = FriendRequestStatus(faker.random_element(elements=["pending", "rejected", "accepted"]))
-                friend_request = {
-                    "sender_id": user["_id"],
-                    "receiver_id": friend["_id"],
-                    "status": status
-                }
-                result_request = db[collection.FRIEND_REQUESTS].insert_one(friend_request)
+                friend_request = FriendRequest(
+                    sender_id=user["_id"],
+                    receiver_id=friend["_id"],
+                    status=status
+                )
+                result_request = db[collection.FRIEND_REQUESTS].insert_one(friend_request.model_dump(by_alias=True))
                 request_id = result_request.inserted_id
                 db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"friend_requests": request_id}})
                 if status == "accepted":
