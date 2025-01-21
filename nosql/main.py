@@ -22,6 +22,10 @@ def generate_events(db: Database, how_many: int):
     for i in range(how_many):
         add_event(db=db)
 
+def generate_pages(db: Database, how_many: int):
+    for i in range(how_many):
+        add_page(db=db)
+
 
 if __name__ == "__main__":
     client = MongoDB()
@@ -35,3 +39,5 @@ if __name__ == "__main__":
     # add_friends_requests_and_friends(db=client.db, max_number_of_requests=20)
     # generate_posts(db=client.db, how_many=1000)
     # generate_events(db=client.db, how_many=500)
+    # generate_pages(db=client.db, how_many=200)
+    add_conversations(db=client.db, max_conversations=10)
