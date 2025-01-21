@@ -325,7 +325,7 @@ def add_post(db: Database) -> None:
         if is_public:
             reaction_user = db[collection.USERS].aggregate(
                 [{"$sample": {"size": 1}}]).next()
-        else:
+        elif user["friends"]:
             reaction_user = db[collection.USERS].find_one(
                 {"_id": user["friends"][faker.random_int(min=0, max=len(user["friends"]) - 1)]})
         reaction_type = ReactionType(
