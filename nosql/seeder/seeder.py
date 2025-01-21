@@ -504,8 +504,8 @@ def add_conversations(db: Database, max_conversations: int = 10):
 
             members = [user]
             members_ids = [user["_id"]]
-            for j in range(faker.random_int(min=0, max=10)):
-                if should_event_occur(0.8):
+            for j in range(faker.random_int(min=0, max=7)):
+                if should_event_occur(0.8) and len(user["friends"]) > 0:
                     user_friend = db[collection.USERS].find_one(
                         {"_id": user["friends"][faker.random_int(min=0, max=len(user["friends"]) - 1)]})
                     if user_friend["_id"] not in members_ids:
