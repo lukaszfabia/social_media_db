@@ -7,8 +7,9 @@ from bson import ObjectId
 from datetime import datetime, timezone, timedelta, tzinfo
 
 from ..models.articles.section import Section
+from ..models.events.event import Event
 from ..models.persons.user import User, UserAuth, UserReadOnly
-from ..models.events.location import ShortLocation
+from ..models.events.location import ShortLocation, Location, Address
 from ..models.articles.article import Article
 from ..models.posts.comment import Comment
 from ..models.posts.post import Post
@@ -330,3 +331,100 @@ def add_post(db: Database):
         result_comment = db[collection.COMMENTS].insert_one(comment.model_dump(by_alias=True))
         comment_id = result_comment.inserted_id
         db[collection.USERS].update_one({"_id": comment_user["_id"]}, {"$push": {"comments": comment_id}})
+
+def add_followed_users(db: Database, max_number_of_followed_users: int = 10) -> None:
+    faker = Faker()
+
+    users = list(db[collection.USERS].find())
+    for user in users:
+        for i in range(faker.random_int(min=0, max=max_number_of_followed_users)):
+            followed_user = db[collection.USERS].aggregate([{"$sample": {"size": 1}}]).next()
+            if followed_user["_id"] != user["_id"] and followed_user["_id"] not in user["followed_users"]:
+                db[collection.USERS].update_one({"_id": user["_id"]}, {"$push": {"followed_users": followed_user["_id"]}})
+        print("Followed users created successfully.")
+
+def add_event(db: Database, max_members: int = 100):
+    faker = Faker()
+
+    user = db[collection.USERS].aggregate([{"$sample": {"size": 1}}]).next()
+    name = faker.text(max_nb_chars=32)
+    desc = faker.text(max_nb_chars=512)
+    s_date = faker.date_time_between_dates(datetime_start=datetime.now(tz=timezone.utc) - timedelta(days=365),
+                                               datetime_end=datetime.now(tz=timezone.utc) + timedelta(days=365))
+    if should_event_occur(0.5):
+        f_date = s_date + timedelta(hours=faker.random_int(min=1, max=24))
+    else:
+        if should_event_occur(0.5):
+            f_date = s_date + timedelta(days=faker.random_int(min=1, max=7))
+        else:
+            f_date = None
+
+    members = []
+    random_users = db[collection.USERS].aggregate([{"$sample": {"size": faker.random_int(min=0, max=max_members)}}])
+    for user in random_users:
+        members.append(user["_id"])
+
+    short_location = ShortLocation(latitude=faker.random.uniform(0, 90), longitude=faker.random.uniform(-180, 180))
+
+    city = None
+    if should_event_occur(0.95):
+        city = faker.city()
+
+    country = None
+    if should_event_occur(0.95):
+        country = faker.country()
+
+    postal_code = None
+    if should_event_occur(0.95):
+        postal_code = faker.postcode()
+
+    street_name = None
+    if should_event_occur(0.95):
+        street_name = faker.street_name()
+
+    building = None
+    if should_event_occur(0.95):
+        building = faker.building_number()
+
+    gate = None
+    if should_event_occur(0.3):
+        gate = faker.building_number()
+
+    floor = None
+    if should_event_occur(0.3):
+        if should_event_occur(0.1):
+            floor = str(faker.random_int(min=0, max=50))
+        else:
+            floor = str(faker.random_int(min=0, max=4))
+
+    apartment = None
+    if should_event_occur(0.3):
+        apartment = faker.building_number()
+
+    address = Address(
+        city=city,
+        country=country,
+        postal_code=postal_code,
+        street_name=street_name,
+        building=building,
+        gate=gate,
+        floor=floor,
+        apartment=apartment
+    )
+
+    location = Location(coords=short_location, address=address)
+
+    event = Event(
+        organizer=user["user_read_only"],
+        name=name,
+        desc=desc,
+        s_date=s_date,
+        f_date=f_date,
+        members=members,
+        location=location
+    )
+    result_event = db[collection.EVENTS].insert_one(event.model_dump(by_alias=True))
+    event_id = result_event.inserted_id
+    for member_id in members:
+        db[collection.USERS].update_one({"_id": member_id}, {"$push": {"events": event_id}})
+    print("Event created successfully.")

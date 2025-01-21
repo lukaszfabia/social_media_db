@@ -1,3 +1,5 @@
+from bson import ObjectId
+
 from ...model import Model
 from typing import List, Optional
 from ....models.persons.user import UserReadOnly
@@ -12,8 +14,8 @@ class Page(Model):
 
     # changed remove table with tags, take only strings
     tags: List[str] = None
-    advertisements: List[str] = None
+    advertisements: Optional[List[ObjectId]] = None
 
     # id who like it
-    likes: List[str] = None
+    likes: Optional[List[ObjectId]] = None
     views: int = 0

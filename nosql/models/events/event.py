@@ -4,7 +4,7 @@ from pydantic import Field
 from datetime import datetime
 from typing import List, Optional
 from bson import ObjectId
-from location import Location
+from ..events.location import Location
 from ..media import Media
 
 

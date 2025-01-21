@@ -16,7 +16,7 @@ class Address(BaseModel):
     city: Optional[str] = Field(None, max_length=100)
     country: Optional[str] = Field(None, max_length=100)
     postal_code: Optional[str] = Field(None, max_length=20)
-    street_name: str = Field(..., max_length=255)
+    street_name: Optional[str] = Field(None, max_length=255)
     building: Optional[str] = Field(None, max_length=20)
     gate: Optional[str] = Field(None, max_length=20)
     floor: Optional[str] = Field(None, max_length=20)
