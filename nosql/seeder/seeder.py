@@ -7,7 +7,9 @@ from pymongo.results import InsertOneResult
 
 from ..models.articles.section import Section
 from ..models.communication.conversation import Conversation
+from ..models.communication.group import Group
 from ..models.events.event import Event
+from ..models.persons.friends.request import FriendRequest
 from ..models.persons.pages.ad import Ad
 from ..models.persons.pages.page import Page
 from ..models.persons.user import User, UserAuth, UserReadOnly
@@ -175,13 +177,14 @@ def add_group(db: Database) -> None:
         members.append(user)
 
     members_ids = [member["_id"] for member in members]
-    group = {
-        "name": name,
-        "members": members_ids,
-        "posts": []
-    }
+    group = Group(
+        name=name,
+        members=members_ids,
+        posts=[]
+    )
 
-    result_group: InsertOneResult = db[collection.GROUP].insert_one(group)
+    result_group = db[collection.GROUP].insert_one(
+        group.model_dump(by_alias=True))
     group_id = result_group.inserted_id
     for member_id in members_ids:
         db[collection.USERS].update_one(
@@ -268,13 +271,13 @@ def add_friends_requests_and_friends(db: Database, max_number_of_requests: int =
             if friend["_id"] != user["_id"] and friend["_id"] not in user["friends"] and friend["_id"] not in user["friend_requests"]:
                 status = FriendRequestStatus(faker.random_element(
                     elements=["pending", "rejected", "accepted"]))
-                friend_request = {
-                    "sender_id": user["_id"],
-                    "receiver_id": friend["_id"],
-                    "status": status
-                }
-                result_request: InsertOneResult = db[collection.FRIEND_REQUESTS].insert_one(
-                    friend_request)
+                friend_request = FriendRequest(
+                    sender_id=user["_id"],
+                    receiver_id=friend["_id"],
+                    status=status
+                )
+                result_request = db[collection.FRIEND_REQUESTS].insert_one(
+                    friend_request.model_dump(by_alias=True))
                 request_id = result_request.inserted_id
                 db[collection.USERS].update_one(
                     {"_id": user["_id"]}, {"$push": {"friend_requests": request_id}})
@@ -542,8 +545,8 @@ def add_conversations(db: Database, max_conversations: int = 10) -> None:
 
             members = [user]
             members_ids = [user["_id"]]
-            for _ in range(faker.random_int(min=0, max=10)):
-                if should_event_occur(0.8):
+            for _ in range(faker.random_int(min=0, max=7)):
+                if should_event_occur(0.8) and len(user["friends"]) > 0:
                     user_friend = db[collection.USERS].find_one(
                         {"_id": user["friends"][faker.random_int(min=0, max=len(user["friends"]) - 1)]})
                     if user_friend and user_friend["_id"] not in members_ids:
