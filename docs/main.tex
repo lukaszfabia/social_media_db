@@ -177,7 +177,7 @@ Do stworzenia struktury bazy wykorzystano mechanizm ORM - (\href{https://gorm.io
 
 \section{Etap 4: Faza fizyczna 2}
 
-\quad Standardowo kod można zobaczyć w repoztorium na gicie: \href{https://github.com/lukaszfabia/social_media_db}{social media db}. \\
+\quad Standardowo kod można zobaczyć w repozytorium na gicie: \href{https://github.com/lukaszfabia/social_media_db}{social media db}. \\
 
 \quad Mając napisany ORM poprzenio, w tym etapie pozostało napisać funkcje generujące dane do bazy. Rozwiązanie można podzielić na 3 cześci (od szczegółu do ogółu):
 
@@ -187,7 +187,7 @@ Do stworzenia struktury bazy wykorzystano mechanizm ORM - (\href{https://gorm.io
     \item Odpowienie ułożenie wywołań.
 \end{enumerate}
 
-Zapełnianie bazy danych dużą ilością danych zajmuje stosunkowo dużo czasu, może to być spowodowane przez unikalność niektórych atrybutów(biblioteka "męczy" się z generowaniem unikalnych sensownych danych), ale także przez wywołania które tworzą listy autorów dla np. eventów, ostatnim podejrzeniem może być nieoptymalnie napisay kod. \\
+Zapełnianie bazy danych dużą ilością danych zajmuje stosunkowo dużo czasu, może to być spowodowane przez unikalność niektórych atrybutów(biblioteka "męczy" się z generowaniem unikalnych sensownych danych), ale także przez wywołania które tworzą listy autorów dla np. eventów, ostatnim podejrzeniem może być nieoptymalnie napisany kod. \\
 
 
 \textbf{Język}: \href{https://go.dev/}{Go}
@@ -699,8 +699,29 @@ Poniżej podaliśmy odpowiedniki komend SQL w MongoDB (NoSQL).
     \item CREATE INDEX idx\_deleted\_at ON users (deleted\_at) $\rightarrow$ db.users.createIndex({ deleted\_at: 1 })
 \end{itemize}
 
+\section{Etap 12: Faza fizyczna }
+
+\quad Standardowo kod można zobaczyć w repozytorium na gicie: \href{https://github.com/lukaszfabia/social_media_db}{social media db}. Skrypt łączący się z bazą danych przechowywaną w chmurze i generujący rekordy do kolekcji to main.py. Wykorzystuje on funkcje napisane w seeder.py.\\
+
+\quad Mając wcześniej napisaną strukturę modeli przy użyciu pydantic należało napisać funkcje generujące dane do bazy. Można je było podzielić na dwa rodzaje:
+
+\begin{enumerate}
+    \item Funkcje generujące rekordy do kolekcji.
+    \item Funkcje generujące rekordy dla wszystkich rekordów w danej kolekcji, przykładowo dodawanie konwersacji dla każdego użytkownika.
+\end{enumerate}
+
+Zapełnianie bazy danych dużą ilością danych zajmuje stosunkowo dużo czasu, może to być spowodowane przez wywołania które tworzą listy użytkowników dla np. eventów, innym podejrzeniem może być nieoptymalnie napisany kod. \\
+
+
+\textbf{Język}: \href{https://www.python.org/}{Python}
+
+\textbf{Generowanie sztucznych danych}: \href{https://faker.readthedocs.io/en/master/}{Faker}
+
 
 \bibliography{sample}
 \bibliographystyle{abbrv}
 
 \end{document}
+
+
+
