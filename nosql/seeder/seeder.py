@@ -7,7 +7,10 @@ from bson import ObjectId
 from datetime import datetime, timezone, timedelta, tzinfo
 
 from ..models.articles.section import Section
+from ..models.communication.conversation import Conversation
 from ..models.events.event import Event
+from ..models.persons.pages.ad import Ad
+from ..models.persons.pages.page import Page
 from ..models.persons.user import User, UserAuth, UserReadOnly
 from ..models.events.location import ShortLocation, Location, Address
 from ..models.articles.article import Article
@@ -428,3 +431,116 @@ def add_event(db: Database, max_members: int = 100):
     for member_id in members:
         db[collection.USERS].update_one({"_id": member_id}, {"$push": {"events": event_id}})
     print("Event created successfully.")
+
+def add_page(db: Database, max_likes: int = 100):
+    faker = Faker()
+
+    author = db[collection.USERS].aggregate([{"$sample": {"size": 1}}]).next()
+    title = faker.text(max_nb_chars=64)
+    if should_event_occur(0.9):
+        picture_url = faker.image_url()
+    else:
+        picture_url = None
+
+    if should_event_occur(0.8):
+        background_url = faker.image_url()
+    else:
+        background_url = None
+
+    tags = []
+    if should_event_occur(0.9):
+        tags = faker.words(nb=faker.random_int(min=1, max=5), ext_word_list=None)
+
+    advertisements = []
+    for i in range(faker.random_int(min=0, max=10)):
+        content = faker.text(max_nb_chars=512)
+        link = faker.url()
+        ad = Ad(
+            content=content,
+            link=link,
+            page_id=None
+        )
+        result_ad = db[collection.ADS].insert_one(ad.model_dump(by_alias=True))
+        ad_id = result_ad.inserted_id
+        advertisements.append(ad_id)
+
+    likes = []
+    random_users = db[collection.USERS].aggregate([{"$sample": {"size": faker.random_int(min=0, max=max_likes)}}])
+    for user in random_users:
+        likes.append(user["_id"])
+
+    views = faker.random_int(min=len(likes), max=10000)
+
+    page = Page(
+        author=author["user_read_only"],
+        title=title,
+        picture_url=picture_url,
+        background_url=background_url,
+        tags=tags,
+        advertisements=advertisements,
+        likes=likes,
+        views=views
+    )
+    result_page = db[collection.PAGES].insert_one(page.model_dump(by_alias=True))
+    page_id = result_page.inserted_id
+    for ad in advertisements:
+        db[collection.ADS].update_one({"_id": ad}, {"$set": {"page_id": page_id}})
+    print("Page created successfully.")
+
+def add_conversations(db: Database, max_conversations: int = 10):
+    faker = Faker()
+
+    users = list(db[collection.USERS].find())
+    for user in users:
+        for i in range(faker.random_int(min=0, max=max_conversations)):
+            title = faker.text(max_nb_chars=32)
+
+            if should_event_occur(0.9):
+                icon = faker.image_url()
+            else:
+                icon = None
+
+            author_id = user["_id"]
+
+            members = [user]
+            members_ids = [user["_id"]]
+            for j in range(faker.random_int(min=0, max=10)):
+                if should_event_occur(0.8):
+                    user_friend = db[collection.USERS].find_one(
+                        {"_id": user["friends"][faker.random_int(min=0, max=len(user["friends"]) - 1)]})
+                    if user_friend["_id"] not in members_ids:
+                        members.append(user_friend)
+                        members_ids.append(user_friend["_id"])
+                else:
+                    user_random = db[collection.USERS].aggregate([{"$sample": {"size": 1}}]).next()
+                    if user_random["_id"] not in members_ids:
+                        members.append(user_random)
+                        members_ids.append(user_random["_id"])
+
+            messages = []
+            for j in range(faker.random_int(min=0, max=100)):
+                sender = members[faker.random_int(min=0, max=len(members) - 1)]
+                content = faker.text(max_nb_chars=512)
+                message = Message(
+                    user=sender["user_read_only"],
+                    content=content
+                )
+                db[collection.MESSAGES].insert_one(message.model_dump(by_alias=True))
+                messages.append(message)
+
+            members_read_only = []
+            for member in members:
+                members_read_only.append(member["user_read_only"])
+
+            conversation = Conversation(
+                title=title,
+                icon=icon,
+                author_id=author_id,
+                members=members_read_only,
+                message=messages
+            )
+            result_conversation = db[collection.CONVERSATIONS].insert_one(conversation.model_dump(by_alias=True))
+            conversation_id = result_conversation.inserted_id
+            for member in members:
+                db[collection.USERS].update_one({"_id": member["_id"]}, {"$push": {"conversations": conversation_id}})
+        print("Conversations created successfully.")
