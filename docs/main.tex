@@ -701,7 +701,7 @@ Poniżej podaliśmy odpowiedniki komend SQL w MongoDB (NoSQL).
 
 \section{Etap 12: Faza fizyczna }
 
-\quad Standardowo kod można zobaczyć w repozytorium na gicie: \href{https://github.com/lukaszfabia/social_media_db}{social media db}. Skrypt łączący się z bazą danych przechowywaną w chmurze i generujący rekordy do kolekcji to main.py. Wykorzystuje on funkcje napisane w seeder.py.\\
+\quad Standardowo kod można zobaczyć w repozytorium na gicie: \href{https://github.com/lukaszfabia/social_media_db}{social media db}. Skrypt łączący się z bazą danych przechowywaną w chmurze i generujący rekordy do kolekcji to main.py. Wykorzystuje on funkcje napisane w seeder.py.\\\\
 
 \quad Mając wcześniej napisaną strukturę modeli przy użyciu pydantic należało napisać funkcje generujące dane do bazy. Można je było podzielić na dwa rodzaje:
 
@@ -710,8 +710,9 @@ Poniżej podaliśmy odpowiedniki komend SQL w MongoDB (NoSQL).
     \item Funkcje generujące rekordy dla wszystkich rekordów w danej kolekcji, przykładowo dodawanie konwersacji dla każdego użytkownika.
 \end{enumerate}
 
-Zapełnianie bazy danych dużą ilością danych zajmuje stosunkowo dużo czasu, może to być spowodowane przez wywołania które tworzą listy użytkowników dla np. eventów, innym podejrzeniem może być nieoptymalnie napisany kod. \\
+Zapełnianie bazy danych dużą ilością danych zajmuje stosunkowo dużo czasu, prawdopodobnie spowodowane jest to opóźnieniami przez potrzebę komunikacji z bazą danych przez internet (w poprzednich etapach korzystaliśmy z lokalnej bazy danych działającej w kontenerze Docker). Dodatkowo, korzystamy z darmowej wersji MongoDB bez dedykowanego RAMu, co prawdopodobnie też odpowiada za opóźnienia. Generujemy też po prostu dużą ilość danych, np. x konwersacji na każdego użytkownika w bazie. Python to też na pewno wolniejszy język niż poprzednio używany Go.
 
+Już na etapie generowania danych widać plusy NoSQL'a dla bazy danych mediów społecznościowych. Jasna opcjonalność atrybutów encji jest bardzo pomocna, widać, że NoSQL jest znacznie bardziej elastyczny od rozwiązań opartych w całości na SQL. Python to język, w którym można bardzo szybko i zwięźle pisać kod, ale mogą być większe obawy o niepoprawne typy, dlatego dodaliśmy w większości miejsc typowanie (choć nadal nie gwarantuje to 100\% pewności). Łączenie się z bazą danych MongoDB jest uproszczone najbardziej, jak to tylko możliwe.
 
 \textbf{Język}: \href{https://www.python.org/}{Python}
 
