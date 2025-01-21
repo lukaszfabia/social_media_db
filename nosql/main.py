@@ -2,29 +2,10 @@ from .database.connect import MongoDB
 from .seeder.seeder import *
 from pymongo.database import Database
 
-def generate_users(db: Database, how_many: int):
-    for i in range(how_many):
-        add_user(db=db)
 
-def generate_articles(db: Database, how_many: int):
-    for i in range(how_many):
-        add_article(db=db)
-
-def generate_groups(db: Database, how_many: int):
-    for i in range(how_many):
-        add_group(db=db)
-
-def generate_posts(db: Database, how_many: int):
-    for i in range(how_many):
-        add_post(db=db)
-
-def generate_events(db: Database, how_many: int):
-    for i in range(how_many):
-        add_event(db=db)
-
-def generate_pages(db: Database, how_many: int):
-    for i in range(how_many):
-        add_page(db=db)
+def generate(db: Database, how_many: int, add_function):
+    for _ in range(how_many):
+        add_function(db=db)
 
 
 if __name__ == "__main__":

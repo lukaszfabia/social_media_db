@@ -17,7 +17,7 @@ example:
 
 ```sh
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.gheyk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-DATABASE_NAME=cluster0
+DATABASE_NAME=social_media_db
 ```
 
 ### Running
