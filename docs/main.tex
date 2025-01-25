@@ -719,10 +719,49 @@ Już na etapie generowania danych widać plusy NoSQL'a dla bazy danych mediów s
 \textbf{Generowanie sztucznych danych}: \href{https://faker.readthedocs.io/en/master/}{Faker}
 
 
+\section{Etap 13: Faza fizyczna }
+
+\subsection{Definicja raportów i funkcji wyszukiwania}
+\quad Poniżej znajduje się 10 zapytań, które zostały napisane w celu przeszukania i stworzenia raportów na podstawie bazy danych:
+
+\begin{itemize}
+    \item Artykuły najpopularniejszaego autora
+    \item Użytkownik z największą liczbą artykułów
+    \item Najdłuższe artykuły z ostatnich 10 dni
+    \item Ostatnia wiadomość z każdej z 5 ostatnich konwersacji użytkownika
+    \item Średnia liczba znajomych
+    \item Średnia liczba poszczególnych reakcji na posty w ostatnim miesiącu
+    \item Wydarzenia, w których wezmą udział znajomi autora
+    \item Tagi stron, posortowane po średniej liczbie wyświetleń i polubień
+    \item Użytkownicy, z którymi użytkownik ma wspólnych znajomych
+    \item Użytkownik z najwiekszą średnią liczbą reakcji na posty
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{docs/images/last_message_nosql.png}
+    \caption{Wynik kwerendy wyszukującej ostatnią wiadomość z ostatnich konwersacji użytkownika}
+    \label{fig:nosql_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{docs/images/mutual_friends_nosql.png}
+    \caption{Wynik kwerendy wyszukującej użytkowników ze wspólnymi znajomymi}
+    \label{fig:nosql_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{docs/images/events_with_your_friends_nosql.png}
+    \caption{Wynik kwerendy wyszukującej wydarzenia, na które zapisali się znajomi użytkownika}
+    \label{fig:nosql_2}
+\end{figure}
+
+
 \bibliography{sample}
 \bibliographystyle{abbrv}
 
 \end{document}
-
 
 
