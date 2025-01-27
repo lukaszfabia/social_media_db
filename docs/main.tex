@@ -758,6 +758,29 @@ Już na etapie generowania danych widać plusy NoSQL'a dla bazy danych mediów s
     \label{fig:nosql_2}
 \end{figure}
 
+\subsection{Analiza porównawcza z projektem relacyjnej bazy danych}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|p{4cm}|p{5cm}|p{5cm}|}
+        \hline
+        \textbf{Cechy} & \textbf{SQL - PostgreSQL} & \textbf{NoSQL - MongoDB} \\ \hline
+        \textbf{Spójność danych} & ACID - natychmiastowa & BASE - ostateczna \\ \hline
+        \textbf{Struktura danych} & Jasno zdefiniowany schemat, powiązania między danymi są realizowane przez klucze obce i relacje między tabelami & Dane przechowywane w dokumentach JSON, elastyczna struktura, możliwość przechowywania różnych struktur w tej samej kolekcji \\ \hline
+        \textbf{Modelowanie relacji} &  Normalizacja, a co za tym idzie wiele tabel asocjacyjnych  & Częściowa denormalizacja danych, zagnieżdżone obiekty w jednym dokumencie \\ \hline
+        \textbf{Zapytania} & SQL jest bardziej rozbudowany i precyzyjny w operacjach na znormalizowanych danych &  MongoDB wymaga użycia składni JSON, co jest mniej intuicyjne dla skomplikowanych operacji, ale pozwala na łatwe pobieranie całych dokumentów \\ \hline
+        \textbf{Skalowalność} & Pionowa - zwiększanie mocy serwera &  Horyzontalna - dodawanie kolejnych serwerów\\ \hline
+        \textbf{Wydajność} & Dzięki wykorzystaniu SQL oraz relacyjnej naturze danych doskonale radzą sobie z obsługą złożonych zapytań, w tym z łączeniami wielu tabel oraz agregacjami  &  Zazwyczaj nie wspierają złożonych zapytań i łączeń, co często wymusza dodatkowe przetwarzanie na poziomie aplikacji. Są zoptymalizowane pod kątem prostych operacji odczytu i zapisu, co może przynosić korzyści wydajnościowe w określonych scenariuszach \\ \hline
+    \end{tabular}
+    \caption{Porównanie baz SQL z NoSQL}
+    \label{tab:sql_nosql_comparison}
+\end{table}
+
+
+\quad Jak widać w Tabeli \ref{tab:sql_nosql_comparison}, bazy SQL i NoSQL mają wiele różnic, zatem będą mieć też różne zastosowania. Bazy SQL lepiej sprawdzą się gdy spójność jest kluczowa, struktura danych jest sztywno zdefiniowana, a rozmiar umiarkowany, czyli np. w finansach czy ERP. Natomiast bazy 
+NoSQL będą lepszym wyborem gdy mamy do czynienia z danymi o dużym rozmiarze i dynamicznej strukturze oraz gdy zależy nam na wydajnośći odczytu/zapisu. Przykładem tutaj mogą być jak w naszym przypadku media społecznościowe, ale też na przykład analizy big data etc.
+
+\quad Jako że bazy mediów społecznościowych idealnie wpisują się w założenia baz NoSQL to nie było koniczności zmieniania założeń, ponieważ wszystkie były możliwe do zrealizowania. Pojawiła się jedynie potrzeba denormalizacji danych (np. przechowywanie zagnieżdżonych struktur zamiast tabel asocjacyjnych) oraz samodzielnego zarządzania integralnością danych, ponieważ MongoDB nie wymaga zdefiniowanego schematu
 
 \bibliography{sample}
 \bibliographystyle{abbrv}
