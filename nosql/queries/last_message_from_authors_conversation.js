@@ -1,8 +1,13 @@
 db.users.aggregate
 [
+	{
+		$addFields: {
+			conversationCount: {$size: "$conversations"}
+		}
+	},
   {
 	$sort:{
-    	"user_read_only.name": 1
+    	"conversationCount": -1
 	}
   },
   {

@@ -448,9 +448,15 @@ def user_with_most_avg_reactions_per_post():
 def last_message_from_conversation():
     collection_name = "users"
     pipline = [
-        {
+         {
+            '$addFields': {
+                'conversationCount': {
+                    '$size': '$conversations'
+                }
+            }
+        }, {
             '$sort': {
-                'user_read_only.name': 1
+                'conversationCount': -1
             }
         }, {
             '$limit': 1
