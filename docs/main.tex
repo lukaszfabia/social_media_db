@@ -782,6 +782,21 @@ NoSQL będą lepszym wyborem gdy mamy do czynienia z danymi o dużym rozmiarze i
 
 \quad Jako że bazy mediów społecznościowych idealnie wpisują się w założenia baz NoSQL to nie było koniczności zmieniania założeń, ponieważ wszystkie były możliwe do zrealizowania. Pojawiła się jedynie potrzeba denormalizacji danych (np. przechowywanie zagnieżdżonych struktur zamiast tabel asocjacyjnych) oraz samodzielnego zarządzania integralnością danych, ponieważ MongoDB nie wymaga zdefiniowanego schematu
 
+
+Warto dodać, że zazwyczaj duże systemy wykorzystują różne typy baz nie tylko dokumentowe czy relacyjne, ale też inne:
+
+
+\begin{itemize}
+  \item realtime database - jako kanały komunikacji
+  \item bazy grafowe - do pokazania relacji miedzy obiektami
+  \item bazy kolumnowe - do przechowywania dużej ilości danych 
+\end{itemize}
+
+
+Często właśnie łączy się kilka tych rozwiązań, aby mieć więcej możliwości skalowania aplikacji, dlatego serwisy takie jak twiiter korzystają z architektury mikroserwisów z uwagi na spory ruch, dodatkowo każda baza jest odpowiednio zopytmalizowana pod jakimś kontem (wady - zalety).
+
+
+
 \bibliography{sample}
 \bibliographystyle{abbrv}
 
